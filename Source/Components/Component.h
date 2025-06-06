@@ -1,7 +1,3 @@
-//
-// Created by Lucas on 06/05/2025.
-//
-
 // ----------------------------------------------------------------
 // From Game Programming in C++ by Sanjay Madhav
 // Copyright (C) 2017 Sanjay Madhav. All rights reserved.
@@ -11,19 +7,22 @@
 // ----------------------------------------------------------------
 
 #pragma once
-#include <SDL2/SDL_stdinc.h>
+#include <SDL_stdinc.h>
 
-class Component {
+class Component
+{
 public:
     // Constructor
     // (the lower the update order, the earlier the component updates)
     explicit Component(class Actor* owner, int updateOrder = 100);
     // Destructor
     virtual ~Component();
-    // Update this component by delta time
+    // Reinsert this component by delta time
     virtual void Update(float deltaTime);
     // Process input for this component (if needed)
     virtual void ProcessInput(const Uint8* keyState);
+    // Handle key press for this component (if needed)
+    virtual void HandleKeyPress(const int key, const bool isPressed);
 
     int GetUpdateOrder() const { return mUpdateOrder; }
     class Actor* GetOwner() const { return mOwner; }
@@ -35,7 +34,7 @@ public:
 protected:
     // Owning actor
     class Actor* mOwner;
-    // Update order
+    // Reinsert order
     int mUpdateOrder;
 
     bool mIsEnabled;

@@ -7,7 +7,8 @@
 #include "../../Math.h"
 #include <vector>
 
-class CircleColliderComponent : public Component {
+class CircleColliderComponent : public Component
+{
 public:
     CircleColliderComponent(class Actor* owner, float radius, int updateOrder = 10);
 

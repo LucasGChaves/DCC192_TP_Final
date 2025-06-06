@@ -1,7 +1,3 @@
-//
-// Created by Lucas on 06/05/2025.
-//
-
 // ----------------------------------------------------------------
 // From Game Programming in C++ by Sanjay Madhav
 // Copyright (C) 2017 Sanjay Madhav. All rights reserved.
@@ -12,99 +8,104 @@
 
 #pragma once
 #include <vector>
-#include <SDL2/SDL_stdinc.h>
+#include <SDL_stdinc.h>
 #include "../Math.h"
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 
-enum class ActorState {
+enum class ActorState
+{
     Active,
     Paused,
     Destroy
 };
 
-class Actor {
-    public:
-        Actor(class Game* game);
-        virtual ~Actor();
+class Actor
+{
+public:
+    Actor(class Game* game);
+    virtual ~Actor();
 
-        // Update function called from Game (not overridable)
-        void Update(float deltaTime);
-        // ProcessInput function called from Game (not overridable)
-        void ProcessInput(const Uint8* keyState);
+    // Reinsert function called from Game (not overridable)
+    void Update(float deltaTime);
+    // ProcessInput function called from Game (not overridable)
+    void ProcessInput(const Uint8* keyState);
+    // HandleKeyPress function called from Game (not overridable)
+    void HandleKeyPress(const int key, const bool isPressed);
 
-        // Position getter/setter
-        const Vector2& GetPosition() const { return mPosition; }
-        void SetPosition(const Vector2& pos) { mPosition = pos; }
+    // Position getter/setter
+    const Vector2& GetPosition() const { return mPosition; }
+    void SetPosition(const Vector2& pos);
 
-        Vector2 GetForward() const { return Vector2(Math::Cos(mRotation), -Math::Sin(mRotation)); }
+    Vector2 GetForward() const { return Vector2(Math::Cos(mRotation), -Math::Sin(mRotation)); }
 
-        // Scale getter/setter
-        float GetScale() const { return mScale; }
-        void SetScale(float scale) { mScale = scale; }
+    // Scale getter/setter
+    float GetScale() const { return mScale; }
+    void SetScale(float scale) { mScale = scale; }
 
-        // Rotation getter/setter
-        float GetRotation() const { return mRotation; }
-        void SetRotation(float rotation) { mRotation = rotation; }
+    // Rotation getter/setter
+    float GetRotation() const { return mRotation; }
+    void SetRotation(float rotation) { mRotation = rotation; }
 
-        // State getter/setter
-        ActorState GetState() const { return mState; }
-        void SetState(ActorState state) { mState = state; }
+    // State getter/setter
+    ActorState GetState() const { return mState; }
+    void SetState(ActorState state) { mState = state; }
 
-        // Game getter
-        class Game* GetGame() { return mGame; }
+    // Game getter
+    class Game* GetGame() { return mGame; }
 
-        // Returns component of type T, or null if doesn't exist
-        template <typename T>
-        T* GetComponent() const
+    // Returns component of type T, or null if doesn't exist
+    template <typename T>
+    T* GetComponent() const
+    {
+        for (auto c : mComponents)
         {
-            for (auto c : mComponents)
+            T* t = dynamic_cast<T*>(c);
+            if (t != nullptr)
             {
-                T* t = dynamic_cast<T*>(c);
-                if (t != nullptr)
-                {
-                    return t;
-                }
+                return t;
             }
-
-            return nullptr;
         }
 
-        // Game specific
-        void SetOnGround() { mIsOnGround = true; };
-        void SetOffGround() { mIsOnGround = false; };
-        bool IsOnGround() const { return mIsOnGround; };
+        return nullptr;
+    }
 
-        // Any actor-specific collision code (overridable)
-        virtual void OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other);
-        virtual void OnVerticalCollision(const float minOverlap, AABBColliderComponent* other);
-        virtual void Kill();
+    // Game specific
+    void SetOnGround() { mIsOnGround = true; };
+    void SetOffGround() { mIsOnGround = false; };
+    bool IsOnGround() const { return mIsOnGround; };
+    bool IsVisibleOnCamera() const;
 
-    protected:
-        class Game* mGame;
+    // Any actor-specific collision code (overridable)
+    virtual void OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other);
+    virtual void OnVerticalCollision(const float minOverlap, AABBColliderComponent* other);
+    virtual void Kill();
 
-        // Any actor-specific update code (overridable)
-        virtual void OnUpdate(float deltaTime);
-        // Any actor-specific update code (overridable)
-        virtual void OnProcessInput(const Uint8* keyState);
+protected:
+    class Game* mGame;
 
-        // Actor's state
-        ActorState mState;
+    // Any actor-specific update code (overridable)
+    virtual void OnUpdate(float deltaTime);
+    virtual void OnProcessInput(const Uint8* keyState);
+    virtual void OnHandleKeyPress(const int key, const bool isPressed);
 
-        // Transform
-        Vector2 mPosition;
-        float mScale;
-        float mRotation;
+    // Actor's state
+    ActorState mState;
 
-        // Components
-        std::vector<class Component*> mComponents;
+    // Transform
+    Vector2 mPosition;
+    float mScale;
+    float mRotation;
 
-        // Game specific
-        bool mIsOnGround;
+    // Components
+    std::vector<class Component*> mComponents;
 
-    private:
-        friend class Component;
+    // Game specific
+    bool mIsOnGround;
 
-        // Adds component to Actor (this is automatically called
-        // in the component constructor)
-        void AddComponent(class Component* c);
+private:
+    friend class Component;
+
+    // Adds component to Actor (this is automatically called
+    // in the component constructor)
+    void AddComponent(class Component* c);
 };

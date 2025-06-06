@@ -1,7 +1,3 @@
-//
-// Created by Lucas on 06/05/2025.
-//
-
 // ----------------------------------------------------------------
 // From Game Programming in C++ by Sanjay Madhav
 // Copyright (C) 2017 Sanjay Madhav. All rights reserved.
