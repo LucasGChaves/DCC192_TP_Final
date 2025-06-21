@@ -3,10 +3,11 @@
 //
 
 #include "SpatialHashing.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <algorithm>
 
 SpatialHashing::SpatialHashing(int cellSize, int width, int height)
-    : mCellSize(cellSize), mWidth(width), mHeight(height)
+        : mCellSize(cellSize), mWidth(width), mHeight(height)
 {
     int cols = (width + cellSize - 1) / cellSize;
     int rows = (height + cellSize - 1) / cellSize;
@@ -20,10 +21,10 @@ SpatialHashing::~SpatialHashing()
     {
         for (auto& cell : row)
         {
-           while(!cell.empty())
-           {
-               delete cell.back();; // Assuming ownership of actors
-           }
+            while(!cell.empty())
+            {
+                delete cell.back();; // Assuming ownership of actors
+            }
 
             cell.clear();
         }
@@ -127,9 +128,9 @@ std::vector<AABBColliderComponent *> SpatialHashing::QueryColliders(const Vector
 }
 
 std::vector<Actor*> SpatialHashing::QueryOnCamera(const Vector2& cameraPosition,
-                                                                  const float screenWidth,
-                                                                  const float screenHeight,
-                                                                  const float extraRadius) const
+                                                  const float screenWidth,
+                                                  const float screenHeight,
+                                                  const float extraRadius) const
 {
     std::vector<Actor*> results;
 

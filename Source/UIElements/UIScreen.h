@@ -49,7 +49,7 @@ public:
     // Add a button to this screen
     UIButton* AddButton(const std::string& name, const Vector2& pos, const Vector2& dims, std::function<void()> onClick);
     UIText* AddText(const std::string& name, const Vector2& pos, const Vector2& dims, const int pointSize = 40, const int unsigned wrapLength = 1024);
-    UIImage* AddImage(const std::string& imagePath, const Vector2& pos, const Vector2& dims, const Vector3& color = Color::White);
+    UIImage* AddImage(SDL_Renderer *renderer,  const std::string& imagePath, const Vector2& pos, const Vector2& dims, const Vector3& color = Color::White);
 
 protected:
     // Sets the mouse mode to relative or not

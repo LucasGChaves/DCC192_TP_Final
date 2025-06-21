@@ -11,9 +11,9 @@
 #include <fstream>
 #include <map>
 #include <vector>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include "CSV.h"
 #include "Random.h"
 #include "Game.h"
@@ -100,25 +100,43 @@ bool Game::Initialize()
     // Start random number generator
     Random::Init();
 
-    // TODO
+    mAudio = new AudioSystem(8);
+
+
+    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f,
+                                         LEVEL_WIDTH * TILE_SIZE,
+                                         LEVEL_HEIGHT * TILE_SIZE);
+    mTicksCount = SDL_GetTicks();
 
     //mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
     mTicksCount = SDL_GetTicks();
 
     // Init all game actors
-    //SetGameScene(GameScene::MainMenu);
+    SetGameScene(GameScene::MainMenu);
 
     return true;
 }
 
 void Game::SetGameScene(Game::GameScene scene, float transitionTime)
 {
-    // TODO
+    if (mSceneManagerState != SceneManagerState::None){
+        SDL_Log("SetGameScene: Scene transition already in progress.");
+        return;
+    }
+    if (scene == GameScene::MainMenu || scene == GameScene::Level1 || scene == GameScene::Level2){
+        mNextScene = scene;
+        mSceneManagerState = SceneManagerState::Entering;
+        mSceneManagerTimer = transitionTime;
+    }else{
+        SDL_Log("SetGameScene: Invalid scene passed.");
+        return;
+    }
 }
 
 void Game::ResetGameScene(float transitionTime)
 {
     // TODO
+    SetGameScene(mGameScene, transitionTime);
 }
 
 void Game::ChangeScene()
@@ -144,6 +162,7 @@ void Game::ChangeScene()
         // TODO
 
         // Initialize main menu actors
+        mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
         LoadMainMenu();
     }
     else if (mNextScene == GameScene::Level1)
@@ -170,7 +189,18 @@ void Game::LoadMainMenu()
 {
     // TODO
 
-    // Esse método será usado para criar uma tela de UI e adicionar os elementos do menu principal.
+    auto mainMenu = new UIScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+    const Vector2 backgroundSize = Vector2(1600.0f, 900.0f);
+    const Vector2 backgroundPos = Vector2(mWindowWidth/2.0f - backgroundSize.x/2.0f, 0.0f);
+    const Vector2 titleSize = Vector2(250.0f, 270.0f) * 2.0f;
+    const Vector2 titlePos = Vector2(mWindowWidth/2.0f - titleSize.x/2.0f, 50.0f);
+    mainMenu->AddImage(mRenderer, "../Assets/Images/Background.png", backgroundPos, backgroundSize);
+    mainMenu->AddImage(mRenderer, "../Assets/Images/Logo.png", titlePos, titleSize);
+
+
+    auto button1 = mainMenu->AddButton("Begin Quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f), Vector2(400.0f, 80.0f),
+                                       [this]() {SetGameScene(GameScene::Level1);});
+
 }
 
 void Game::LoadLevel(const std::string& levelName, const int levelWidth, const int levelHeight)
@@ -276,9 +306,9 @@ void Game::RunLoop()
 {
     while (mIsRunning)
     {
-        //ProcessInput();
-        //UpdateGame();
-        //GenerateOutput(); // TODO - descomentar depois
+        ProcessInput();
+        UpdateGame();
+        GenerateOutput();
     }
 }
 
@@ -427,12 +457,31 @@ void Game::UpdateGame()
 
     UpdateCamera();
 
-    // TODO
+    UpdateSceneManager(deltaTime);
+
+    if (mGameScene != GameScene::MainMenu && mGamePlayState == GamePlayState::Playing){
+        UpdateLevelTime(deltaTime);
+    }
 }
 
 void Game::UpdateSceneManager(float deltaTime)
 {
-    // TODO
+    if (mSceneManagerState == SceneManagerState::Entering){
+        mSceneManagerTimer -= deltaTime;
+
+        if (mSceneManagerTimer <= 0.0f){
+            mSceneManagerTimer = TRANSITION_TIME;
+            mSceneManagerState = SceneManagerState::Active;
+        }
+    }
+
+    if (mSceneManagerState == SceneManagerState::Active){
+        mSceneManagerTimer -= deltaTime;
+        if (mSceneManagerTimer <= 0.0f){
+            ChangeScene();
+            mSceneManagerState = SceneManagerState::None;
+        }
+    }
 }
 
 void Game::UpdateLevelTime(float deltaTime)
@@ -444,7 +493,7 @@ void Game::UpdateCamera()
 {
     if (!mPlayer) return;
 
-    // TODO
+    mCameraPos.x = mPlayer->GetPosition().x - (mWindowWidth / 2.0f);
 }
 
 void Game::UpdateActors(float deltaTime)
@@ -507,8 +556,6 @@ std::vector<AABBColliderComponent *> Game::GetNearbyColliders(const Vector2& pos
 
 void Game::GenerateOutput()
 {
-    // TODO - vai ser necessário alterar
-
     // Clear frame with background color
     SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
 
@@ -560,8 +607,11 @@ void Game::GenerateOutput()
         ui->Draw(mRenderer);
     }
 
-
-    // TODO
+    if (mSceneManagerState == SceneManagerState::Active) {
+        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
+        SDL_Rect fullScreenRect = {0, 0, mWindowWidth, mWindowHeight};
+        SDL_RenderFillRect(mRenderer, &fullScreenRect);
+    }
 
     // Swap front buffer and back buffer
     SDL_RenderPresent(mRenderer);
@@ -610,7 +660,21 @@ SDL_Texture* Game::LoadTexture(const std::string& texturePath)
 
 UIFont* Game::LoadFont(const std::string& fileName)
 {
-    // TODO
+    auto iter = mFonts.find(fileName);
+    if (iter != mFonts.end()){
+        return iter->second;
+    }
+    UIFont* newFont = new UIFont(mRenderer);
+    if (newFont->Load(fileName)){
+        mFonts.emplace(fileName, newFont);
+        return newFont;
+    }
+    else{
+        newFont->Unload();
+        delete newFont;
+        SDL_Log("Failed to load font: %s", fileName.c_str());
+        return nullptr;
+    }
 }
 
 void Game::UnloadScene()
@@ -634,22 +698,21 @@ void Game::UnloadScene()
 void Game::Shutdown()
 {
     // TODO - descomentar e alterar depois
-    // UnloadScene();
-    //
-    // for (auto font : mFonts) {
-    //     font.second->Unload();
-    //     delete font.second;
-    // }
-    // mFonts.clear();
-    //
-    // delete mAudio;
-    // mAudio = nullptr;
-    //
-    // Mix_CloseAudio();
-    //
-    // Mix_Quit();
-    // TTF_Quit();
-    // IMG_Quit();
+    UnloadScene();
+    for (auto font : mFonts) {
+         font.second->Unload();
+         delete font.second;
+    }
+     mFonts.clear();
+
+     delete mAudio;
+     mAudio = nullptr;
+
+     Mix_CloseAudio();
+
+     Mix_Quit();
+     TTF_Quit();
+     IMG_Quit();
 
     SDL_DestroyRenderer(mRenderer);
     SDL_DestroyWindow(mWindow);

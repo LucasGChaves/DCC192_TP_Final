@@ -16,7 +16,6 @@ DrawAnimatedComponent::DrawAnimatedComponent(class Actor* owner, const std::stri
 
 DrawAnimatedComponent::~DrawAnimatedComponent()
 {
-    DrawSpriteComponent::~DrawSpriteComponent();
 
     for (const auto& rect : mSpriteSheetData)
     {
@@ -97,3 +96,4 @@ void DrawAnimatedComponent::AddAnimation(const std::string& name, const std::vec
 {
     mAnimations.emplace(name, spriteNums);
 }
+

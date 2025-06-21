@@ -8,7 +8,7 @@
 
 #pragma once
 #include <vector>
-#include <SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include "../Math.h"
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 
