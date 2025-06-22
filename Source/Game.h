@@ -7,7 +7,7 @@
 // ----------------------------------------------------------------
 
 #pragma once
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <vector>
 #include <unordered_map>
 #include "AudioSystem.h"

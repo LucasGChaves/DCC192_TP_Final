@@ -32,6 +32,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/DrawComponents/DrawPolygonComponent.h
         Source/Actors/Player.cpp
         Source/Actors/Player.h
+        Source/Actors/Skeleton.h
+        Source/Actors/Skeleton.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
@@ -57,4 +59,4 @@ add_executable(${PROJECT_NAME}
         Source/SpatialHashing.h
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2 SDL2_image SDL2_ttf SDL2_mixer)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
