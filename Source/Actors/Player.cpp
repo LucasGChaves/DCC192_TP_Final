@@ -3,7 +3,7 @@
 #include "../Components/DrawComponents/DrawAnimatedComponent.h"
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 #include "../Components/RigidBodyComponent.h"
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <algorithm>
 
 Player::Player(Game* game, const float forwardSpeed)
