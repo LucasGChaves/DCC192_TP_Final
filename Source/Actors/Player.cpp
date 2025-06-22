@@ -27,7 +27,7 @@ Player::Player(Game* game, const float forwardSpeed)
             100
     );
 
-    mColliderComponent->SetEnabled(false);
+    mColliderComponent->SetEnabled(true);
 
     mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json");
 
@@ -42,10 +42,11 @@ Player::Player(Game* game, const float forwardSpeed)
     mDrawComponent->AddAnimation("StrikeUp", GetAnimationFramesByNamePrefix("Strike_up", 4));
     mDrawComponent->AddAnimation("StrikeSide", GetAnimationFramesByNamePrefix("Strike_horizontal", 4));
     mDrawComponent->AddAnimation("Dead", GetAnimationFramesByNamePrefix("Death", 5));
+    auto deadFrames = GetAnimationFramesByNamePrefix("Death", 5);
+    mDrawComponent->AddAnimation("Dead", deadFrames);
 
     mDrawComponent->SetAnimation("IdleDown");
     mDrawComponent->SetAnimFPS(10.0f);
-    SDL_Log("✅ Player criado em %.1f, %.1f", GetPosition().x, GetPosition().y);
 }
 
 void Player::OnProcessInput(const uint8_t* state)
@@ -102,12 +103,29 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
 
 void Player::OnUpdate(float deltaTime)
 {
-    if (mIsDying) return;
+    if (mIsDying)
+    {
+        mDeathTimer -= deltaTime;
+        if (mDeathTimer <= 0.0f)
+        {
+            mGame->SetGamePlayState(Game::GamePlayState::GameOver);
+            mGame->ResetGameScene(0.0f);
+        }
+    }
     ManageAnimations();
 }
 
 void Player::ManageAnimations()
 {
+    if (mIsDying)
+    {
+        if (mDrawComponent->GetAnimationName() != "Dead")
+        {
+            mDrawComponent->ForceSetAnimation("Dead");
+        }
+        return;
+    }
+
     const std::string& currentAnim = mDrawComponent->GetAnimationName();
     if (currentAnim.find("Strike") != std::string::npos)
     {
@@ -128,18 +146,16 @@ void Player::ManageAnimations()
 
 void Player::Kill()
 {
-    if (mIsDying) return;
-
     mIsDying = true;
-    mGame->SetGamePlayState(Game::GamePlayState::GameOver);
+    mDeathTimer = 1.0f;
 
-    mDrawComponent->SetAnimation("Dead");
+    mDrawComponent->ForceSetAnimation("Dead");
+    mRigidBodyComponent->SetVelocity(Vector2::Zero);
     mRigidBodyComponent->SetEnabled(false);
+    mColliderComponent->SetEnabled(false);
 
     mGame->GetAudio()->StopAllSounds();
     mGame->GetAudio()->PlaySound("Assets/Audio/Dead.wav");
-
-    mGame->ResetGameScene(3.5f);
 }
 
 void Player::Win(AABBColliderComponent *poleCollider)

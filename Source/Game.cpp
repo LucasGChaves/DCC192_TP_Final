@@ -20,6 +20,7 @@
 #include "HUD.h"
 #include "SpatialHashing.h"
 #include "Actors/Actor.h"
+#include "Actors/Skeleton.h"
 #include "Actors/Player.h"
 //#include "Actors/Block.h"
 #include "Actors/Spawner.h"
@@ -172,6 +173,9 @@ void Game::ChangeScene()
         //LoadLevel("../Assets/Levels/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
         mPlayer = new Player(this);
         mPlayer->SetPosition(Vector2(mWindowWidth / 2.0f, mWindowHeight / 2.0f));
+
+        Skeleton* skelly = new Skeleton(this, mPlayer);
+        skelly->SetPosition(Vector2(mWindowWidth / 2.0f - 200.0f, mWindowHeight / 2.0f));
     }
     else if (mNextScene == GameScene::Level2)
     {

@@ -20,6 +20,7 @@ public:
     void Win(class AABBColliderComponent *poleCollider);
 
 private:
+    float mDeathTimer = -1.0f;
     void ManageAnimations();
     std::vector<int> GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount);
 

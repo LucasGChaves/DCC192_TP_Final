@@ -80,10 +80,15 @@ void DrawAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modColor
 
 void DrawAnimatedComponent::ForceSetAnimation(const std::string& name)
 {
-    if (mAnimations.find(name) != mAnimations.end())
+    if (mAnimName != name && mAnimations.find(name) != mAnimations.end())
     {
+        SDL_Log("🎞️ SetAnimation: %s", name.c_str());
         mAnimName = name;
         mAnimTimer = 0.0f;
+    }
+    else if (mAnimations.find(name) == mAnimations.end())
+    {
+        SDL_Log("❌ Animacao '%s' nao encontrada!", name.c_str());
     }
 }
 
