@@ -47,7 +47,11 @@ public:
     Vector2 GetCenter() const;
     ColliderLayer GetLayer() const { return mLayer; }
 
+    void SetEnabled(bool enabled) { mIsEnabled = enabled; }
+    bool IsEnabled() const { return mIsEnabled; }
+
 private:
+    bool mIsEnabled = true;
     float GetMinVerticalOverlap(AABBColliderComponent* b) const;
     float GetMinHorizontalOverlap(AABBColliderComponent* b) const;
 

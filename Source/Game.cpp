@@ -159,7 +159,6 @@ void Game::ChangeScene()
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
-        // TODO
 
         // Initialize main menu actors
         mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
@@ -171,6 +170,8 @@ void Game::ChangeScene()
 
         // Initialize actors
         //LoadLevel("../Assets/Levels/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+        mPlayer = new Player(this);
+        mPlayer->SetPosition(Vector2(mWindowWidth / 2.0f, mWindowHeight / 2.0f));
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -371,27 +372,19 @@ void Game::ProcessInputActors()
 
 void Game::HandleKeyPressActors(const int key, const bool isPressed)
 {
-    if(mGamePlayState == GamePlayState::Playing)
+    std::vector<Actor*> actorsOnCamera = mSpatialHashing->QueryOnCamera(mCameraPos, mWindowWidth, mWindowHeight);
+    bool isPlayerOnCamera = false;
+
+    for (auto actor : actorsOnCamera)
     {
-        // Get actors on camera
-        std::vector<Actor*> actorsOnCamera =
-                mSpatialHashing->QueryOnCamera(mCameraPos,mWindowWidth,mWindowHeight);
+        actor->HandleKeyPress(key, isPressed);
+        if (actor == mPlayer)
+            isPlayerOnCamera = true;
+    }
 
-        // Handle key press for actors
-        bool isPlayerOnCamera = false;
-        for (auto actor: actorsOnCamera) {
-            actor->HandleKeyPress(key, isPressed);
-
-            if (actor == mPlayer) {
-                isPlayerOnCamera = true;
-            }
-        }
-
-        // If Player is not on camera, handle key press for him
-        if (!isPlayerOnCamera && mPlayer)
-        {
-            mPlayer->HandleKeyPress(key, isPressed);
-        }
+    if (!isPlayerOnCamera && mPlayer)
+    {
+        mPlayer->HandleKeyPress(key, isPressed);
     }
 
 }
@@ -494,41 +487,43 @@ void Game::UpdateCamera()
     if (!mPlayer) return;
 
     mCameraPos.x = mPlayer->GetPosition().x - (mWindowWidth / 2.0f);
+    mCameraPos.y = mPlayer->GetPosition().y - (mWindowHeight / 2.0f);
 }
 
 void Game::UpdateActors(float deltaTime)
 {
-    // Get actors on camera
     std::vector<Actor*> actorsOnCamera =
-        mSpatialHashing->QueryOnCamera(mCameraPos,mWindowWidth,mWindowHeight);
+            mSpatialHashing->QueryOnCamera(mCameraPos, mWindowWidth, mWindowHeight);
 
+    std::vector<Actor*> toDelete;
     bool isPlayerOnCamera = false;
+
     for (auto actor : actorsOnCamera)
     {
         actor->Update(deltaTime);
         if (actor == mPlayer)
-        {
             isPlayerOnCamera = true;
-        }
+
+        if (actor->GetState() == ActorState::Destroy)
+            toDelete.emplace_back(actor);
     }
 
-    // If Player is not on camera, reset camera position
     if (!isPlayerOnCamera && mPlayer)
     {
-         mPlayer->Update(deltaTime);
+        mPlayer->Update(deltaTime);
     }
 
-    for (auto actor : actorsOnCamera)
+    // Remoção separada para evitar usar ponteiros já deletados
+    for (auto actor : toDelete)
     {
-        if (actor->GetState() == ActorState::Destroy)
+        if (actor == mPlayer)
         {
-            delete actor;
-            if (actor == mPlayer) {
-                mPlayer = nullptr;
-            }
+            mPlayer = nullptr;
         }
+        delete actor;
     }
 }
+
 
 void Game::AddActor(Actor* actor)
 {
