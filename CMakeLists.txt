@@ -32,6 +32,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/DrawComponents/DrawPolygonComponent.h
         Source/Actors/Player.cpp
         Source/Actors/Player.h
+        Source/Actors/Skeleton.h
+        Source/Actors/Skeleton.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp

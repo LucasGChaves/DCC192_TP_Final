@@ -7,16 +7,16 @@
 #include "../../Game.h"
 
 DrawComponent::DrawComponent(class Actor* owner, int drawOrder)
-    :Component(owner)
-    ,mDrawOrder(drawOrder)
-    ,mIsVisible(true)
+        :Component(owner)
+        ,mDrawOrder(drawOrder)
+        ,mIsVisible(true)
 {
-    //    mOwner->GetGame()->AddDrawable(this);
+//    mOwner->GetGame()->AddDrawable(this);
 }
 
 DrawComponent::~DrawComponent()
 {
-    //    mOwner->GetGame()->RemoveDrawable(this);
+//    mOwner->GetGame()->RemoveDrawable(this);
 }
 
 

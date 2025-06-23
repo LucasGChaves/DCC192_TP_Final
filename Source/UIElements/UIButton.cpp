@@ -24,19 +24,38 @@ UIButton::~UIButton()
 
 void UIButton::Draw(SDL_Renderer *renderer, const Vector2 &screenPos)
 {
-    // TODO
-    SDL_Rect titleQuad = {static_cast<int>(screenPos.x + mPosition.x),
-                          static_cast<int>(screenPos.y + mPosition.y),
-                          static_cast<int>(mSize.x),
-                          static_cast<int>(mSize.y)};
+    SDL_Rect titleQuad = {
+            static_cast<int>(screenPos.x + mPosition.x),
+            static_cast<int>(screenPos.y + mPosition.y),
+            static_cast<int>(mSize.x),
+            static_cast<int>(mSize.y)
+    };
+
+    SDL_SetRenderDrawColor(renderer, 139, 69, 19, 255);
+    SDL_RenderFillRect(renderer, &titleQuad);
 
     if (mHighlighted)
     {
-        SDL_SetRenderDrawColor(renderer, 200, 100, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 210, 105, 30, 100);
         SDL_RenderFillRect(renderer, &titleQuad);
     }
 
-    mText.Draw(renderer, screenPos + mPosition + mSize * 0.5f - mText.GetSize() * 0.5f);
+    SDL_SetRenderDrawColor(renderer, 100, 50, 10, 100);
+    SDL_Rect shadowRect = {
+            titleQuad.x + 3,
+            titleQuad.y + 3,
+            titleQuad.w - 6,
+            titleQuad.h - 6
+    };
+    SDL_RenderFillRect(renderer, &shadowRect);
+
+    SDL_SetRenderDrawColor(renderer, 60, 30, 0, 255); // Borda
+    SDL_RenderDrawRect(renderer, &titleQuad);
+
+    mText.Draw(
+            renderer,
+            screenPos + mPosition + mSize * 0.5f - mText.GetSize() * 0.5f
+    );
 }
 
 void UIButton::OnClick()
