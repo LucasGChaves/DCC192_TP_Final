@@ -174,8 +174,29 @@ void Game::ChangeScene()
         mPlayer = new Player(this);
         mPlayer->SetPosition(Vector2(mWindowWidth / 2.0f, mWindowHeight / 2.0f));
 
-        Skeleton* skelly = new Skeleton(this, mPlayer);
-        skelly->SetPosition(Vector2(mWindowWidth / 2.0f - 200.0f, mWindowHeight / 2.0f));
+
+        const float minDistance = 200.0f;
+        Vector2 minBounds(0.0f, 0.0f);
+        Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
+
+        for (int i = 0; i < 5; ++i) {
+            Vector2 spawnPos;
+            bool validPos = false;
+
+            while (!validPos) {
+                spawnPos = Random::GetVector(minBounds, maxBounds);
+
+                Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
+                float distance = toPlayer.Length();
+
+                if (distance >= minDistance) {
+                    validPos = true;
+                }
+            }
+
+            auto* newSkeleton = new Skeleton(this, mPlayer);
+            newSkeleton->SetPosition(spawnPos);
+        }
     }
     else if (mNextScene == GameScene::Level2)
     {
