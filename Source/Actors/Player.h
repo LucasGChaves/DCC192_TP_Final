@@ -19,6 +19,8 @@ public:
     void EnableCollision(bool enabled);
     void Win(class AABBColliderComponent *poleCollider);
 
+    void Hit();
+
 private:
     float mDeathTimer = -1.0f;
     void ManageAnimations();
@@ -28,6 +30,9 @@ private:
     bool mIsRunning;
     bool mIsDying;
     std::string mLastDirection;
+
+    int mHearts;
+    float mInvincibleTime;
 
     class RigidBodyComponent* mRigidBodyComponent;
     class DrawAnimatedComponent* mDrawComponent;
