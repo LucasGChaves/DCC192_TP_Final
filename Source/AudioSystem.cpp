@@ -9,19 +9,41 @@ SoundHandle SoundHandle::Invalid;
 // (Defaults to 8 channels)
 AudioSystem::AudioSystem(int numChannels)
 {
-    // TODO
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Failed to initialize SDL_mixer: %s", Mix_GetError());
+	}
+	Mix_AllocateChannels(numChannels);
+	mChannels.resize(numChannels);
 }
 
 // Destroy the AudioSystem
 AudioSystem::~AudioSystem()
 {
-    // TODO
+	for (auto& soundPair : mSounds) {
+		Mix_FreeChunk(soundPair.second);
+	}
+
+	mSounds.clear();
+	Mix_CloseAudio();
 }
 
 // Updates the status of all the active sounds every frame
 void AudioSystem::Update(float deltaTime)
 {
-    // TODO
+	for (size_t i = 0; i < mChannels.size(); ++i)
+	{
+		if (Mix_Playing(static_cast<int>(i)) == 0)
+		{
+			SoundHandle handle = mChannels[i];
+
+			auto handleIt = mHandleMap.find(handle);
+			if (handleIt != mHandleMap.end()) {
+				mHandleMap.erase(handleIt);
+			}
+
+			mChannels[i].Reset();
+		}
+	}
 }
 
 // Plays the sound with the specified name and loops if looping is true
@@ -37,7 +59,65 @@ SoundHandle AudioSystem::PlaySound(const std::string& soundName, bool looping)
 
     // TODO
 
+	if (!sound)
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Failed to load sound: %s", soundName.c_str());
+		return SoundHandle::Invalid;
+	}
+
     int availableChannel = -1;
+
+	for (size_t i = 0; i < mChannels.size(); ++i)
+	{
+		if (!mChannels[i].IsValid())
+		{
+			availableChannel = static_cast<int>(i);
+			break;
+		}
+	}
+
+	if (availableChannel == -1)
+	{
+		for (auto& [handle, info] : mHandleMap)
+		{
+			if (info.mSoundName == soundName)
+			{
+				availableChannel = info.mChannel;
+				SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Stoping sound: %s", info.mSoundName.c_str());
+				mHandleMap.erase(handle);
+				break;
+			}
+		}
+	}
+
+	if (availableChannel == -1)
+	{
+		for (auto& [handle, info] : mHandleMap)
+		{
+			if (info.mIsLooping)
+			{
+				StopSound(handle);
+				availableChannel = info.mChannel;
+				SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Stoping sound: %s", info.mSoundName.c_str());
+				break;
+			}
+		}
+	}
+
+	if (availableChannel == -1 && !mHandleMap.empty())
+	{
+		auto oldestHandle = mHandleMap.begin()->first;
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Stoping oldest sound.");
+		StopSound(oldestHandle);
+		availableChannel = mHandleMap.begin()->second.mChannel;
+	}
+
+	++mLastHandle;
+	HandleInfo handleInfo{ soundName, availableChannel, looping, false };
+	mHandleMap[mLastHandle] = handleInfo;
+	mChannels[availableChannel] = mLastHandle;
+
+	Mix_PlayChannel(availableChannel, sound, looping ? -1 : 0);
 
     return mLastHandle;
 }
@@ -45,19 +125,54 @@ SoundHandle AudioSystem::PlaySound(const std::string& soundName, bool looping)
 // Stops the sound if it is currently playing
 void AudioSystem::StopSound(SoundHandle sound)
 {
-    // TODO
+	auto handleIt = mHandleMap.find(sound);
+	if (handleIt == mHandleMap.end())
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Attempted to stop a non-existent sound handle.");
+		return;
+	}
+
+	int channel = handleIt->second.mChannel;
+	Mix_HaltChannel(channel);
+	mHandleMap.erase(handleIt);
+	mChannels[channel].Reset();
 }
 
 // Pauses the sound if it is currently playing
 void AudioSystem::PauseSound(SoundHandle sound)
 {
-    // TODO
+	auto handleIt = mHandleMap.find(sound);
+	if (handleIt == mHandleMap.end())
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Attempted to pause a non-existent sound handle.");
+		return;
+	}
+
+	int channel = handleIt->second.mChannel;
+	if (handleIt->second.mIsPaused) {
+		return;
+	}
+	Mix_Pause(channel);
+	handleIt->second.mIsPaused = true;
 }
 
 // Resumes the sound if it is currently paused
 void AudioSystem::ResumeSound(SoundHandle sound)
 {
-    // TODO
+	auto handleIt = mHandleMap.find(sound);
+
+	if (handleIt == mHandleMap.end())
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Attempted to resume a non-existent sound handle.");
+		return;
+	}
+
+	int channel = handleIt->second.mChannel;
+	if (!handleIt->second.mIsPaused) {
+		return;
+	}
+	Mix_Resume(channel);
+	handleIt->second.mIsPaused = false;
 }
 
 // Returns the current state of the sound

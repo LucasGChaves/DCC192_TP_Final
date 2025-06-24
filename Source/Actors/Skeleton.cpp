@@ -57,6 +57,13 @@ void Skeleton::OnUpdate(float deltaTime)
         {
             mDrawComponent->SetAnimation("WalkDown");
         }
+
+        mStepTimer -= deltaTime;
+        if (mStepTimer <= 0.0f)
+        {
+            mGame->GetAudio()->PlaySound("PlayerWalk.wav");
+            mStepTimer = 0.2f;
+        }
     }
     else
     {

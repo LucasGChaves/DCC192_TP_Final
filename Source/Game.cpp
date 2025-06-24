@@ -163,11 +163,16 @@ void Game::ChangeScene()
 
         // Initialize main menu actors
         mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
+
+        mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
+
         LoadMainMenu();
     }
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
+        mAudio->StopSound(mMusicHandle);
+        // mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize actors
         //LoadLevel("../Assets/Levels/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
