@@ -12,6 +12,8 @@ Player::Player(Game* game, const float forwardSpeed)
         , mIsDying(false)
         , mForwardSpeed(forwardSpeed)
         , mLastDirection("Down")
+        , mHearts(5)
+        , mInvincibleTime(.0f)
 {
     SetPosition(Vector2(100.0f, 100.0f));
     float scale = mGame->GetWindowHeight() / 240.0f;
@@ -107,8 +109,20 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
     }
 }
 
+void Player::Hit() {
+    if (mInvincibleTime >= .0f) return;
+
+    mHearts -= 1;
+    mInvincibleTime = 2.f;
+}
+
+
 void Player::OnUpdate(float deltaTime)
 {
+    if (mHearts <= 0) Kill();
+
+    if (mInvincibleTime >= .0f) mInvincibleTime -= deltaTime;
+
     if (mIsDying)
     {
         mDeathTimer -= deltaTime;
@@ -184,7 +198,7 @@ void Player::OnHorizontalCollision(const float minOverlap, AABBColliderComponent
 {
     if (other->GetLayer() == ColliderLayer::Enemy)
     {
-        Kill();
+        Hit();
     }
 }
 
@@ -198,7 +212,7 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
 {
     if (other->GetLayer() == ColliderLayer::Enemy)
     {
-        Kill();
+        Hit();
     }
 }
 
