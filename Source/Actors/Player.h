@@ -20,6 +20,7 @@ public:
     void Win(class AABBColliderComponent *poleCollider);
 
     void Hit();
+    int GetHearts() const { return mHearts; }
 
 private:
     float mDeathTimer = -1.0f;

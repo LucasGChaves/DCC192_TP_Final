@@ -5,7 +5,6 @@
 #include "../Components/RigidBodyComponent.h"
 #include <SDL_mixer.h>
 #include <algorithm>
-#include "../HUD.h"
 
 Player::Player(Game* game, const float forwardSpeed)
         : Actor(game)
@@ -115,7 +114,7 @@ void Player::Hit() {
 
     mHearts -= 1;
     mInvincibleTime = 2.f;
-    mGame->GetHUD()->SetLives(mHearts);
+    // mGame->GetHUD()->SetLives(mHearts);
 }
 
 

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <string>
-
 #include "UIElements/UIScreen.h"
 
 class HUD : public UIScreen
@@ -34,17 +33,19 @@ public:
 
     void SetLevelName(const std::string& levelName);
 
+    void Update(float deltaTime) override;
+    void Draw(class SDL_Renderer *renderer) override;
+
+    void UpdateHeartImages(SDL_Renderer* renderer);
     Vector2 GetHeartPosition(int index) const;
-    void SetLives(int lives);
 
 private:
-    // HUD elements
-    UIText* mScoreCounter;
-    UIText* mLevelName;
-    UIText* mLivesCount;
-    UIText* mTimeText;
-
     float hudScale;
     Vector2 hudPos;
+
+    int mCurrentHearts;
+    int mlastDrawnLives;
     std::vector<UIImage*> mHearts;
+
+    UIText* mScoreCounter;
 };
