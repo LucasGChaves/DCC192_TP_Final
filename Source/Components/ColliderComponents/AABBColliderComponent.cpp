@@ -82,7 +82,7 @@ float AABBColliderComponent::DetectHorizontalCollision(RigidBodyComponent* rigid
         if (Intersect(*collider))
         {
             float overlap = GetMinHorizontalOverlap(collider);
-            if (!mIsStatic && rigidBody) {
+            if (!mIsStatic && rigidBody && collider->GetLayer() != ColliderLayer::PlayerAttack) {
                 ResolveHorizontalCollisions(rigidBody, overlap);
             }
 
@@ -114,7 +114,7 @@ float AABBColliderComponent::DetectVertialCollision(RigidBodyComponent* rigidBod
         if (Intersect(*collider))
         {
             float overlap = GetMinVerticalOverlap(collider);
-            if (!mIsStatic && rigidBody) {
+            if (!mIsStatic && rigidBody && collider->GetLayer() != ColliderLayer::PlayerAttack) {
                 ResolveVerticalCollisions(rigidBody, overlap);
             }
 

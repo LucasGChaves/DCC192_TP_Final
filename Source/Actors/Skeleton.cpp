@@ -12,7 +12,6 @@ Skeleton::Skeleton(Game* game, Player* target)
         , mIsDying(false)
 {
     SetScale(4.0f);
-    SetPosition(Vector2(300.0f, 300.0f));
 
     // Draw e animações
     mDrawComponent = new DrawAnimatedComponent(this,
@@ -70,6 +69,7 @@ void Skeleton::OnHorizontalCollision(float, AABBColliderComponent* other)
 
     if (other->GetLayer() == ColliderLayer::PlayerAttack)
     {
+        SDL_Log("entrou horizontal");
         Die();
     }
     else if (other->GetLayer() == ColliderLayer::Player)

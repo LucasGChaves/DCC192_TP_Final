@@ -6,6 +6,8 @@
 #include <SDL_mixer.h>
 #include <algorithm>
 
+#include "Attack.h"
+
 Player::Player(Game* game, const float forwardSpeed)
         : Actor(game)
         , mIsRunning(false)
@@ -100,6 +102,7 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
     if (key == SDLK_SPACE && isPressed)
     {
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
+        new Attack(mGame, GetPosition());
     }
 }
 
