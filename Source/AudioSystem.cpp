@@ -67,6 +67,28 @@ SoundHandle AudioSystem::PlaySound(const std::string& soundName, bool looping)
 
     int availableChannel = -1;
 
+	// int sameSoundCount = 0;
+	// auto oldestSameSound = mHandleMap.begin();
+	//
+	// for (auto it = mHandleMap.begin(); it != mHandleMap.end();)
+	// {
+	// 	if (it->second.mSoundName == soundName)
+	// 	{
+	// 		sameSoundCount++;
+	//
+	// 		if (sameSoundCount == 1) {
+	// 			oldestSameSound = it;
+	// 		}
+	// 		if (sameSoundCount == 3)
+	// 		{
+	// 			availableChannel = oldestSameSound->second.mChannel;
+	// 			mHandleMap.erase(oldestSameSound);
+	// 			break;
+	// 		}
+	// 	}
+	// 	++it;
+	// }
+
 	for (size_t i = 0; i < mChannels.size(); ++i)
 	{
 		if (!mChannels[i].IsValid())

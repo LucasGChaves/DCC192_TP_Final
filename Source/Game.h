@@ -101,6 +101,9 @@ public:
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
 
+    SDL_Renderer* GetRenderer() { return mRenderer; }
+    class HUD* GetHUD() { return mHUD; }
+
 private:
     void ProcessInput();
     void UpdateGame();

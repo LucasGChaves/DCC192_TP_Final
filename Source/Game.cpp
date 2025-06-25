@@ -171,8 +171,13 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
+        float hudScale = 2.0f;
+        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
+        // mHUD->AddImage(mRenderer, "../Assets/Images/ruffQuestHudSkel.png", Vector2(0.0f, 0.0f), Vector2(144.f * hudScale, 64.f * hudScale));
+        // mHUD->SetLives(5);
+
         mAudio->StopSound(mMusicHandle);
-        // mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize actors
         //LoadLevel("../Assets/Levels/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);

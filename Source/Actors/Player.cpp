@@ -5,6 +5,7 @@
 #include "../Components/RigidBodyComponent.h"
 #include <SDL_mixer.h>
 #include <algorithm>
+#include "../HUD.h"
 
 Player::Player(Game* game, const float forwardSpeed)
         : Actor(game)
@@ -114,6 +115,7 @@ void Player::Hit() {
 
     mHearts -= 1;
     mInvincibleTime = 2.f;
+    mGame->GetHUD()->SetLives(mHearts);
 }
 
 
@@ -187,7 +189,7 @@ void Player::Kill()
     mColliderComponent->SetEnabled(false);
 
     mGame->GetAudio()->StopAllSounds();
-    mGame->GetAudio()->PlaySound("Assets/Audio/PlayerDead.wav");
+    mGame->GetAudio()->PlaySound("PlayerDead.wav"); // mGame->GetAudio()->PlaySound("Assets/Audio/PlayerDead.wav");
 }
 
 void Player::Win(AABBColliderComponent *poleCollider)
