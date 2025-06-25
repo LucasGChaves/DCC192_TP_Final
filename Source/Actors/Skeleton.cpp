@@ -35,6 +35,14 @@ Skeleton::Skeleton(Game* game, Player* target)
 
 void Skeleton::OnUpdate(float deltaTime)
 {
+    if (mIsDying) {
+        mDeathTimer -= deltaTime;
+        if (mDeathTimer <= 0.0f) {
+            SetState(ActorState::Destroy);
+        }
+        return;
+    }
+
     if (mIsDying || !mTarget) return;
 
     Vector2 toPlayer = mTarget->GetPosition() - GetPosition();
@@ -87,12 +95,9 @@ void Skeleton::Die()
 {
     if (mIsDying) return;
     mIsDying = true;
-
     mDrawComponent->SetAnimation("Dead");
-    mColliderComponent->SetEnabled(true);
-
-    GetGame()->AddActor(new Actor(GetGame()));
-    SetState(ActorState::Destroy);
+    mColliderComponent->SetEnabled(false); // Disable collision after death
+    mDeathTimer = 0.5f; // Adjust to match animation duration (in seconds)
 }
 
 std::vector<int> Skeleton::GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount)

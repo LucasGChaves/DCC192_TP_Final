@@ -17,14 +17,15 @@ public:
     void OnHorizontalCollision(float, class AABBColliderComponent* other) override;
     void OnVerticalCollision(float, class AABBColliderComponent* other) override;
 
-private:
-    std::vector<int> GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount);
+    AABBColliderComponent* GetColliderComponent() const { return mColliderComponent; }
     void Die();
 
+private:
+    std::vector<int> GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount);
     Player* mTarget;
     float mSpeed;
     bool mIsDying;
-
+    float mDeathTimer = -1.0f;
     class DrawAnimatedComponent* mDrawComponent;
     class AABBColliderComponent* mColliderComponent;
 };
