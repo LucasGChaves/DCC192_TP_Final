@@ -432,14 +432,12 @@ void Game::TogglePause()
         if (mGamePlayState == GamePlayState::Playing)
         {
             mGamePlayState = GamePlayState::Paused;
-
-            // TODO
+            // PushUI(CreatePauseMenu());
         }
         else if (mGamePlayState == GamePlayState::Paused)
         {
             mGamePlayState = GamePlayState::Playing;
-
-            // TODO
+            // PushUI(CreatePauseMenu());
         }
     }
 }
