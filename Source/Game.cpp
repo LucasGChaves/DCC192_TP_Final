@@ -160,10 +160,10 @@ void Game::ChangeScene()
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
-
         // Initialize main menu actors
         mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
 
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
 
         LoadMainMenu();
@@ -367,7 +367,8 @@ void Game::ProcessInput()
                 HandleKeyPressActors(event.key.keysym.sym, event.key.repeat == 0);
 
                 // Check if the Return key has been pressed to pause/unpause the game
-                if (event.key.keysym.sym == SDLK_RETURN)
+                // if (event.key.keysym.sym == SDLK_RETURN)
+                if (event.key.keysym.sym == SDLK_ESCAPE) // troquei para não termos conflito com o input especifico da tela (ver 'if' acima)
                 {
                     TogglePause();
                 }
@@ -432,12 +433,15 @@ void Game::TogglePause()
         if (mGamePlayState == GamePlayState::Playing)
         {
             mGamePlayState = GamePlayState::Paused;
-            // PushUI(CreatePauseMenu());
+            CreatePauseMenu();
         }
         else if (mGamePlayState == GamePlayState::Paused)
         {
             mGamePlayState = GamePlayState::Playing;
-            // PushUI(CreatePauseMenu());
+            if (!mUIStack.empty())
+            {
+                mUIStack.back()->Close();
+            }
         }
     }
 }
@@ -556,7 +560,6 @@ void Game::UpdateActors(float deltaTime)
         delete actor;
     }
 }
-
 
 void Game::AddActor(Actor* actor)
 {
@@ -685,7 +688,6 @@ SDL_Texture* Game::LoadTexture(const std::string& texturePath)
     return texture;
 }
 
-
 UIFont* Game::LoadFont(const std::string& fileName)
 {
     auto iter = mFonts.find(fileName);
@@ -709,12 +711,16 @@ void Game::UnloadScene()
 {
     // Delete actors
     delete mSpatialHashing;
+    mSpatialHashing = nullptr;
+
+    mHUD = nullptr;
+    mPlayer = nullptr;
 
     // Delete UI screens
     for (auto ui : mUIStack) {
         delete ui;
+        mUIStack.pop_back();
     }
-    mUIStack.clear();
 
     // Delete background texture
     if (mBackgroundTexture) {
@@ -745,4 +751,74 @@ void Game::Shutdown()
     SDL_DestroyRenderer(mRenderer);
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
+}
+
+UIScreen* Game::CreatePauseMenu()
+{
+    UIScreen* pauseMenu = new UIScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+
+    const Vector2 backgroundOriginalSize(1024.0f, 1049.0f);
+    const float backgroundScale = 0.6f;
+    const Vector2 backgroundSize = backgroundOriginalSize * backgroundScale;
+
+    const Vector2 backgroundPos(
+        mWindowWidth / 2.0f - backgroundSize.x / 2.0f,
+        mWindowHeight / 2.0f - backgroundSize.y / 2.0f
+    );
+
+    const Vector2 titleSize(320.0f, 60.0f);
+    const int titleFontSize = 52;
+    const float titleYOffset = 0.16f;
+
+    const Vector2 titlePos = backgroundPos + Vector2(
+        (backgroundSize.x - titleSize.x) / 2.0f,
+        backgroundSize.y * titleYOffset
+    );
+
+    const Vector2 buttonSize(400.0f, 80.0f);
+    const float buttonSpacing = 20.0f;
+    const float firstButtonYOffset = 0.4f; // 40% da altura da imagem
+
+    const Vector2 firstButtonPos = backgroundPos + Vector2(
+        (backgroundSize.x - buttonSize.x) / 2.0f,
+        backgroundSize.y * firstButtonYOffset
+    );
+
+    const Vector2 secondButtonPos = firstButtonPos + Vector2(0.0f, buttonSize.y + buttonSpacing);
+
+    pauseMenu->AddImage(
+        mRenderer,
+        "../Assets/Images/pauseMenu.png",
+        backgroundPos,
+        backgroundSize
+    );
+
+    pauseMenu->AddText(
+        "Game Paused",
+        titlePos,
+        titleSize,
+        titleFontSize,
+        0);
+
+    pauseMenu->AddButton(
+        "Main Menu",
+        firstButtonPos,
+        buttonSize,
+        [this, pauseMenu]() {
+            if (pauseMenu->GetState() != UIScreen::UIState::Active) return;
+            pauseMenu->Close();
+            SetGameScene(GameScene::MainMenu);
+        }
+    );
+
+    pauseMenu->AddButton(
+        "Continue",
+        secondButtonPos,
+        buttonSize,
+        [this]() {
+            TogglePause();
+        }
+    );
+
+    return pauseMenu;
 }

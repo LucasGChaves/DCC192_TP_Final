@@ -54,7 +54,7 @@ void HUD::Draw(SDL_Renderer *renderer)
     if (!mBaseImageLoaded)
     {
         Vector2 imageSize = kHudSize * hudScale;
-        AddImage(mGame->GetRenderer(), "../Assets/Images/ruffQuestHudSkel.png", hudPos, imageSize);
+        AddImage(renderer, "../Assets/Images/ruffQuestHudSkel.png", hudPos, imageSize);
         mBaseImageLoaded = true;
     }
 

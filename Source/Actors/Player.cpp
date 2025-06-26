@@ -188,7 +188,7 @@ void Player::Kill()
     mColliderComponent->SetEnabled(false);
 
     mGame->GetAudio()->StopAllSounds();
-    mGame->GetAudio()->PlaySound("PlayerDead.wav"); // mGame->GetAudio()->PlaySound("Assets/Audio/PlayerDead.wav");
+    // mGame->GetAudio()->PlaySound("PlayerDead.wav");
 }
 
 void Player::Win(AABBColliderComponent *poleCollider)
