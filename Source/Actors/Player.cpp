@@ -102,9 +102,9 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
     if (key == SDLK_SPACE && isPressed)
     {
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
-        // Always base polygon on current player position
+
         Vector2 base = GetPosition();
-        float w = 32.0f, h = 32.0f, offset = 32.0f;
+        float w = 40.0f, h = 40.0f, offset = 40.0f;
         std::vector<Vector2> poly;
         if (mLastDirection == "Up") {
             poly = { Vector2(base.x, base.y - offset), Vector2(base.x + w, base.y - offset), Vector2(base.x + w, base.y - offset + h), Vector2(base.x, base.y - offset + h) };

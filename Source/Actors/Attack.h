@@ -13,7 +13,6 @@ public:
 
 private:
     class AABBColliderComponent* mColliderComponent;
-    class DrawPolygonComponent *mDrawPolygonComponent;
 };
 
 

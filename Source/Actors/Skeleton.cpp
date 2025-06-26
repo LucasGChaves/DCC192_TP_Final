@@ -74,12 +74,6 @@ void Skeleton::OnUpdate(float deltaTime)
 void Skeleton::OnHorizontalCollision(float, AABBColliderComponent* other)
 {
     if (mIsDying) return;
-
-    if (other->GetLayer() == ColliderLayer::PlayerAttack)
-    {
-        SDL_Log("entrou horizontal");
-        Die();
-    }
     else if (other->GetLayer() == ColliderLayer::Player)
     {
         mTarget->Kill();
