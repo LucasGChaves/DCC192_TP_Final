@@ -16,6 +16,8 @@ Player::Player(Game* game, const float forwardSpeed)
         , mLastDirection("Down")
         , mHearts(5)
         , mInvincibleTime(.0f)
+        , mBlinkTimer(0.0f)
+        , mIsBlinkVisible(true)
 {
     SetPosition(Vector2(100.0f, 100.0f));
     float scale = mGame->GetWindowHeight() / 240.0f;
@@ -132,6 +134,9 @@ void Player::Hit() {
 
     mHearts -= 1;
     mInvincibleTime = 2.f;
+    mBlinkTimer = 0.0f;
+    mIsBlinkVisible = true;
+    if (mDrawComponent) mDrawComponent->SetIsVisible(true);
 }
 
 
@@ -139,7 +144,21 @@ void Player::OnUpdate(float deltaTime)
 {
     if (mHearts <= 0) Kill();
 
-    if (mInvincibleTime >= .0f) mInvincibleTime -= deltaTime;
+    if (mInvincibleTime >= .0f) {
+        mInvincibleTime -= deltaTime;
+        // Blinking logic: toggle every 0.1s
+        mBlinkTimer += deltaTime;
+        if (mBlinkTimer >= 0.1f) {
+            mIsBlinkVisible = !mIsBlinkVisible;
+            mBlinkTimer = 0.0f;
+        }
+        if (mDrawComponent) mDrawComponent->SetIsVisible(mIsBlinkVisible);
+    } else {
+        // Ensure visible when not invincible
+        if (mDrawComponent) mDrawComponent->SetIsVisible(true);
+        mIsBlinkVisible = true;
+        mBlinkTimer = 0.0f;
+    }
 
     if (mIsDying)
     {

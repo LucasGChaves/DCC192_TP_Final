@@ -34,6 +34,9 @@ private:
 
     int mHearts;
     float mInvincibleTime;
+    // Blinking effect variables
+    float mBlinkTimer = 0.0f;
+    bool mIsBlinkVisible = true;
 
     class RigidBodyComponent* mRigidBodyComponent;
     class DrawAnimatedComponent* mDrawComponent;

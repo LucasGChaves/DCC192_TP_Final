@@ -47,6 +47,7 @@ void DrawAnimatedComponent::LoadSpriteSheet(const std::string& texturePath, cons
 
 void DrawAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modColor)
 {
+    if (!mIsVisible) return;
     if (mSpriteSheetData.empty() || mAnimations.find(mAnimName) == mAnimations.end()) return;
 
     int frameIndex = static_cast<int>(mAnimTimer);
