@@ -6,6 +6,8 @@
 #include <SDL_mixer.h>
 #include <algorithm>
 
+#include "Attack.h"
+
 Player::Player(Game* game, const float forwardSpeed)
         : Actor(game)
         , mIsRunning(false)
@@ -106,6 +108,22 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
         }
 
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
+
+        Vector2 base = GetPosition();
+        float w = 40.0f, h = 40.0f, offset = 40.0f;
+        std::vector<Vector2> poly;
+        if (mLastDirection == "Up") {
+            poly = { Vector2(base.x, base.y - offset), Vector2(base.x + w, base.y - offset), Vector2(base.x + w, base.y - offset + h), Vector2(base.x, base.y - offset + h) };
+        } else if (mLastDirection == "Down") {
+            poly = { Vector2(base.x, base.y + offset), Vector2(base.x + w, base.y + offset), Vector2(base.x + w, base.y + offset + h), Vector2(base.x, base.y + offset + h) };
+        } else if (mLastDirection == "Side") {
+            if (GetRotation() == 0.0f) {
+                poly = { Vector2(base.x + offset, base.y), Vector2(base.x + offset + w, base.y), Vector2(base.x + offset + w, base.y + h), Vector2(base.x + offset, base.y + h) };
+            } else {
+                poly = { Vector2(base.x - offset - w, base.y), Vector2(base.x - offset, base.y), Vector2(base.x - offset, base.y + h), Vector2(base.x - offset - w, base.y + h) };
+            }
+        }
+        new Attack(mGame, poly);
     }
 }
 

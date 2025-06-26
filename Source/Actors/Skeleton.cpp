@@ -12,7 +12,6 @@ Skeleton::Skeleton(Game* game, Player* target)
         , mIsDying(false)
 {
     SetScale(4.0f);
-    SetPosition(Vector2(300.0f, 300.0f));
 
     // Draw e animações
     mDrawComponent = new DrawAnimatedComponent(this,
@@ -36,6 +35,14 @@ Skeleton::Skeleton(Game* game, Player* target)
 
 void Skeleton::OnUpdate(float deltaTime)
 {
+    if (mIsDying) {
+        mDeathTimer -= deltaTime;
+        if (mDeathTimer <= 0.0f) {
+            SetState(ActorState::Destroy);
+        }
+        return;
+    }
+
     if (mIsDying || !mTarget) return;
 
     Vector2 toPlayer = mTarget->GetPosition() - GetPosition();
@@ -74,11 +81,6 @@ void Skeleton::OnUpdate(float deltaTime)
 void Skeleton::OnHorizontalCollision(float, AABBColliderComponent* other)
 {
     if (mIsDying) return;
-
-    if (other->GetLayer() == ColliderLayer::PlayerAttack)
-    {
-        Die();
-    }
     else if (other->GetLayer() == ColliderLayer::Player)
     {
         mTarget->Kill();
@@ -94,12 +96,9 @@ void Skeleton::Die()
 {
     if (mIsDying) return;
     mIsDying = true;
-
     mDrawComponent->SetAnimation("Dead");
-    mColliderComponent->SetEnabled(true);
-
-    GetGame()->AddActor(new Actor(GetGame()));
-    SetState(ActorState::Destroy);
+    mColliderComponent->SetEnabled(false); // Disable collision after death
+    mDeathTimer = 0.5f; // Adjust to match animation duration (in seconds)
 }
 
 std::vector<int> Skeleton::GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount)
