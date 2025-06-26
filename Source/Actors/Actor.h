@@ -101,6 +101,7 @@ protected:
 
     // Game specific
     bool mIsOnGround;
+    float mStepTimer;
 
 private:
     friend class Component;

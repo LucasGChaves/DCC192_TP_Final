@@ -18,6 +18,7 @@ Actor::Actor(Game* game)
         , mRotation(0.0f)
         , mGame(game)
         , mIsOnGround(false)
+        , mStepTimer(0.0f)
 {
     mGame->AddActor(this);
 }

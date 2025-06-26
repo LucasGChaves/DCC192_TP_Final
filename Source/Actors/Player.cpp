@@ -99,6 +99,12 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
 
     if (key == SDLK_SPACE && isPressed)
     {
+        const std::string& currentAnim = mDrawComponent->GetAnimationName();
+        if (currentAnim.find("Strike") == std::string::npos)
+        {
+            mGame->GetAudio()->PlaySound("PlayerAttack.wav");
+        }
+
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
     }
 }
@@ -126,6 +132,11 @@ void Player::OnUpdate(float deltaTime)
             mGame->ResetGameScene(0.0f);
         }
     }
+    else if (mIsRunning)
+    {
+        mStepTimer -= deltaTime;
+    }
+
     ManageAnimations();
 }
 
@@ -144,11 +155,18 @@ void Player::ManageAnimations()
     if (currentAnim.find("Strike") != std::string::npos)
     {
         if (!mDrawComponent->IsAnimationFinished())
+        {
             return;
+        }
     }
 
     if (mIsRunning)
     {
+        if (mStepTimer <= 0.0f)
+        {
+            mGame->GetAudio()->PlaySound("PlayerWalk.wav");
+            mStepTimer = 0.2f;
+        }
         mDrawComponent->SetAnimation("Walk" + mLastDirection);
     }
     else
@@ -169,7 +187,7 @@ void Player::Kill()
     mColliderComponent->SetEnabled(false);
 
     mGame->GetAudio()->StopAllSounds();
-    mGame->GetAudio()->PlaySound("Assets/Audio/Dead.wav");
+    // mGame->GetAudio()->PlaySound("PlayerDead.wav");
 }
 
 void Player::Win(AABBColliderComponent *poleCollider)
