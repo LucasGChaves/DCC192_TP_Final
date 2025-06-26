@@ -102,8 +102,6 @@ public:
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
 
     UIScreen* CreatePauseMenu();
-    // SDL_Renderer* GetRenderer() { return mRenderer; }
-    // class HUD* GetHUD() { return mHUD; }
 
 private:
     void ProcessInput();

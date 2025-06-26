@@ -79,12 +79,12 @@ void UIScreen::HandleKeyPress(int key)
     if (mSelectedButtonIndex >= 0 && mSelectedButtonIndex < static_cast<int>(mButtons.size())){
         mButtons[mSelectedButtonIndex]->SetHighlighted(false);
     }
-    if (key == SDLK_w){
+    if (key == SDLK_UP){
         mSelectedButtonIndex--;
         if (mSelectedButtonIndex < 0){
             mSelectedButtonIndex = static_cast<int>(mButtons.size()) - 1;
         }
-    }else if (key == SDLK_s){
+    }else if (key == SDLK_DOWN){
         mSelectedButtonIndex++;
         if (mSelectedButtonIndex >= static_cast<int>(mButtons.size())){
             mSelectedButtonIndex = 0;

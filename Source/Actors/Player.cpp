@@ -114,7 +114,6 @@ void Player::Hit() {
 
     mHearts -= 1;
     mInvincibleTime = 2.f;
-    // mGame->GetHUD()->SetLives(mHearts);
 }
 
 

@@ -173,8 +173,6 @@ void Game::ChangeScene()
         // TODO
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
-        // mHUD->AddImage(mRenderer, "../Assets/Images/ruffQuestHudSkel.png", Vector2(0.0f, 0.0f), Vector2(144.f * hudScale, 64.f * hudScale));
-        // mHUD->SetLives(5);
 
         mAudio->StopSound(mMusicHandle);
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
@@ -777,7 +775,7 @@ UIScreen* Game::CreatePauseMenu()
 
     const Vector2 buttonSize(400.0f, 80.0f);
     const float buttonSpacing = 20.0f;
-    const float firstButtonYOffset = 0.4f; // 40% da altura da imagem
+    const float firstButtonYOffset = 0.4f;
 
     const Vector2 firstButtonPos = backgroundPos + Vector2(
         (backgroundSize.x - buttonSize.x) / 2.0f,
