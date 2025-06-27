@@ -1,9 +1,5 @@
-
-//
-// Created by Lucas N. Ferreira on 28/09/23.
-//
-
 #pragma once
+
 #include "../Component.h"
 #include "../../Math.h"
 #include "../RigidBodyComponent.h"
@@ -17,47 +13,50 @@ enum class ColliderLayer
     Player,
     Enemy,
     Blocks,
-    Pole
+    Pole,
+    PlayerAttack // ✅ Adicionado
 };
+
+// Define os pares de camadas que se ignoram
+extern const std::map<ColliderLayer, const std::set<ColliderLayer>> ColliderIgnoreMap;
 
 class AABBColliderComponent : public Component
 {
 public:
-    // Collider ignore map
-    const std::map<ColliderLayer, const std::set<ColliderLayer>> ColliderIgnoreMap = {
-        {ColliderLayer::Player, {}},
-        {ColliderLayer::Enemy,  {}},
-        {ColliderLayer::Blocks, {ColliderLayer::Blocks}},
-        {ColliderLayer::Pole, {}}
-    };
-
     AABBColliderComponent(class Actor* owner, int dx, int dy, int w, int h,
-                                ColliderLayer layer, bool isStatic = false, int updateOrder = 10);
+                          ColliderLayer layer, bool isStatic = false, int updateOrder = 10);
     ~AABBColliderComponent() override;
 
+    // Colisão AABB básica
     bool Intersect(const AABBColliderComponent& b) const;
 
-    float DetectHorizontalCollision(RigidBodyComponent *rigidBody);
-    float DetectVertialCollision(RigidBodyComponent *rigidBody);
+    // Checagem de colisões em ambos os eixos
+    float DetectHorizontalCollision(class RigidBodyComponent* rigidBody);
+    float DetectVertialCollision(class RigidBodyComponent* rigidBody);
 
+    // Acessores utilitários
+    void SetEnabled(bool enabled);
+    bool IsEnabled() const;
     void SetStatic(bool isStatic) { mIsStatic = isStatic; }
+    ColliderLayer GetLayer() const;
 
+    // AABB básico
     Vector2 GetMin() const;
     Vector2 GetMax() const;
     Vector2 GetCenter() const;
-    ColliderLayer GetLayer() const { return mLayer; }
 
 private:
-    float GetMinVerticalOverlap(AABBColliderComponent* b) const;
     float GetMinHorizontalOverlap(AABBColliderComponent* b) const;
+    float GetMinVerticalOverlap(AABBColliderComponent* b) const;
 
-    void ResolveHorizontalCollisions(RigidBodyComponent *rigidBody, const float minOverlap);
-    void ResolveVerticalCollisions(RigidBodyComponent *rigidBody, const float minOverlap);
+    void ResolveHorizontalCollisions(class RigidBodyComponent* rigidBody, float minXOverlap);
+    void ResolveVerticalCollisions(class RigidBodyComponent* rigidBody, float minYOverlap);
 
     Vector2 mOffset;
     int mWidth;
     int mHeight;
     bool mIsStatic;
+    bool mIsEnabled;
 
     ColliderLayer mLayer;
 };

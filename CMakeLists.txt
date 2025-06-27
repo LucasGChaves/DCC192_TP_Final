@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(PROJECT_NAME "tp-final")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
-find_package(SDL2 2.32.2 EXACT REQUIRED)
+find_package(SDL2  REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(SDL2_mixer REQUIRED)
@@ -38,6 +38,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Player.h
         Source/Actors/ColliderBlock.cpp
         Source/Actors/ColliderBlock.h
+        Source/Actors/Skeleton.h
+        Source/Actors/Skeleton.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
@@ -61,6 +63,8 @@ add_executable(${PROJECT_NAME}
         Source/UIElements/UIImage.h
         Source/SpatialHashing.cpp
         Source/SpatialHashing.h
+        Source/Actors/Attack.cpp
+        Source/Actors/Attack.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)

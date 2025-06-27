@@ -5,6 +5,7 @@
 #include "DrawSpriteComponent.h"
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
+#include <algorithm>
 
 DrawSpriteComponent::DrawSpriteComponent(class Actor* owner, const std::string &texturePath,
     const int width, const int height, const int drawOrder,
