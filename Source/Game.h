@@ -12,15 +12,17 @@
 #include <unordered_map>
 #include "AudioSystem.h"
 #include "Math.h"
+#include "MapHelper.h"
 
 class Game
 {
 public:
-    static const int LEVEL_WIDTH = 215;
-    static const int LEVEL_HEIGHT = 15;
-    static const int TILE_SIZE = 32;
+    static const int LEVEL_WIDTH = 46;
+    static const int LEVEL_HEIGHT = 23;
+    static const int TILE_SIZE = 16;
     static const int SPAWN_DISTANCE = 700;
     static const int TRANSITION_TIME = 1;
+    static const int SCALE = 1;
 
     enum class GameScene
     {
@@ -123,6 +125,8 @@ private:
     // Spatial Hashing for collision detection
     class SpatialHashing* mSpatialHashing;
 
+    void BuildActorsFromMap();
+
     // All the UI elements
     std::vector<class UIScreen*> mUIStack;
     std::unordered_map<std::string, class UIFont*> mFonts;
@@ -163,4 +167,6 @@ private:
     SDL_Texture *mBackgroundTexture;
     Vector2 mBackgroundSize;
     Vector2 mBackgroundPosition;
+
+    MapData* mTileMap;
 };

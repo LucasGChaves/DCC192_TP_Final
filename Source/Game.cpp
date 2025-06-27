@@ -21,7 +21,7 @@
 #include "SpatialHashing.h"
 #include "Actors/Actor.h"
 #include "Actors/Player.h"
-//#include "Actors/Block.h"
+#include "Actors/ColliderBlock.h"
 #include "Actors/Spawner.h"
 #include "UIElements/UIScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
@@ -46,11 +46,12 @@ Game::Game(int windowWidth, int windowHeight)
         ,mGameTimeLimit(0)
         ,mSceneManagerTimer(0.0f)
         ,mSceneManagerState(SceneManagerState::None)
-        ,mGameScene(GameScene::MainMenu)
+        ,mGameScene(GameScene::Level1)
         ,mNextScene(GameScene::Level1)
         ,mBackgroundTexture(nullptr)
         ,mBackgroundSize(Vector2::Zero)
         ,mBackgroundPosition(Vector2::Zero)
+        ,mTileMap(nullptr)
 {
 
 }
@@ -63,7 +64,7 @@ bool Game::Initialize()
         return false;
     }
 
-    mWindow = SDL_CreateWindow("TP Final: A Ruff Quest", 0, 0, mWindowWidth, mWindowHeight, 0);
+    mWindow = SDL_CreateWindow("TP Final: A Ruff Quest", 200, 200, mWindowWidth, mWindowHeight, 0);
     if (!mWindow)
     {
         SDL_Log("Failed to create window: %s", SDL_GetError());
@@ -102,11 +103,15 @@ bool Game::Initialize()
 
     // TODO
 
-    //mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
+    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
     mTicksCount = SDL_GetTicks();
 
     // Init all game actors
-    //SetGameScene(GameScene::MainMenu);
+    // SetGameScene(GameScene::MainMenu);
+
+    // Initially, change scene to MainMenu
+    //mCameraPos = Vector2{mWindowWidth / 2.0f, mWindowHeight/2.f}; //
+    ChangeScene();
 
     return true;
 }
@@ -132,7 +137,7 @@ void Game::ChangeScene()
     // Reset game timer
     mGameTimer = 0.0f;
 
-    // Reset gameplau state
+    // Reset gameplay state
     mGamePlayState = GamePlayState::Playing;
 
     // Reset scene manager state
@@ -151,7 +156,8 @@ void Game::ChangeScene()
         // TODO
 
         // Initialize actors
-        //LoadLevel("../Assets/Levels/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+        LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
+        //BuildActorsFromMap();
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -173,18 +179,19 @@ void Game::LoadMainMenu()
     // Esse método será usado para criar uma tela de UI e adicionar os elementos do menu principal.
 }
 
-void Game::LoadLevel(const std::string& levelName, const int levelWidth, const int levelHeight)
+void Game::LoadLevel(const std::string& mapPath, const int levelWidth, const int levelHeight)
 {
     // Load level data
-    int **mLevelData = ReadLevelData(levelName, levelWidth, levelHeight);
+    mTileMap = LoadTileMap(mapPath, mRenderer);
 
-    if (!mLevelData) {
-        SDL_Log("Failed to load level data");
+    if (!mTileMap) {
+        SDL_Log("Failed to load map data");
         return;
     }
 
     // Instantiate level actors
-    BuildLevel(mLevelData, levelWidth, levelHeight);
+    //BuildLevel(mLevelData, levelWidth, levelHeight);
+    BuildActorsFromMap();
 }
 
 void Game::BuildLevel(int** levelData, int width, int height)
@@ -276,11 +283,31 @@ void Game::RunLoop()
 {
     while (mIsRunning)
     {
-        //ProcessInput();
-        //UpdateGame();
-        //GenerateOutput(); // TODO - descomentar depois
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                mIsRunning = false;
+            }
+            // (você pode repassar pra ProcessInput se quiser)
+        }
+
+        SDL_Delay(16);
+
+        GenerateOutput();
     }
 }
+
+// void Game::RunLoop()
+// {
+//     while (mIsRunning)
+//     {
+//         ProcessInput();
+//         UpdateGame();
+//         GenerateOutput(); // TODO - descomentar depois
+//     }
+// }
 
 void Game::ProcessInput()
 {
@@ -515,16 +542,26 @@ void Game::GenerateOutput()
     // Clear back buffer
     SDL_RenderClear(mRenderer);
 
-    // Draw background texture considering camera position
-    if (mBackgroundTexture)
-    {
-        SDL_Rect dstRect = { static_cast<int>(mBackgroundPosition.x - mCameraPos.x),
-                             static_cast<int>(mBackgroundPosition.y - mCameraPos.y),
-                             static_cast<int>(mBackgroundSize.x),
-                             static_cast<int>(mBackgroundSize.y) };
-
-        SDL_RenderCopy(mRenderer, mBackgroundTexture, nullptr, &dstRect);
+    int roofIdx = -1;
+    for (int i=0; i<mTileMap->layers.size(); i++) {
+        if (mTileMap->layers[i].name == "roof") {
+            roofIdx = i;
+        }
+        else if (mTileMap->layers[i].type == LayerType::Block) {
+            RenderLayer(mRenderer, mTileMap, i, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+        }
     }
+
+    // Draw background texture considering camera position
+    // if (mBackgroundTexture)
+    // {
+    //     SDL_Rect dstRect = { static_cast<int>(mBackgroundPosition.x - mCameraPos.x),
+    //                          static_cast<int>(mBackgroundPosition.y - mCameraPos.y),
+    //                          static_cast<int>(mBackgroundSize.x),
+    //                          static_cast<int>(mBackgroundSize.y) };
+    //
+    //     SDL_RenderCopy(mRenderer, mBackgroundTexture, nullptr, &dstRect);
+    // }
 
     // Get actors on camera
     std::vector<Actor*> actorsOnCamera =
@@ -551,7 +588,12 @@ void Game::GenerateOutput()
     // Draw all drawables
     for (auto drawable : drawables)
     {
+        //SDL_Log("Drawing actor...");
         drawable->Draw(mRenderer, mModColor);
+    }
+
+    if (roofIdx > -1) {
+        RenderLayer(mRenderer, mTileMap, roofIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
     }
 
     // Draw all UI screens
@@ -654,4 +696,54 @@ void Game::Shutdown()
     SDL_DestroyRenderer(mRenderer);
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
+}
+
+void Game::BuildActorsFromMap() {
+    if (!mTileMap) {
+        return;
+    }
+
+    int dynamicObjectsLayerIdx = GetLayerIdx(*mTileMap, "dynamicObjects");
+    int staticObjectsLayerIdx = GetLayerIdx(*mTileMap, "staticObjects");
+
+    for (auto obj : mTileMap->layers[dynamicObjectsLayerIdx].objects) {
+        if (obj.name == "player") {
+            SDL_Log("Loading player at pos... %f, %f", obj.pos.x, obj.pos.y);
+            // TODO - completar ao linkar com código do Adalberto
+            //mPlayer = new Player(this);
+            //mPlayer->SetPosition(Vector2(pos.x * TILE_SIZE, pos.y * TILE_SIZE));
+        }
+    }
+
+    Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];
+
+    for (int y=0; y<staticObjectLayer.height; y++) {
+        for (int x=0; x<staticObjectLayer.width; x++) {
+
+            int gid = staticObjectLayer.data[y*staticObjectLayer.width + x];
+
+            if (gid == 0) continue;
+
+            int tsxIdx = FindTilesetIndex(mTileMap, gid);
+            const auto& ts = mTileMap->tilesets[tsxIdx];
+            int localId = gid - ts.firstGid;
+
+            if (!ts.isCollection) {
+                int row = localId / ts.columns;
+                int col = localId % ts.columns;
+
+                Vector2 pos{static_cast<float>(x*TILE_SIZE), static_cast<float>(y*TILE_SIZE)};
+                Vector2 srcPos{static_cast<float>(col * TILE_SIZE), static_cast<float>(row * TILE_SIZE)};
+
+                new ColliderBlock(this, pos, srcPos, ts.imageTexture);
+            }
+            else {
+                const SDL_Rect& size = ts.sizes[localId];
+                Vector2 pos{static_cast<float>(x * TILE_SIZE),
+                    static_cast<float>((y*TILE_SIZE) - size.h + TILE_SIZE)};
+
+                new ColliderBlock(this, pos, Vector2::Zero, ts.textures[localId]);
+            }
+        }
+    }
 }
