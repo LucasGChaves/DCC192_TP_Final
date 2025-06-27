@@ -17,6 +17,12 @@ add_executable(${PROJECT_NAME}
         Source/Random.cpp
         Source/Actors/Actor.cpp
         Source/Components/Component.cpp
+        Source/Json.h
+        Source/CSV.h
+        Source/tinyxml2.cpp
+        Source/tinyxml2.h
+        Source/MapHelper.cpp
+        Source/MapHelper.h
         Source/Game.cpp
         Source/Components/DrawComponents/DrawComponent.cpp
         Source/Components/DrawComponents/DrawComponent.h
@@ -24,14 +30,14 @@ add_executable(${PROJECT_NAME}
         Source/Components/RigidBodyComponent.h
         Source/Components/ColliderComponents/CircleColliderComponent.cpp
         Source/Components/ColliderComponents/CircleColliderComponent.h
-        Source/Json.h
-        Source/CSV.h
         Source/Components/DrawComponents/DrawSpriteComponent.cpp
         Source/Components/DrawComponents/DrawSpriteComponent.h
         Source/Components/DrawComponents/DrawPolygonComponent.cpp
         Source/Components/DrawComponents/DrawPolygonComponent.h
         Source/Actors/Player.cpp
         Source/Actors/Player.h
+        Source/Actors/ColliderBlock.cpp
+        Source/Actors/ColliderBlock.h
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
