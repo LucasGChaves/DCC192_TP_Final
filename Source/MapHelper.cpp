@@ -141,7 +141,7 @@ void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
 
     const auto& layer = map->layers[layerIdx];
 
-    if (map->layers[layerIdx].name == "staticObjects") {
+    if (map->layers[layerIdx].name == "staticObjects" || map->layers[layerIdx].name == "dynamicObjects") {
         return;
     }
 
@@ -158,6 +158,11 @@ void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
             int localId = gid - ts.firstGid;
 
             if (!ts.isCollection) {
+
+                if (!ts.imageTexture) {
+                    SDL_Log("Failed to load image %s", ts.tsxSource.c_str());
+                }
+
                 int row = localId / ts.columns;
                 int col = localId % ts.columns;
 
@@ -168,6 +173,10 @@ void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
                 SDL_RenderCopy(renderer, ts.imageTexture, &src, &dst);
             }
             else {
+                if (!ts.textures[localId]) {
+                    SDL_Log("Failed to load image %s", ts.tsxSource.c_str());
+                }
+
                 const SDL_Rect& size = ts.sizes[localId];
                 SDL_Rect dst{x * map->tileWidth * scale - static_cast<int>(cameraPos.x),
                     (y * map->tileHeight * scale) + (map->tileHeight * scale) - (size.h * scale) - static_cast<int>(cameraPos.y),
@@ -180,12 +189,8 @@ void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
 
 
 
-std::array<int,4> GetCameraTileBounds(
-    const Vector2& cameraPos,
-    float screenW, float screenH,
-    float extraRadius,
-    int tileSize,
-    int mapWidth, int mapHeight)
+std::array<int,4> GetCameraTileBounds(const Vector2& cameraPos, float screenW, float screenH, float extraRadius,
+    int tileSize, int mapWidth, int mapHeight)
 {
 
     float left   = cameraPos.x - extraRadius;
@@ -194,16 +199,16 @@ std::array<int,4> GetCameraTileBounds(
     float bottom = cameraPos.y + screenH + extraRadius;
 
 
-    int startCol = static_cast<int>(std::floor(left  / tileSize));
-    int endCol   = static_cast<int>(std::floor(right / tileSize));
-    int startRow = static_cast<int>(std::floor(top   / tileSize));
-    int endRow   = static_cast<int>(std::floor(bottom/ tileSize));
+    int startCol = static_cast<int>(left  / tileSize);
+    int endCol   = static_cast<int>(right / tileSize);
+    int startRow = static_cast<int>(top   / tileSize);
+    int endRow   = static_cast<int>(bottom/ tileSize);
 
 
-    startCol = std::clamp(startCol, 0, mapWidth  - 1);
-    endCol   = std::clamp(endCol,   0, mapWidth  - 1);
-    startRow = std::clamp(startRow, 0, mapHeight - 1);
-    endRow   = std::clamp(endRow,   0, mapHeight - 1);
+    startCol = std::max(0, startCol);
+    endCol   = std::min(endCol, mapWidth  - 1);
+    startRow = std::max(0, startRow);
+    endRow   = std::min(endRow, mapHeight - 1);
 
     return { startRow, startCol, endRow, endCol };
 }

@@ -11,7 +11,7 @@ class AABBColliderComponent;
 class Skeleton : public Actor
 {
 public:
-    Skeleton(class Game* game, Player* target);
+    Skeleton(class Game* game, Player* target, Vector2 pos);
 
     void OnUpdate(float deltaTime) override;
     void OnHorizontalCollision(float, class AABBColliderComponent* other) override;

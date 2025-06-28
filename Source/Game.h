@@ -17,11 +17,17 @@
 class Game
 {
 public:
-    static const int LEVEL_WIDTH = 1600;
-    static const int LEVEL_HEIGHT = 1600;
+    static const int LEVEL_WIDTH = 46;
+    static const int LEVEL_HEIGHT = 23;
     static const int TILE_SIZE = 16;
     static const int SPAWN_DISTANCE = 700;
     static const int TRANSITION_TIME = 1;
+
+    //Screen dimension constants
+    static const int SCREEN_WIDTH = 736;
+    static const int SCREEN_HEIGHT = 368;
+
+    //static const int SCALE = SCREEN_HEIGHT / (LEVEL_HEIGHT * TILE_SIZE);
     static const int SCALE = 1;
 
     enum class GameScene

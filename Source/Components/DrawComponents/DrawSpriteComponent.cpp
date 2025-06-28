@@ -34,19 +34,17 @@ DrawSpriteComponent::~DrawSpriteComponent()
 
 void DrawSpriteComponent::Draw(SDL_Renderer *renderer, const Vector3 &modColor)
 {
-    int scale = mOwner->GetScale();
-    //SDL_Log("cameraPos: %f %f",mOwner->GetGame()->GetCameraPos().x, mOwner->GetGame()->GetCameraPos().y);
     SDL_Rect dstRect = {
-        static_cast<int>(mOwner->GetPosition().x - mOwner->GetGame()->GetCameraPos().x) * scale,
-        static_cast<int>(mOwner->GetPosition().y - mOwner->GetGame()->GetCameraPos().y) * scale,
-        mWidth * scale,
-        mHeight * scale
+        static_cast<int>(mOwner->GetPosition().x - mOwner->GetGame()->GetCameraPos().x),
+        static_cast<int>(mOwner->GetPosition().y - mOwner->GetGame()->GetCameraPos().y),
+        mWidth,
+        mHeight
     };
 
     SDL_Rect* srcRect = nullptr;
 
     if (mHasSrc) {
-        SDL_Rect srcPos{static_cast<int>(mSrcPos.x), static_cast<int>(mSrcPos.y), mWidth, mHeight};
+        SDL_Rect srcPos{static_cast<int>(mSrcPos.x), static_cast<int>(mSrcPos.y), mWidth/Game::SCALE, mHeight/Game::SCALE};
         srcRect = &srcPos;
     }
 

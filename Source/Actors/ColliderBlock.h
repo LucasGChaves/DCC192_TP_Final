@@ -9,7 +9,7 @@
 
 class ColliderBlock : public Actor {
     public:
-        explicit ColliderBlock(Game* game,  Vector2 pos, Vector2 srcPos, SDL_Texture* texture);
+        explicit ColliderBlock(Game* game,  Vector2 pos, Vector2 srcPos, int width, int height, SDL_Texture* texture);
 
     private:
         class AABBColliderComponent* mColliderComponent;

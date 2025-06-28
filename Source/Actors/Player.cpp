@@ -8,7 +8,7 @@
 
 #include "Attack.h"
 
-Player::Player(Game* game, const float forwardSpeed)
+Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
         : Actor(game)
         , mIsRunning(false)
         , mIsDying(false)
@@ -19,15 +19,15 @@ Player::Player(Game* game, const float forwardSpeed)
         , mBlinkTimer(0.0f)
         , mIsBlinkVisible(true)
 {
-    SetPosition(Vector2(100.0f, 100.0f));
-    float scale = mGame->GetWindowHeight() / 240.0f;
-    SetScale(scale);
+    SetPosition(pos);
+    SetScale(Game::SCALE);
 
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(
             this,
             0, 0,
-            32, 32,
+            Game::TILE_SIZE * Game::SCALE * 2,
+            Game::TILE_SIZE * Game::SCALE * 2,
             ColliderLayer::Player,
             false,
             100

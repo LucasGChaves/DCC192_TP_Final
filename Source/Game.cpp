@@ -104,13 +104,10 @@ bool Game::Initialize()
 
     mAudio = new AudioSystem(8);
 
+    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f * SCALE,
+                                         LEVEL_WIDTH * TILE_SIZE * SCALE,
+                                         LEVEL_HEIGHT * TILE_SIZE * SCALE);
 
-    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f,
-                                         LEVEL_WIDTH * TILE_SIZE,
-                                         LEVEL_HEIGHT * TILE_SIZE);
-    mTicksCount = SDL_GetTicks();
-
-    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
     mTicksCount = SDL_GetTicks();
 
     // Init all game actors
@@ -156,7 +153,9 @@ void Game::ChangeScene()
     mGamePlayState = GamePlayState::Playing;
 
     // Reset scene manager state
-    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
+    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f * SCALE,
+                                         LEVEL_WIDTH * TILE_SIZE * SCALE,
+                                         LEVEL_HEIGHT * TILE_SIZE * SCALE);
 
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
@@ -178,36 +177,34 @@ void Game::ChangeScene()
         mAudio->StopSound(mMusicHandle);
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
-        // Initialize actors
+        SDL_Log("Loading level 1 map...");
+
+        // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
-        //LoadLevel("../Assets/Levels/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
-        //mPlayer = new Player(this);
-        //mPlayer->SetPosition(Vector2(mWindowWidth / 2.0f, mWindowHeight / 2.0f));
 
-
-        const float minDistance = 200.0f;
-        Vector2 minBounds(0.0f, 0.0f);
-        Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
-
-        for (int i = 0; i < 5; ++i) {
-            Vector2 spawnPos;
-            bool validPos = false;
-
-            while (!validPos) {
-                spawnPos = Random::GetVector(minBounds, maxBounds);
-
-                Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
-                float distance = toPlayer.Length();
-
-                if (distance >= minDistance) {
-                    validPos = true;
-                }
-            }
-
-            auto* newSkeleton = new Skeleton(this, mPlayer);
-            newSkeleton->SetPosition(spawnPos);
-        }
+        //OBS: Inicialização do esqueleto comentada para fins de debug //TODO - descomentar depois
+        //  const float minDistance = 200.0f;
+        //  Vector2 minBounds(0.0f, 0.0f);
+        //  Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
+        //
+        //  for (int i = 0; i < 5; ++i) {
+        //      Vector2 spawnPos;
+        //      bool validPos = false;
+        //
+        //      while (!validPos) {
+        //          spawnPos = Random::GetVector(minBounds, maxBounds);
+        //
+        //          Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
+        //          float distance = toPlayer.Length();
+        //
+        //          if (distance >= minDistance) {
+        //              validPos = true;
+        //          }
+        //      }
+        //
+        //      new Skeleton(this, mPlayer, spawnPos);
+        // }
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -255,91 +252,6 @@ void Game::LoadLevel(const std::string& mapPath, const int levelWidth, const int
     //BuildActorsFromMap();
 }
 
-void Game::BuildLevel(int** levelData, int width, int height)
-{
-
-    // Const map to convert tile ID to block type
-    const std::map<int, const std::string> tileMap = {
-            //{0, "../Assets/Sprites/Blocks/BlockA.png"},
-    };
-
-    for (int y = 0; y < LEVEL_HEIGHT; ++y)
-    {
-        for (int x = 0; x < LEVEL_WIDTH; ++x)
-        {
-            // int tile = levelData[y][x];
-
-            // TODO - Mudar posição inicial do player e verificar IDs dos tiles nos CSVs
-            // if(tile == 16) // Player
-            // {
-            //     mPlayer = new Player(this);
-            //     mPlayer->SetPosition(Vector2(x * TILE_SIZE, y * TILE_SIZE));
-            // }
-            // else if(tile == 10) // Spawner
-            // {
-            //     Spawner* spawner = new Spawner(this, SPAWN_DISTANCE);
-            //     spawner->SetPosition(Vector2(x * TILE_SIZE, y * TILE_SIZE));
-            // }
-            // else // Blocks
-            // {
-            //     auto it = tileMap.find(tile);
-            //     if (it != tileMap.end())
-            //     {
-            //         // Create a block actor
-            //         //Block* block = new Block(this, it->second);
-            //         //block->SetPosition(Vector2(x * TILE_SIZE, y * TILE_SIZE));
-            //     }
-            // }
-        }
-    }
-}
-
-int **Game::ReadLevelData(const std::string& fileName, int width, int height)
-{
-    std::ifstream file(fileName);
-    if (!file.is_open())
-    {
-        SDL_Log("Failed to load paths: %s", fileName.c_str());
-        return nullptr;
-    }
-
-    // Create a 2D array of size width and height to store the level data
-    int** levelData = new int*[height];
-    for (int i = 0; i < height; ++i)
-    {
-        levelData[i] = new int[width];
-    }
-
-    // Read the file line by line
-    int row = 0;
-
-    std::string line;
-    while (!file.eof())
-    {
-        std::getline(file, line);
-        if(!line.empty())
-        {
-            auto tiles = CSVHelper::Split(line);
-
-            if (tiles.size() != width) {
-                SDL_Log("Invalid level data");
-                return nullptr;
-            }
-
-            for (int i = 0; i < width; ++i) {
-                levelData[row][i] = tiles[i];
-            }
-        }
-
-        ++row;
-    }
-
-    // Close the file
-    file.close();
-
-    return levelData;
-}
-
 void Game::RunLoop()
 {
     while (mIsRunning)
@@ -370,7 +282,7 @@ void Game::ProcessInput()
 
                 // Check if the Return key has been pressed to pause/unpause the game
                 // if (event.key.keysym.sym == SDLK_RETURN)
-                if (event.key.keysym.sym == SDLK_ESCAPE) // troquei para não termos conflito com o input especifico da tela (ver 'if' acima)
+                if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_p) // troquei para não termos conflito com o input especifico da tela (ver 'if' acima)
                 {
                     TogglePause();
                 }
@@ -525,8 +437,8 @@ void Game::UpdateCamera()
 {
     if (!mPlayer) return;
 
-    mCameraPos.x = mPlayer->GetPosition().x - (mWindowWidth / 2.0f);
-    mCameraPos.y = mPlayer->GetPosition().y - (mWindowHeight / 2.0f);
+    SetCameraPos(Vector2{mPlayer->GetPosition().x - (mWindowWidth / 2.0f),
+        mPlayer->GetPosition().y - (mWindowHeight / 2.0f)});
 }
 
 void Game::UpdateActors(float deltaTime)
@@ -590,30 +502,22 @@ std::vector<AABBColliderComponent *> Game::GetNearbyColliders(const Vector2& pos
 void Game::GenerateOutput()
 {
     // Clear frame with background color
-    SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
+    //SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
 
     // Clear back buffer
     SDL_RenderClear(mRenderer);
 
     int roofIdx = -1;
-    for (int i=0; i<mTileMap->layers.size(); i++) {
-        if (mTileMap->layers[i].name == "roof") {
-            roofIdx = i;
-        }
-        else if (mTileMap->layers[i].type == LayerType::Block) {
-            RenderLayer(mRenderer, mTileMap, i, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
-        }
-    }
 
-    // Draw background texture considering camera position
-    if (mBackgroundTexture)
-    {
-        SDL_Rect dstRect = { static_cast<int>(mBackgroundPosition.x - mCameraPos.x),
-                             static_cast<int>(mBackgroundPosition.y - mCameraPos.y),
-                             static_cast<int>(mBackgroundSize.x),
-                             static_cast<int>(mBackgroundSize.y) };
-
-        SDL_RenderCopy(mRenderer, mBackgroundTexture, nullptr, &dstRect);
+    if (mTileMap && !mTileMap->layers.empty()) {
+        for (int i=0; i<mTileMap->layers.size(); i++) {
+            if (mTileMap->layers[i].name == "roof") {
+                roofIdx = i;
+            }
+            else if (mTileMap->layers[i].type == LayerType::Block && mTileMap->layers[i].name != "staticObjects") {
+                RenderLayer(mRenderer, mTileMap, i, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+            }
+        }
     }
 
     // Get actors on camera
@@ -737,6 +641,7 @@ void Game::UnloadScene()
         delete ui;
         mUIStack.pop_back();
     }
+    mUIStack.clear();
 
     // Delete background texture
     if (mBackgroundTexture) {
@@ -850,11 +755,7 @@ void Game::BuildActorsFromMap() {
 
     for (auto obj : mTileMap->layers[dynamicObjectsLayerIdx].objects) {
         if (obj.name == "player") {
-            SDL_Log("Loading player at pos... %f, %f", obj.pos.x, obj.pos.y);
-            // TODO - completar ao linkar com código do Adalberto
-
-            mPlayer = new Player(this);
-            mPlayer->SetPosition(Vector2(obj.pos.x * TILE_SIZE, obj.pos.y * TILE_SIZE));
+            mPlayer = new Player(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
     }
 
@@ -875,17 +776,17 @@ void Game::BuildActorsFromMap() {
                 int row = localId / ts.columns;
                 int col = localId % ts.columns;
 
-                Vector2 pos{static_cast<float>(x*TILE_SIZE), static_cast<float>(y*TILE_SIZE)};
+                Vector2 pos{static_cast<float>(x*TILE_SIZE*SCALE), static_cast<float>(y*TILE_SIZE*SCALE)};
                 Vector2 srcPos{static_cast<float>(col * TILE_SIZE), static_cast<float>(row * TILE_SIZE)};
 
-                new ColliderBlock(this, pos, srcPos, ts.imageTexture);
+                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture);
             }
             else {
                 const SDL_Rect& size = ts.sizes[localId];
-                Vector2 pos{static_cast<float>(x * TILE_SIZE),
-                    static_cast<float>((y*TILE_SIZE) - size.h + TILE_SIZE)};
+                Vector2 pos{static_cast<float>(x * TILE_SIZE * SCALE),
+                    static_cast<float>(((y*TILE_SIZE) - size.h + TILE_SIZE) * SCALE)};
 
-                new ColliderBlock(this, pos, Vector2::Zero, ts.textures[localId]);
+                new ColliderBlock(this, pos, Vector2::Zero, size.w * SCALE, size.h * SCALE, ts.textures[localId]);
             }
         }
     }
