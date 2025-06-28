@@ -24,11 +24,11 @@ public:
     static const int TRANSITION_TIME = 1;
 
     //Screen dimension constants
-    static const int SCREEN_WIDTH = 736;
-    static const int SCREEN_HEIGHT = 368;
+    static const int SCREEN_WIDTH = 1400;
+    static const int SCREEN_HEIGHT = 800;
 
-    //static const int SCALE = SCREEN_HEIGHT / (LEVEL_HEIGHT * TILE_SIZE);
-    static const int SCALE = 1;
+    static const int SCALE = SCREEN_HEIGHT / (LEVEL_HEIGHT * TILE_SIZE);
+    //static const int SCALE = 1;
 
     enum class GameScene
     {
