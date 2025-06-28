@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "Attack.h"
+#include "../UIElements/UIGameOver.h"
 
 Player::Player(Game* game, const float forwardSpeed)
         : Actor(game)
@@ -225,6 +226,11 @@ void Player::Kill()
 
     mGame->GetAudio()->StopAllSounds();
     // mGame->GetAudio()->PlaySound("PlayerDead.wav");
+
+    // Show Game Over menu
+    mGame->SetGamePlayState(Game::GamePlayState::GameOver);
+    auto* gameOverScreen = new UIGameOver(mGame);
+    gameOverScreen->Open();
 }
 
 void Player::Win(AABBColliderComponent *poleCollider)
