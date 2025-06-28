@@ -1,0 +1,181 @@
+{
+    "activeFile": "maps/e01m05.tmx",
+    "expandedProjectPaths": [
+        "maps",
+        "tileset/teste",
+        "tileset",
+        "."
+    ],
+    "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
+    "fileStates": {
+        ":/automap-tiles.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/gabri/Documents/game-dev/tp3-super-mario-bros-1-1-LucasGChaves/Assets/Levels/Level1-1/level1-1.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 3256.6666666666665,
+                "y": 431.33333333333337
+            }
+        },
+        "maps/Cave_Entrance.tsx": {
+            "scaleInDock": 1
+        },
+        "maps/Cave_Floor_Decoration-Sheet_edit.tsx": {
+            "scaleInDock": 1
+        },
+        "maps/Ores.tsx": {
+            "scaleInDock": 1
+        },
+        "maps/e01m01.tmx": {
+            "expandedObjectLayers": [
+                6
+            ],
+            "scale": 2,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 368.25,
+                "y": 107.75
+            }
+        },
+        "maps/e01m03.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 368.66666666666663,
+                "y": 368.66666666666663
+            }
+        },
+        "maps/e01m04.tmx": {
+            "expandedObjectLayers": [
+                6
+            ],
+            "scale": 1.5,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 368.3333333333333,
+                "y": 184.33333333333331
+            }
+        },
+        "maps/e01m05.tmx": {
+            "expandedObjectLayers": [
+                19
+            ],
+            "scale": 1.5,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": -13.666666666666664,
+                "y": 104.66666666666664
+            }
+        },
+        "maps/e01m06.tmx": {
+            "scale": 3.198828125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 128.01563072414214,
+                "y": 111.1344486506289
+            }
+        },
+        "tileset/Cave_Entrance.tsx": {
+            "scaleInDock": 1
+        },
+        "tileset/Dungeon_1_Arch_Open.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tileset/Dungeon_2_Door_anim.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tileset/Fences.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tileset/Objects.tsx": {
+            "scaleInDock": 1
+        },
+        "tileset/Scarecrows.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tileset/Spike_Gate_anim.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tileset/Stone_Cliff_2_Tile.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tileset/Tileset.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tileset/animals.tsx": {
+            "scaleInDock": 1
+        },
+        "tileset/cave.tsx": {
+            "scaleInDock": 1
+        },
+        "tileset/chars.tsx": {
+            "scaleInDock": 1
+        },
+        "tileset/dog_idle.tsx": {
+            "scaleInDock": 1
+        },
+        "tileset/grass.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tileset/outdoor_deco.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tileset/tree_edit.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "tileset/trees.tsx": {
+            "scaleInDock": 1
+        },
+        "tileset/water.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/gabri/Documents/game-dev/DCC192_TP_Final/Assets/Images/mapDrafts/maps",
+    "last.externalTilesetPath": "C:/Users/gabri/Documents/game-dev/DCC192_TP_Final/Assets/Images/mapDrafts/assets/Cute_Fantasy_Free/Player",
+    "last.imagePath": "C:/Users/gabri/Documents/game-dev/DCC192_TP_Final/Assets/Images/mapDrafts/assets/Cute_Fantasy_Free/Player",
+    "map.lastUsedExportFilter": "Arquivos de mapa JSON (*.tmj *.json)",
+    "openFiles": [
+        "maps/e01m06.tmx",
+        "maps/e01m04.tmx",
+        "tileset/Spike_Gate_anim.tsx",
+        "tileset/Dungeon_2_Door_anim.tsx",
+        "maps/e01m01.tmx",
+        "maps/e01m03.tmx",
+        "tileset/Dungeon_1_Arch_Open.tsx",
+        "maps/e01m05.tmx"
+    ],
+    "project": "ruffQuest.tiled-project",
+    "recentFiles": [
+        "maps/e01m06.tmx",
+        "maps/e01m04.tmx",
+        "tileset/Spike_Gate_anim.tsx",
+        "tileset/Dungeon_2_Door_anim.tsx",
+        "maps/e01m01.tmx",
+        "maps/e01m03.tmx",
+        "tileset/Dungeon_1_Arch_Open.tsx",
+        "maps/e01m05.tmx",
+        "tileset/Fences.tsx",
+        "maps/e01m02.tmx",
+        "tileset/tree_edit.tsx",
+        "tileset/dungeon_objects2.tsx"
+    ],
+    "tileset.lastUsedFilter": "Todos os Ficheiros (*)",
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
