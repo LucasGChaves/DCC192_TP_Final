@@ -5,8 +5,10 @@
 #include "../Components/RigidBodyComponent.h"
 #include <SDL_mixer.h>
 #include <algorithm>
+#include "../Math.h"
 
 #include "Attack.h"
+#include "../Components/DrawComponents/DrawPolygonComponent.h"
 
 Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
         : Actor(game)
@@ -25,17 +27,20 @@ Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(
             this,
-            0, 0,
-            Game::TILE_SIZE * Game::SCALE * 2,
-            Game::TILE_SIZE * Game::SCALE * 2,
+            (Game::TILE_SIZE * Game::SCALE * 2) / 3, (Game::TILE_SIZE * Game::SCALE) / 4,
+            (Game::TILE_SIZE * Game::SCALE * 2) / 3,
+            (Game::TILE_SIZE * Game::SCALE) / 2,
             ColliderLayer::Player,
             false,
             100
     );
 
-    mColliderComponent->SetEnabled(true);
-
-    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json");
+    // std::vector<Vector2> vertices= {
+    //     Vector2(0, 0), Vector2(Game::TILE_SIZE * Game::SCALE  * 2, 0),
+    //     Vector2(Game::TILE_SIZE * Game::SCALE  * 2, Game::TILE_SIZE * Game::SCALE  * 2), Vector2(0, Game::TILE_SIZE * Game::SCALE  * 2),
+    // };
+    //new DrawPolygonComponent(this, vertices);
+    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json", 1);
 
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
