@@ -129,15 +129,15 @@ int FindTilesetIndex(const MapData* map, int gid) {
 void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
     Vector2& cameraPos, float windowWidth, float windowHeight, int scale, float extraRadius) {
 
-    auto [sr, sc, er, ec] = GetCameraTileBounds(
-    cameraPos,
-    windowWidth,
-    windowHeight,
-    extraRadius,
-    map->tileWidth,
-    map->mapWidth,
-    map->mapHeight
-);
+//     auto [sr, sc, er, ec] = GetCameraTileBounds(
+//     cameraPos,
+//     windowWidth,
+//     windowHeight,
+//     extraRadius,
+//     map->tileWidth * scale,
+//     map->mapWidth,
+//     map->mapHeight
+// );
 
     const auto& layer = map->layers[layerIdx];
 
@@ -145,10 +145,10 @@ void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
         return;
     }
 
-    //for (int y=0; y<layer.height; y++) {
-    for (int y=sr; y<=er; y++) {
-        for (int x=sc; x<=ec; x++) {
-        //for (int x=0; x<layer.width; x++) {
+    for (int y=0; y<layer.height; y++) {
+    //for (int y=sr; y<=er; y++) {
+        //for (int x=sc; x<=ec; x++) {
+        for (int x=0; x<layer.width; x++) {
             int gid = layer.data[y*layer.width + x];
 
             if (gid == 0) continue;

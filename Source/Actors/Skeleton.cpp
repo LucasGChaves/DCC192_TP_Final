@@ -32,8 +32,11 @@ Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
     mDrawComponent->SetAnimFPS(10.0f);
 
     // Colisor
-    mColliderComponent = new AABBColliderComponent(this, 0, 0,
-        Game::TILE_SIZE * Game::SCALE, Game::TILE_SIZE * Game::SCALE, ColliderLayer::Enemy, false);
+    mColliderComponent = new AABBColliderComponent(this,
+        (Game::TILE_SIZE * Game::SCALE * 2) / 3, (Game::TILE_SIZE * Game::SCALE) / 4,
+            (Game::TILE_SIZE * Game::SCALE * 2) / 3,
+            (Game::TILE_SIZE * Game::SCALE) / 2,
+            ColliderLayer::Enemy, false);
 }
 
 void Skeleton::OnUpdate(float deltaTime)

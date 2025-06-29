@@ -6,6 +6,7 @@
 #include "../Game.h"
 #include "Actor.h"
 #include "../Components/DrawComponents/DrawSpriteComponent.h"
+#include "../Components/DrawComponents/DrawPolygonComponent.h"
 
 class ColliderBlock : public Actor {
     public:

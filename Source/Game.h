@@ -27,7 +27,7 @@ public:
     static const int SCREEN_WIDTH = 1400;
     static const int SCREEN_HEIGHT = 800;
 
-    static const int SCALE = SCREEN_HEIGHT / (LEVEL_HEIGHT * TILE_SIZE);
+    static const int SCALE = 3;
     //static const int SCALE = 1;
 
     enum class GameScene
