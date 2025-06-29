@@ -24,6 +24,7 @@
 #include "Actors/Player.h"
 #include "Actors/ColliderBlock.h"
 #include "Actors/Spawner.h"
+#include "Actors/SpikeGate.h" // TODO: ativar o spikeGate!!!
 #include "UIElements/UIScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Components/DrawComponents/DrawSpriteComponent.h"
@@ -757,6 +758,9 @@ void Game::BuildActorsFromMap() {
         if (obj.name == "player") {
             mPlayer = new Player(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
+        // else if (obj.name.find("spike-gate-") != std::string::npos) { // TODO: instanciar os spikes!!
+        // new SpikeGate(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE), 32.0f, 32.0f);
+        //
     }
 
     Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];
