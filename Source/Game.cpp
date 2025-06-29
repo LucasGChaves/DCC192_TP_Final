@@ -24,6 +24,7 @@
 #include "Actors/Player.h"
 //#include "Actors/Block.h"
 #include "Actors/Spawner.h"
+#include "Actors/Dog.h"
 #include "UIElements/UIScreen.h"
 #include "UIElements/UIWinScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
@@ -210,6 +211,10 @@ void Game::ChangeScene()
             auto* newSkeleton = new Skeleton(this, mPlayer);
             newSkeleton->SetPosition(spawnPos);
         }
+
+        // Spawn a Dog near the player
+        Dog* dog = new Dog(this);
+        dog->SetPosition(mPlayer->GetPosition() + Vector2(80.0f, 0.0f));
     }
     else if (mNextScene == GameScene::Level2)
     {
