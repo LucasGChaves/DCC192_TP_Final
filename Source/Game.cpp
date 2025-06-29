@@ -25,6 +25,7 @@
 //#include "Actors/Block.h"
 #include "Actors/Spawner.h"
 #include "UIElements/UIScreen.h"
+#include "UIElements/UIWinScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Components/DrawComponents/DrawSpriteComponent.h"
 #include "Components/DrawComponents/DrawPolygonComponent.h"
@@ -171,6 +172,7 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
+        mShowWinScreen = true;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
@@ -187,7 +189,10 @@ void Game::ChangeScene()
         Vector2 minBounds(0.0f, 0.0f);
         Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
 
-        for (int i = 0; i < 5; ++i) {
+        int numSkeletons = Random::GetIntRange(4, 15);
+        // Store the number of skeletons for win condition
+        mNumSkeletons = numSkeletons;
+        for (int i = 0; i < numSkeletons; ++i) {
             Vector2 spawnPos;
             bool validPos = false;
 
@@ -489,6 +494,13 @@ void Game::UpdateGame()
 
     if (mGameScene != GameScene::MainMenu && mGamePlayState == GamePlayState::Playing){
         UpdateLevelTime(deltaTime);
+    }
+
+    if (mGameScene == GameScene::Level1 && mPlayer && mPlayer->GetScore() == mNumSkeletons) {
+        if (mShowWinScreen) {
+            mShowWinScreen = false;
+            new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+        }
     }
 }
 

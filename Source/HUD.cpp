@@ -41,11 +41,9 @@ void HUD::Update(float deltaTime)
             mCurrentHearts = hearts;
         }
 
-        // int score = mGame->GetPlayer()->GetScore(); // aguardando
-        // if (score < 0)  score = 0; // just for caution
-        static int fakeScore = 0;
-        fakeScore += 1;
-        SetScore(fakeScore);
+        int score = mGame->GetPlayer()->GetScore(); 
+ 
+        SetScore(score);
     }
 }
 

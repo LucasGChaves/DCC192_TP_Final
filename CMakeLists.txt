@@ -61,6 +61,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Attack.h
         Source/UIElements/UIGameOver.cpp
         Source/UIElements/UIGameOver.h
+        Source/UIElements/UIWinScreen.cpp
+        Source/UIElements/UIWinScreen.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
