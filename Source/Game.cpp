@@ -505,6 +505,10 @@ void Game::UpdateGame()
         if (mShowWinScreen) {
             mShowWinScreen = false;
             new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+            // Spawn a Dog that follows the player and walks randomly near them
+            Dog* winDog = new Dog(this);
+            winDog->SetPosition(mPlayer->GetPosition() + Vector2(Random::GetFloatRange(-60, 60), Random::GetFloatRange(-60, 60)));
+            winDog->StartCircleAround(mPlayer, 120.0f, 2.5f); // Circle around player at win
         }
     }
 }

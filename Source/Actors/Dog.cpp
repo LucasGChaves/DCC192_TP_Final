@@ -4,6 +4,7 @@
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include <SDL_log.h>
+#include "../Random.h"
 
 Dog::Dog(Game* game)
     : Actor(game)
@@ -40,15 +41,71 @@ Dog::Dog(Game* game)
     mColliderComponent = new AABBColliderComponent(this, 0, 0, 32, 32, ColliderLayer::Enemy, false);
 }
 
+void Dog::SetFollowTarget(Actor* target, float maxDistance) {
+    mFollowTarget = target;
+    mMaxFollowDistance = maxDistance;
+}
+
+void Dog::StartCircleAround(Actor* target, float radius, float speed) {
+    mFollowTarget = target;
+    mCircleMode = true;
+    mCircleRadius = radius;
+    mCircleAngularSpeed = speed;
+    // Start at a random angle
+    mCircleAngle = Random::GetFloatRange(0, 2 * Math::Pi);
+}
+
 void Dog::OnUpdate(float deltaTime)
 {
     if (mIsDying) return;
-    // Move up
+    if (mCircleMode && mFollowTarget) {
+        mCircleAngle += mCircleAngularSpeed * deltaTime;
+        if (mCircleAngle > 2 * Math::Pi) mCircleAngle -= 2 * Math::Pi;
+        Vector2 center = mFollowTarget->GetPosition();
+        Vector2 offset(cos(mCircleAngle) * mCircleRadius, sin(mCircleAngle) * mCircleRadius);
+        SetPosition(center + offset);
+
+        float deg = mCircleAngle * 180.0f / Math::Pi;
+        std::string dir;
+        if (deg > 45 && deg <= 135) dir = "Down";
+        else if (deg > 135 && deg <= 225) dir = "Left";
+        else if (deg > 225 && deg <= 315) dir = "Up";
+        else dir = "Right";
+        mDrawComponent->SetAnimation("Walk" + dir);
+        return;
+    }
+    if (mFollowTarget) {
+
+        Vector2 toTarget = mFollowTarget->GetPosition() - GetPosition();
+        float dist = toTarget.Length();
+        if (dist > mMaxFollowDistance) {
+            toTarget.Normalize();
+            SetPosition(GetPosition() + toTarget * mSpeed * deltaTime);
+            mDrawComponent->SetAnimation("Walk" + std::string((fabs(toTarget.x) > fabs(toTarget.y)) ? (toTarget.x > 0 ? "Right" : "Left") : (toTarget.y > 0 ? "Down" : "Up")));
+        } else {
+
+            static float changeDirTimer = 0.0f;
+            static Vector2 randomDir(0, -1);
+            changeDirTimer -= deltaTime;
+            if (changeDirTimer <= 0.0f) {
+                float angle = Random::GetFloatRange(0, 2 * Math::Pi);
+                randomDir = Vector2(cos(angle), sin(angle));
+                changeDirTimer = Random::GetFloatRange(0.5f, 1.5f);
+            }
+            Vector2 newPos = GetPosition() + randomDir * mSpeed * 0.5f * deltaTime;
+
+            if ((newPos - mFollowTarget->GetPosition()).Length() < mMaxFollowDistance) {
+                SetPosition(newPos);
+            }
+            mDrawComponent->SetAnimation("Walk" + std::string((fabs(randomDir.x) > fabs(randomDir.y)) ? (randomDir.x > 0 ? "Right" : "Left") : (randomDir.y > 0 ? "Down" : "Up")));
+        }
+        return;
+    }
+    if (mIsDying) return;
     Vector2 pos = GetPosition();
     pos.y -= mSpeed * deltaTime;
     SetPosition(pos);
     mDrawComponent->SetAnimation("WalkUp");
-    // Optionally: destroy when off screen (above top)
     if (pos.y + 32 < 0) {
         SetState(ActorState::Destroy);
     }
