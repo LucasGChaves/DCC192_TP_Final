@@ -25,7 +25,9 @@
 #include "Actors/ColliderBlock.h"
 #include "Actors/InvisibleWall.h"
 #include "Actors/Spawner.h"
+#include "Actors/Dog.h"
 #include "UIElements/UIScreen.h"
+#include "UIElements/UIWinScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Components/DrawComponents/DrawSpriteComponent.h"
 #include "Components/DrawComponents/DrawPolygonComponent.h"
@@ -106,9 +108,12 @@ bool Game::Initialize()
     mAudio = new AudioSystem(8);
 
     mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f * SCALE,
-                                         LEVEL_WIDTH * TILE_SIZE * SCALE,
-                                         LEVEL_HEIGHT * TILE_SIZE * SCALE);
+                                            LEVEL_WIDTH * TILE_SIZE * SCALE,
+                                            LEVEL_HEIGHT * TILE_SIZE * SCALE);
 
+    mTicksCount = SDL_GetTicks();
+
+    //mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
     mTicksCount = SDL_GetTicks();
 
     // Init all game actors
@@ -150,7 +155,7 @@ void Game::ChangeScene()
     // Reset game timer
     mGameTimer = 0.0f;
 
-    // Reset gameplay state
+    // Reset gameplau state
     mGamePlayState = GamePlayState::Playing;
 
     // Reset scene manager state
@@ -172,6 +177,7 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
+        mShowWinScreen = true;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
@@ -209,7 +215,7 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level2)
     {
-
+        // TODO
 
         // Initialize actors
         //LoadLevel("../Assets/Levels/level1-2.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -406,6 +412,17 @@ void Game::UpdateGame()
 
     if (mGameScene != GameScene::MainMenu && mGamePlayState == GamePlayState::Playing){
         UpdateLevelTime(deltaTime);
+    }
+
+    if (mGameScene == GameScene::Level1 && mPlayer && mPlayer->GetScore() == mNumSkeletons) {
+        if (mShowWinScreen) {
+            mShowWinScreen = false;
+            new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+            // Spawn a Dog that follows the player and walks randomly near them
+            Dog* winDog = new Dog(this);
+            winDog->SetPosition(mPlayer->GetPosition() + Vector2(Random::GetFloatRange(-60, 60), Random::GetFloatRange(-60, 60)));
+            winDog->StartCircleAround(mPlayer, 120.0f, 2.5f); // Circle around player at win
+        }
     }
 }
 

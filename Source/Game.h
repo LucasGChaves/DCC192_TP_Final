@@ -176,5 +176,11 @@ private:
     Vector2 mBackgroundSize;
     Vector2 mBackgroundPosition;
 
+    int mNumSkeletons = 0;
+
+    bool mShowWinScreen = true;
+public:
+    int GetNumSkeletons() const { return mNumSkeletons; }
+
     MapData* mTileMap;
 };
