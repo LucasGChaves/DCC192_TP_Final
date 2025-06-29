@@ -10,7 +10,10 @@ class DrawSpriteComponent : public DrawComponent
 {
 public:
     // (Lower draw order corresponds with further back)
-    DrawSpriteComponent(class Actor* owner, const std::string &texturePath, int width = 0, int height = 0, int drawOrder = 100);
+    DrawSpriteComponent(class Actor* owner, const std::string &texturePath,
+        int width, int height, int drawOrder,
+        bool hasSrc=false, Vector2 srcPos=Vector2::Zero, SDL_Texture* texture=nullptr);
+
     ~DrawSpriteComponent() override;
 
     void Draw(SDL_Renderer* renderer, const Vector3 &modColor = Color::White) override;
@@ -21,4 +24,6 @@ protected:
 
     int mWidth;
     int mHeight;
+    bool mHasSrc;
+    Vector2 mSrcPos;
 };

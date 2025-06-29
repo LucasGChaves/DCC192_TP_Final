@@ -56,14 +56,11 @@ void DrawAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modColor
 
     SDL_Rect* srcRect = mSpriteSheetData[frames[frameIndex]];
 
-    int scaledW = static_cast<int>(srcRect->w * mOwner->GetScale());
-    int scaledH = static_cast<int>(srcRect->h * mOwner->GetScale());
-
     SDL_Rect dstRect = {
             static_cast<int>(mOwner->GetPosition().x - mOwner->GetGame()->GetCameraPos().x),
             static_cast<int>(mOwner->GetPosition().y - mOwner->GetGame()->GetCameraPos().y),
-            scaledW,
-            scaledH
+            srcRect->w * Game::SCALE,
+            srcRect->h * Game::SCALE
     };
 
     SDL_RendererFlip flip = SDL_FLIP_NONE;
