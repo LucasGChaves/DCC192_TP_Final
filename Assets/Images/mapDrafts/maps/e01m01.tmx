@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="46" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="56">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="46" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="57">
  <editorsettings>
   <export target="e01m01.tmj" format="json"/>
  </editorsettings>
@@ -91,36 +91,37 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="6" name="dynamicObjects">
-  <object id="3" name="player" type="scene_1" x="352" y="304" width="32" height="32"/>
-  <object id="26" name="skeleton" type="scene_1" x="501.333" y="72" width="32" height="32"/>
-  <object id="27" name="skeleton" type="scene_1" x="216" y="66" width="32" height="32"/>
-  <object id="28" name="skeleton" type="scene_1" x="182.667" y="102.667" width="32" height="32"/>
-  <object id="29" name="skeleton" type="scene_1" x="180" y="218.667" width="32" height="32"/>
-  <object id="30" name="skeleton" type="scene_1" x="214.667" y="250" width="32" height="32"/>
-  <object id="31" name="skeleton" type="scene_1" x="234" y="136.333" width="32" height="32"/>
-  <object id="33" name="skeleton" type="scene_1" x="275.333" y="108" width="32" height="32"/>
-  <object id="34" name="skeleton" type="scene_1" x="352.667" y="160.667" width="32" height="32"/>
-  <object id="35" name="skeleton" type="scene_1" x="412.667" y="108.667" width="32" height="32"/>
-  <object id="36" name="skeleton" type="scene_1" x="534.667" y="112.667" width="32" height="32"/>
-  <object id="37" name="skeleton" type="scene_1" x="496.667" y="156.667" width="32" height="32"/>
-  <object id="38" name="skeleton" type="scene_1" x="554" y="154.667" width="32" height="32"/>
-  <object id="39" name="skeleton" type="scene_1" x="540.667" y="200.667" width="32" height="32"/>
-  <object id="40" name="skeleton" type="scene_1" x="506" y="234.667" width="32" height="32"/>
-  <object id="41" name="skeleton" type="scene_1" x="450.667" y="180" width="32" height="32"/>
-  <object id="43" name="spike-gate-1" x="352" y="96" width="32" height="32"/>
-  <object id="44" name="spike-gate-2" x="370.667" y="82" width="32" height="32"/>
-  <object id="45" name="spike-gate-2" x="333.667" y="81.6667" width="32" height="32"/>
-  <object id="46" name="spike-gate-3" x="317.667" y="66.6667" width="32" height="32"/>
-  <object id="47" name="spike-gate-3" x="388.667" y="65.3333" width="32" height="32"/>
-  <object id="48" name="spike-gate-4" x="298.167" y="46.6666" width="32" height="32"/>
-  <object id="49" name="spike-gate-4" x="406.167" y="44.6666" width="32" height="32"/>
-  <object id="50" name="skeleton" type="scene_1" x="464" y="48" width="32" height="32"/>
-  <object id="51" name="skeleton" type="scene_1" x="256" y="48" width="32" height="32"/>
-  <object id="52" name="skeleton" type="scene_1" x="153.333" y="148" width="32" height="32"/>
-  <object id="53" name="skeleton" type="scene_1" x="461.333" y="132" width="32" height="32"/>
-  <object id="54" name="skeleton" type="scene_1" x="222.333" y="174" width="32" height="32"/>
-  <object id="55" name="dog" x="352" y="48" width="32" height="32"/>
+ <objectgroup id="6" name="dynamicObjects" locked="1">
+  <object id="3" name="player" type="scene2" x="352" y="334" width="32" height="32"/>
+  <object id="26" name="skeleton" type="scene2" x="501.333" y="72" width="32" height="32"/>
+  <object id="27" name="skeleton" type="scene2" x="216" y="66" width="32" height="32"/>
+  <object id="28" name="skeleton" type="scene2" x="182.667" y="102.667" width="32" height="32"/>
+  <object id="29" name="skeleton" type="scene2" x="180" y="218.667" width="32" height="32"/>
+  <object id="30" name="skeleton" type="scene2" x="214.667" y="250" width="32" height="32"/>
+  <object id="31" name="skeleton" type="scene2" x="234" y="136.333" width="32" height="32"/>
+  <object id="33" name="skeleton" type="scene2" x="275.333" y="108" width="32" height="32"/>
+  <object id="34" name="skeleton" type="scene2" x="352.667" y="160.667" width="32" height="32"/>
+  <object id="35" name="skeleton" type="scene2" x="412.667" y="108.667" width="32" height="32"/>
+  <object id="36" name="skeleton" type="scene2" x="534.667" y="112.667" width="32" height="32"/>
+  <object id="37" name="skeleton" type="scene2" x="496.667" y="156.667" width="32" height="32"/>
+  <object id="38" name="skeleton" type="scene2" x="554" y="154.667" width="32" height="32"/>
+  <object id="39" name="skeleton" type="scene2" x="540.667" y="200.667" width="32" height="32"/>
+  <object id="40" name="skeleton" type="scene2" x="506" y="234.667" width="32" height="32"/>
+  <object id="41" name="skeleton" type="scene2" x="450.667" y="180" width="32" height="32"/>
+  <object id="43" name="spike-gate-1" type="scene2" x="352" y="96" width="32" height="32"/>
+  <object id="44" name="spike-gate-2" type="scene2" x="370.667" y="82" width="32" height="32"/>
+  <object id="45" name="spike-gate-2" type="scene2" x="333.667" y="81.6667" width="32" height="32"/>
+  <object id="46" name="spike-gate-3" type="scene2" x="317.667" y="66.6667" width="32" height="32"/>
+  <object id="47" name="spike-gate-3" type="scene2" x="388.667" y="65.3333" width="32" height="32"/>
+  <object id="48" name="spike-gate-4" type="scene2" x="298.167" y="46.6666" width="32" height="32"/>
+  <object id="49" name="spike-gate-4" type="scene2" x="406.167" y="44.6666" width="32" height="32"/>
+  <object id="50" name="skeleton" type="scene2" x="464" y="48" width="32" height="32"/>
+  <object id="51" name="skeleton" type="scene2" x="256" y="48" width="32" height="32"/>
+  <object id="52" name="skeleton" type="scene2" x="153.333" y="148" width="32" height="32"/>
+  <object id="53" name="skeleton" type="scene2" x="461.333" y="132" width="32" height="32"/>
+  <object id="54" name="skeleton" type="scene2" x="222.333" y="174" width="32" height="32"/>
+  <object id="55" name="dog" type="scene2" x="352" y="48" width="32" height="32"/>
+  <object id="56" name="invisibleWall" type="scene2" x="352" y="304" width="32" height="32"/>
  </objectgroup>
  <layer id="10" name="wallDetails" width="46" height="23" locked="1">
   <data encoding="csv">
