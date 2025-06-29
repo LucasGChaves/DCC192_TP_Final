@@ -74,6 +74,8 @@ public:
     void SetOffGround() { mIsOnGround = false; };
     bool IsOnGround() const { return mIsOnGround; };
     bool IsVisibleOnCamera() const;
+    Vector2 GetTargetPos() const { return mTargetPos; }
+    bool IsActorLocked() const { return mIsLocked; }
 
     // Any actor-specific collision code (overridable)
     virtual void OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other);
@@ -102,6 +104,8 @@ protected:
     // Game specific
     bool mIsOnGround;
     float mStepTimer;
+    Vector2 mTargetPos;
+    bool mIsLocked;
 
 private:
     friend class Component;

@@ -13,7 +13,7 @@ enum class ColliderLayer
     Player,
     Enemy,
     Blocks,
-    Pole,
+    InvisibleWall,
     PlayerAttack // ✅ Adicionado
 };
 
