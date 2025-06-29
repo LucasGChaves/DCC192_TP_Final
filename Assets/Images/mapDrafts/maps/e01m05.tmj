@@ -134,6 +134,17 @@
                  "width":32,
                  "x":336,
                  "y":176
+                }, 
+                {
+                 "height":32,
+                 "id":75,
+                 "name":"changeSceneTrigger",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":352,
+                 "y":16
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -238,7 +249,7 @@
          "height":23,
          "id":21,
          "locked":true,
-         "name":"wall-makeup",
+         "name":"wallMakeup",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
@@ -247,7 +258,7 @@
          "y":0
         }],
  "nextlayerid":22,
- "nextobjectid":75,
+ "nextobjectid":76,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
