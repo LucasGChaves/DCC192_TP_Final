@@ -9,6 +9,7 @@
 
 #include "Attack.h"
 #include "../Components/DrawComponents/DrawPolygonComponent.h"
+#include "../UIElements/UIGameOver.h"
 
 Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
         : Actor(game)
@@ -230,6 +231,11 @@ void Player::Kill()
 
     mGame->GetAudio()->StopAllSounds();
     // mGame->GetAudio()->PlaySound("PlayerDead.wav");
+
+    // Show Game Over menu
+    mGame->SetGamePlayState(Game::GamePlayState::GameOver);
+    auto* gameOverScreen = new UIGameOver(mGame);
+    gameOverScreen->Open();
 }
 
 void Player::Win(AABBColliderComponent *poleCollider)
