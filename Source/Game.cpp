@@ -172,6 +172,7 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
+        mShowWinScreen = true;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
@@ -496,10 +497,8 @@ void Game::UpdateGame()
     }
 
     if (mGameScene == GameScene::Level1 && mPlayer && mPlayer->GetScore() == mNumSkeletons) {
-        // Show win screen only once
-        static bool winScreenShown = false;
-        if (!winScreenShown) {
-            winScreenShown = true;
+        if (mShowWinScreen) {
+            mShowWinScreen = false;
             new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
         }
     }
