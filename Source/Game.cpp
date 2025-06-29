@@ -23,6 +23,7 @@
 #include "Actors/Skeleton.h"
 #include "Actors/Player.h"
 #include "Actors/ColliderBlock.h"
+#include "Actors/InvisibleWall.h"
 #include "Actors/Spawner.h"
 #include "UIElements/UIScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
@@ -208,7 +209,7 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level2)
     {
-        // TODO
+
 
         // Initialize actors
         //LoadLevel("../Assets/Levels/level1-2.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -756,6 +757,10 @@ void Game::BuildActorsFromMap() {
     for (auto obj : mTileMap->layers[dynamicObjectsLayerIdx].objects) {
         if (obj.name == "player") {
             mPlayer = new Player(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+        }
+        else if (obj.name == "invisibleWall") {
+            new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                TILE_SIZE * SCALE * 2, TILE_SIZE * SCALE * 2, obj.scene);
         }
     }
 
