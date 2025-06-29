@@ -57,6 +57,11 @@ void RigidBodyComponent::Update(float deltaTime)
         mOwner->SetPosition(Vector2(mOwner->GetPosition().x + mVelocity.x * deltaTime,
                                          mOwner->GetPosition().y));
 
+        if (mOwner->IsActorLocked() &&
+            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), 5.f) {
+            SetVelocity(Vector2::Zero);
+        }
+
         if (collider) {
             collider->DetectHorizontalCollision(this);
         }
@@ -66,6 +71,12 @@ void RigidBodyComponent::Update(float deltaTime)
     {
         mOwner->SetPosition(Vector2(mOwner->GetPosition().x,
                                          mOwner->GetPosition().y + mVelocity.y * deltaTime));
+
+
+        if (mOwner->IsActorLocked() &&
+            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), 5.f) {
+            SetVelocity(Vector2::Zero);
+        }
 
         if (collider) {
             collider->DetectVertialCollision(this);

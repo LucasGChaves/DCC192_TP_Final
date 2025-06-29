@@ -68,29 +68,50 @@ void Player::OnProcessInput(const uint8_t* state)
     Vector2 velocity = Vector2::Zero;
     mIsRunning = false;
 
-    if (state[SDL_SCANCODE_UP])
-    {
-        velocity.y -= 1.0f;
-        mLastDirection = "Up";
-    }
-    else if (state[SDL_SCANCODE_DOWN])
-    {
-        velocity.y += 1.0f;
-        mLastDirection = "Down";
-    }
+    if (!mIsLocked) {
+        if (state[SDL_SCANCODE_UP])
+        {
+            velocity.y -= 1.0f;
+            mLastDirection = "Up";
+        }
+        else if (state[SDL_SCANCODE_DOWN])
+        {
+            velocity.y += 1.0f;
+            mLastDirection = "Down";
+        }
 
-    if (state[SDL_SCANCODE_LEFT])
-    {
-        velocity.x -= 1.0f;
-        mLastDirection = "Side";
-        SetRotation(Math::Pi);
+        if (state[SDL_SCANCODE_LEFT])
+        {
+            velocity.x -= 1.0f;
+            mLastDirection = "Side";
+            SetRotation(Math::Pi);
 
+        }
+        else if (state[SDL_SCANCODE_RIGHT])
+        {
+            velocity.x += 1.0f;
+            mLastDirection = "Side";
+            SetRotation(0.0f);
+        }
     }
-    else if (state[SDL_SCANCODE_RIGHT])
-    {
-        velocity.x += 1.0f;
-        mLastDirection = "Side";
-        SetRotation(0.0f);
+    else {
+        if (Math::NearZero(Math::Abs(mTargetPos.x-mPosition.x), 5.f)) {
+            velocity.y -= 1.0f;
+            mLastDirection = "Up";
+        }
+        else if ((mPosition.x > mTargetPos.x) && !Math::NearZero(Math::Abs(mTargetPos.x-mPosition.x), 5.f))
+        {
+            velocity.x -= 1.0f;
+            mLastDirection = "Side";
+            SetRotation(Math::Pi);
+
+        }
+        else if ((mPosition.x < mTargetPos.x) && !Math::NearZero(Math::Abs(mTargetPos.x-mPosition.x), 5.f))
+        {
+            velocity.x += 1.0f;
+            mLastDirection = "Side";
+            SetRotation(0.0f);
+        }
     }
 
     if (!Math::NearZero(velocity.Length()))
@@ -261,6 +282,12 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
     if (other->GetLayer() == ColliderLayer::Enemy)
     {
         Hit();
+    }
+
+    if (other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
+        mIsLocked = true;
+        other->SetEnabled(false);
+        mTargetPos = other->GetOwner()->GetPosition();
     }
 }
 

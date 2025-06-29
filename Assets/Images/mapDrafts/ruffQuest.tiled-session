@@ -46,11 +46,11 @@
             "expandedObjectLayers": [
                 6
             ],
-            "scale": 3,
+            "scale": 8,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 357.8333333333333,
-                "y": 126.5
+                "x": 386.5,
+                "y": 78.5625
             }
         },
         "maps/e01m03.tmx": {
@@ -76,11 +76,11 @@
             "expandedObjectLayers": [
                 19
             ],
-            "scale": 3,
-            "selectedLayer": 6,
+            "scale": 8,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 300.8333333333333,
-                "y": 98.5
+                "x": 351,
+                "y": 18.0625
             }
         },
         "maps/e01m06.tmx": {

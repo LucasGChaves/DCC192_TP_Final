@@ -19,6 +19,8 @@ Actor::Actor(Game* game)
         , mGame(game)
         , mIsOnGround(false)
         , mStepTimer(0.0f)
+        , mTargetPos(Vector2::Zero)
+        , mIsLocked(false)
 {
     mGame->AddActor(this);
 }

@@ -8,8 +8,7 @@ const std::map<ColliderLayer, const std::set<ColliderLayer>> ColliderIgnoreMap =
         { ColliderLayer::Player, {} },
         { ColliderLayer::Enemy, {} },
         { ColliderLayer::Blocks, { ColliderLayer::Blocks } },
-        { ColliderLayer::Pole, {} },
-        { ColliderLayer::PlayerAttack, { ColliderLayer::Player, ColliderLayer::Blocks, ColliderLayer::Pole } } // ✅
+        { ColliderLayer::PlayerAttack, { ColliderLayer::Player, ColliderLayer::Blocks } } // ✅
 };
 
 AABBColliderComponent::AABBColliderComponent(
