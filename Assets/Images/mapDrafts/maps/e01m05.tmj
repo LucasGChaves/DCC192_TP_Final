@@ -110,7 +110,6 @@
         {
          "draworder":"topdown",
          "id":19,
-         "locked":true,
          "name":"dynamicObjects",
          "objects":[
                 {
@@ -136,7 +135,7 @@
                  "y":176
                 }, 
                 {
-                 "height":64,
+                 "height":70,
                  "id":75,
                  "name":"invisibleWall",
                  "rotation":0,

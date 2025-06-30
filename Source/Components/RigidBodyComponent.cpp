@@ -57,8 +57,9 @@ void RigidBodyComponent::Update(float deltaTime)
         mOwner->SetPosition(Vector2(mOwner->GetPosition().x + mVelocity.x * deltaTime,
                                          mOwner->GetPosition().y));
 
+        //SDL_Log("Deltatime * velocity: %f", mVelocity.x * deltaTime);
         if (mOwner->IsActorLocked() &&
-            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), 5.f) {
+            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), mVelocity.x * deltaTime) {
             SetVelocity(Vector2::Zero);
         }
 
@@ -74,14 +75,20 @@ void RigidBodyComponent::Update(float deltaTime)
 
 
         if (mOwner->IsActorLocked() &&
-            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), 5.f) {
+            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), mVelocity.x * deltaTime) {
             SetVelocity(Vector2::Zero);
         }
 
         if (collider) {
             collider->DetectVertialCollision(this);
         }
+    }
 
+    if (mOwner->GetGame()->GetGamePlayState() == Game::GamePlayState::EnteringMap) {
+        if (collider) {
+            SDL_Log("testing...");
+            collider->DetectVertialCollision(this);
+        }
     }
 
     mAcceleration.Set(0.f, 0.f);

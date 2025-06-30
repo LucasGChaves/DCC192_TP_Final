@@ -99,7 +99,7 @@
  <objectgroup id="19" name="dynamicObjects" locked="1">
   <object id="73" name="player" type="scene1" x="288" y="176" width="32" height="32"/>
   <object id="74" name="dog" type="scene1" x="352" y="176" width="32" height="32"/>
-  <object id="75" name="invisibleWall" type="scene1" x="352" y="0" width="32" height="64"/>
+  <object id="75" name="invisibleWall" type="scene1" x="352" y="0" width="32" height="70"/>
  </objectgroup>
  <layer id="9" name="roof" width="46" height="23" locked="1">
   <data encoding="csv">
