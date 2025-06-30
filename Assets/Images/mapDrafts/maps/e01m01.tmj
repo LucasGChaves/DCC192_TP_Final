@@ -291,7 +291,7 @@
                 {
                  "height":32,
                  "id":43,
-                 "name":"spike-gate-1",
+                 "name":"spike-gate-3",
                  "rotation":0,
                  "type":"scene2",
                  "visible":true,
@@ -324,7 +324,7 @@
                 {
                  "height":32,
                  "id":46,
-                 "name":"spike-gate-3",
+                 "name":"spike-gate-1",
                  "rotation":0,
                  "type":"scene2",
                  "visible":true,
@@ -335,35 +335,13 @@
                 {
                  "height":32,
                  "id":47,
-                 "name":"spike-gate-3",
+                 "name":"spike-gate-1",
                  "rotation":0,
                  "type":"scene2",
                  "visible":true,
                  "width":32,
                  "x":388.667,
                  "y":65.3333
-                }, 
-                {
-                 "height":32,
-                 "id":48,
-                 "name":"spike-gate-4",
-                 "rotation":0,
-                 "type":"scene2",
-                 "visible":true,
-                 "width":32,
-                 "x":298.167,
-                 "y":46.6666
-                }, 
-                {
-                 "height":32,
-                 "id":49,
-                 "name":"spike-gate-4",
-                 "rotation":0,
-                 "type":"scene2",
-                 "visible":true,
-                 "width":32,
-                 "x":406.167,
-                 "y":44.6666
                 }, 
                 {
                  "height":32,

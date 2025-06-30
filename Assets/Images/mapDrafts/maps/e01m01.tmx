@@ -107,13 +107,11 @@
   <object id="39" name="skeleton" type="scene2" x="540.667" y="200.667" width="32" height="32"/>
   <object id="40" name="skeleton" type="scene2" x="506" y="234.667" width="32" height="32"/>
   <object id="41" name="skeleton" type="scene2" x="450.667" y="180" width="32" height="32"/>
-  <object id="43" name="spike-gate-1" type="scene2" x="352" y="96" width="32" height="32"/>
+  <object id="43" name="spike-gate-3" type="scene2" x="352" y="96" width="32" height="32"/>
   <object id="44" name="spike-gate-2" type="scene2" x="370.667" y="82" width="32" height="32"/>
   <object id="45" name="spike-gate-2" type="scene2" x="333.667" y="81.6667" width="32" height="32"/>
-  <object id="46" name="spike-gate-3" type="scene2" x="317.667" y="66.6667" width="32" height="32"/>
-  <object id="47" name="spike-gate-3" type="scene2" x="388.667" y="65.3333" width="32" height="32"/>
-  <object id="48" name="spike-gate-4" type="scene2" x="298.167" y="46.6666" width="32" height="32"/>
-  <object id="49" name="spike-gate-4" type="scene2" x="406.167" y="44.6666" width="32" height="32"/>
+  <object id="46" name="spike-gate-1" type="scene2" x="317.667" y="66.6667" width="32" height="32"/>
+  <object id="47" name="spike-gate-1" type="scene2" x="388.667" y="65.3333" width="32" height="32"/>
   <object id="50" name="skeleton" type="scene2" x="464" y="48" width="32" height="32"/>
   <object id="51" name="skeleton" type="scene2" x="256" y="48" width="32" height="32"/>
   <object id="52" name="skeleton" type="scene2" x="153.333" y="148" width="32" height="32"/>
