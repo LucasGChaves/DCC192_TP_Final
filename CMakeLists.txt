@@ -42,6 +42,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Skeleton.cpp
         Source/Actors/InvisibleWall.cpp
         Source/Actors/InvisibleWall.h
+        Source/Actors/SpikeGate.cpp
+        Source/Actors/SpikeGate.h
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
