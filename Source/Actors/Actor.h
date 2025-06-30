@@ -54,6 +54,11 @@ public:
     SDL_RendererFlip GetFlip() const { return mFlip; }
     void SetFlip(SDL_RendererFlip flip) { mFlip = flip; }
 
+    std::tuple<int, int, int, int> ComputeColliderParams(
+    int spriteWidthOriginal,
+    int spriteHeightOriginal
+);
+
     // Game getter
     class Game* GetGame() { return mGame; }
 

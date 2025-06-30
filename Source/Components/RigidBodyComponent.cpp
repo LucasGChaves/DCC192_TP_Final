@@ -86,7 +86,6 @@ void RigidBodyComponent::Update(float deltaTime)
 
     if (mOwner->GetGame()->GetGamePlayState() == Game::GamePlayState::EnteringMap) {
         if (collider) {
-            SDL_Log("testing...");
             collider->DetectVertialCollision(this);
         }
     }

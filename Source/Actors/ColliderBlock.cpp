@@ -13,7 +13,7 @@ ColliderBlock::ColliderBlock(Game* game, Vector2 pos, Vector2 srcPos, int width,
     SetRotation(angle);
     SetFlip(flip);
 
-    new DrawSpriteComponent(this, "", width, height, 100, true, srcPos, texture);
+    new DrawSpriteComponent(this, "", width, height, 1, true, srcPos, texture);
     mColliderComponent = new AABBColliderComponent(this, 0, 0, width, height, ColliderLayer::Blocks, true);
     // std::vector<Vector2> vertices= {
     //     Vector2(0, 0), Vector2(static_cast<float>(width), 0),

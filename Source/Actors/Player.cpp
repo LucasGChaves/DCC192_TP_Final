@@ -25,23 +25,24 @@ Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
-    mRigidBodyComponent = new RigidBodyComponent(this);
-    mColliderComponent = new AABBColliderComponent(
-            this,
-            (Game::TILE_SIZE * Game::SCALE * 2) / 3, (Game::TILE_SIZE * Game::SCALE) / 4,
-            (Game::TILE_SIZE * Game::SCALE * 2) / 3,
-            (Game::TILE_SIZE * Game::SCALE) / 2,
-            ColliderLayer::Player,
-            false,
-            100
-    );
+    // int dx = (Game::TILE_SIZE * Game::SCALE * 2) / 3;
+    // int dy = (Game::TILE_SIZE * Game::SCALE) / 4;
+    // int width = (Game::TILE_SIZE * Game::SCALE * 2) / 3;
+    // int height = (Game::TILE_SIZE * Game::SCALE) / 2;
 
-    // std::vector<Vector2> vertices= {
-    //     Vector2(0, 0), Vector2(Game::TILE_SIZE * Game::SCALE  * 2, 0),
-    //     Vector2(Game::TILE_SIZE * Game::SCALE  * 2, Game::TILE_SIZE * Game::SCALE  * 2), Vector2(0, Game::TILE_SIZE * Game::SCALE  * 2),
+
+    auto [dx, dy, w, h] = ComputeColliderParams(Game::TILE_SIZE * 2, Game::TILE_SIZE * 2);
+    mRigidBodyComponent = new RigidBodyComponent(this);
+    mColliderComponent = new AABBColliderComponent(this,dx, dy, w, h, ColliderLayer::Player, false, 100);
+
+    // std::vector<Vector2> vertices = {
+    //     Vector2(dx, dy),                     // Top-left
+    //     Vector2(dx + w, dy),            // Top-right
+    //     Vector2(dx + w, dy + h),   // Bottom-right
+    //     Vector2(dx, dy + h)            // Bottom-left
     // };
     //new DrawPolygonComponent(this, vertices);
-    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json", 1);
+    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json", 6);
 
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
