@@ -186,6 +186,8 @@ void Game::ChangeScene()
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
+
+        mDog->SetState(Dog::State::Wander);
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -198,6 +200,7 @@ void Game::ChangeScene()
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
+        mDog->SetState(Dog::State::Idle);
         mGamePlayState = GamePlayState::EnteringMap;
     }
 
@@ -806,10 +809,8 @@ void Game::BuildActorsFromMap() {
         }
         else if (obj.name == "dog")
         {
-            auto dog = new Dog(this, Vector2(obj.pos.x * SCALE - 48.0f, obj.pos.y * SCALE - 48.0f));
-            if (mPlayer) dog->SetOwner(mPlayer);
-            // dog->SetPosition(mPlayer->GetPosition() + Vector2(Random::GetFloatRange(-60, 60), Random::GetFloatRange(-60, 60)));
-            // winDog->StartCircleAround(mPlayer, 120.0f, 2.5f); // Circle around player at win
+            mDog = new Dog(this, Vector2(obj.pos.x * SCALE - 48.0f, obj.pos.y * SCALE - 48.0f));
+            if (mPlayer) mDog->SetOwner(mPlayer);
         }
     }
 

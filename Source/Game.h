@@ -176,6 +176,7 @@ private:
 
     // Game-specific
     class Player *mPlayer;
+    class Dog *mDog;
     class HUD *mHUD;
     SoundHandle mMusicHandle;
 

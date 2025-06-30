@@ -11,6 +11,7 @@ public:
     enum class State {
         Wander,
         Follow,
+        Idle,
         Dying
     };
 
@@ -46,6 +47,7 @@ private:
 
     void UpdateWander(float dt);
     void UpdateFollow(float dt);
+    void UpdateIdle(float dt);
 
     std::string GetDirectionFromVector(const Vector2& dir) const;
     std::vector<int> GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount);

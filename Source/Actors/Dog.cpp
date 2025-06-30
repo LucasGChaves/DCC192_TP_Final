@@ -33,8 +33,6 @@ Dog::Dog(Game* game, Vector2 pos)
 
     mDrawComponent->SetAnimation("IdleDown");
     mDrawComponent->SetAnimFPS(10.0f);
-
-    mState = State::Follow;
 }
 
 void Dog::SetOwner(Actor* owner)
@@ -64,6 +62,7 @@ void Dog::OnUpdate(float dt)
     switch (mState) {
         case State::Wander: UpdateWander(dt); break;
         case State::Follow: UpdateFollow(dt); break;
+        case State::Idle: UpdateIdle(dt); break;
         default: break;
     }
 }
@@ -111,6 +110,12 @@ void Dog::UpdateFollow(float dt)
 
         mDrawComponent->SetAnimation("Walk" + GetDirectionFromVector(mRandomDir));
     }
+}
+
+void Dog::UpdateIdle(float dt)
+{
+    mDrawComponent->SetAnimation("IdleDown");
+    // Nada de movimento, ele permanece na posição atual
 }
 
 std::string Dog::GetDirectionFromVector(const Vector2& dir) const
