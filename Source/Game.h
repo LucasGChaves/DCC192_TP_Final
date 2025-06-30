@@ -24,11 +24,11 @@ public:
     static const int TRANSITION_TIME = 1;
 
     //Screen dimension constants
-    static const int SCREEN_WIDTH = 736;
-    static const int SCREEN_HEIGHT = 368;
+    static const int SCREEN_WIDTH = 1400;
+    static const int SCREEN_HEIGHT = 800;
 
-    //static const int SCALE = SCREEN_HEIGHT / (LEVEL_HEIGHT * TILE_SIZE);
-    static const int SCALE = 1;
+    static const int SCALE = 3;
+    //static const int SCALE = 1;
 
     enum class GameScene
     {
@@ -51,7 +51,8 @@ public:
         Paused,
         GameOver,
         LevelComplete,
-        Leaving
+        Leaving,
+        EnteringMap
     };
 
     Game(int windowWidth, int windowHeight);
@@ -103,8 +104,11 @@ public:
     void SetBackgroundImage(const std::string& imagePath, const Vector2 &position = Vector2::Zero, const Vector2& size = Vector2::Zero);
     void TogglePause();
 
+    GameScene GetGameScene() { return mGameScene; }
+
     // Game-specific
     const class Player* GetPlayer() { return mPlayer; }
+
 
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }

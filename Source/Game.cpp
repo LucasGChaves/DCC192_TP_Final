@@ -23,6 +23,7 @@
 #include "Actors/Skeleton.h"
 #include "Actors/Player.h"
 #include "Actors/ColliderBlock.h"
+#include "Actors/InvisibleWall.h"
 #include "Actors/Spawner.h"
 #include "UIElements/UIScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
@@ -160,8 +161,6 @@ void Game::ChangeScene()
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
-        // Initialize main menu actors
-        mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
 
         mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
@@ -171,9 +170,9 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
-        float hudScale = 2.0f;
-        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
-
+        // float hudScale = 2.0f;
+        // mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
+        //
         mAudio->StopSound(mMusicHandle);
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
@@ -182,36 +181,18 @@ void Game::ChangeScene()
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
-
-        //OBS: Inicialização do esqueleto comentada para fins de debug //TODO - descomentar depois
-        //  const float minDistance = 200.0f;
-        //  Vector2 minBounds(0.0f, 0.0f);
-        //  Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
-        //
-        //  for (int i = 0; i < 5; ++i) {
-        //      Vector2 spawnPos;
-        //      bool validPos = false;
-        //
-        //      while (!validPos) {
-        //          spawnPos = Random::GetVector(minBounds, maxBounds);
-        //
-        //          Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
-        //          float distance = toPlayer.Length();
-        //
-        //          if (distance >= minDistance) {
-        //              validPos = true;
-        //          }
-        //      }
-        //
-        //      new Skeleton(this, mPlayer, spawnPos);
-        // }
     }
     else if (mNextScene == GameScene::Level2)
     {
-        // TODO
+        float hudScale = 2.0f;
+        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
-        // Initialize actors
-        //LoadLevel("../Assets/Levels/level1-2.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+        mAudio->StopSound(mMusicHandle);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+
+        LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
+        BuildActorsFromMap();
+        mGamePlayState = GamePlayState::EnteringMap;
     }
 
     // Set new scene
@@ -295,7 +276,9 @@ void Game::ProcessInput()
 
 void Game::ProcessInputActors()
 {
-    if(mGamePlayState == GamePlayState::Playing)
+    if(mGamePlayState == GamePlayState::Playing ||
+        mGamePlayState == GamePlayState::Leaving ||
+        mGamePlayState == GamePlayState::EnteringMap)
     {
         // Get actors on camera
         std::vector<Actor*> actorsOnCamera =
@@ -306,9 +289,12 @@ void Game::ProcessInputActors()
         bool isPlayerOnCamera = false;
         for (auto actor: actorsOnCamera)
         {
-            actor->ProcessInput(state);
+            if (mGamePlayState == GamePlayState::Playing && actor != mPlayer) {
+                actor->ProcessInput(state);
+            }
 
             if (actor == mPlayer) {
+                actor->ProcessInput(state);
                 isPlayerOnCamera = true;
             }
         }
@@ -502,17 +488,21 @@ std::vector<AABBColliderComponent *> Game::GetNearbyColliders(const Vector2& pos
 void Game::GenerateOutput()
 {
     // Clear frame with background color
-    //SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
+    SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
 
     // Clear back buffer
     SDL_RenderClear(mRenderer);
 
     int roofIdx = -1;
+    int wallDetailsIdx = -1;
 
     if (mTileMap && !mTileMap->layers.empty()) {
         for (int i=0; i<mTileMap->layers.size(); i++) {
             if (mTileMap->layers[i].name == "roof") {
                 roofIdx = i;
+            }
+            else if (mTileMap->layers[i].name == "wallDetails") {
+                wallDetailsIdx = i;
             }
             else if (mTileMap->layers[i].type == LayerType::Block && mTileMap->layers[i].name != "staticObjects") {
                 RenderLayer(mRenderer, mTileMap, i, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
@@ -550,6 +540,9 @@ void Game::GenerateOutput()
 
     if (roofIdx > -1) {
         RenderLayer(mRenderer, mTileMap, roofIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+    }
+    if (wallDetailsIdx > -1) {
+        RenderLayer(mRenderer, mTileMap, wallDetailsIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
     }
 
     // Draw all UI screens
@@ -757,9 +750,19 @@ void Game::BuildActorsFromMap() {
         if (obj.name == "player") {
             mPlayer = new Player(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
+        else if (obj.name == "invisibleWall") {
+            new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                obj.width * SCALE, obj.height * SCALE, obj.scene);
+        }
+        else if (obj.name == "skeleton") {
+            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+            // TODO: add mSkeletonNum
+        }
     }
 
     Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];
+    bool rotate = false;
 
     for (int y=0; y<staticObjectLayer.height; y++) {
         for (int x=0; x<staticObjectLayer.width; x++) {
@@ -768,9 +771,16 @@ void Game::BuildActorsFromMap() {
 
             if (gid == 0) continue;
 
-            int tsxIdx = FindTilesetIndex(mTileMap, gid);
+            TileRenderInfo tsInfo = GetTileFlipInfoFromGID(gid);
+            uint32_t clean_gid = tsInfo.clean_gid;
+
+            int tsxIdx = FindTilesetIndex(mTileMap, clean_gid);
             const auto& ts = mTileMap->tilesets[tsxIdx];
-            int localId = gid - ts.firstGid;
+            int localId = clean_gid - ts.firstGid;
+
+            if (clean_gid != gid) {
+                rotate = true;
+            }
 
             if (!ts.isCollection) {
                 int row = localId / ts.columns;
@@ -779,7 +789,7 @@ void Game::BuildActorsFromMap() {
                 Vector2 pos{static_cast<float>(x*TILE_SIZE*SCALE), static_cast<float>(y*TILE_SIZE*SCALE)};
                 Vector2 srcPos{static_cast<float>(col * TILE_SIZE), static_cast<float>(row * TILE_SIZE)};
 
-                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture);
+                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture, rotate);
             }
             else {
                 const SDL_Rect& size = ts.sizes[localId];

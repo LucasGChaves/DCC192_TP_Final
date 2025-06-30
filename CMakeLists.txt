@@ -40,6 +40,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/ColliderBlock.h
         Source/Actors/Skeleton.h
         Source/Actors/Skeleton.cpp
+        Source/Actors/InvisibleWall.cpp
+        Source/Actors/InvisibleWall.h
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
@@ -65,6 +67,8 @@ add_executable(${PROJECT_NAME}
         Source/SpatialHashing.h
         Source/Actors/Attack.cpp
         Source/Actors/Attack.h
+        Source/UIElements/UIGameOver.cpp
+        Source/UIElements/UIGameOver.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)

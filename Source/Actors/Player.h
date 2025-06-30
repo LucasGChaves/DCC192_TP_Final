@@ -6,7 +6,7 @@
 class Player : public Actor
 {
 public:
-    explicit Player(Game* game, Vector2 pos, float forwardSpeed = 150.0f);
+    explicit Player(Game* game, Vector2 pos, float forwardSpeed = 300.0f);
 
     void OnProcessInput(const Uint8* keyState) override;
     void OnUpdate(float deltaTime) override;
