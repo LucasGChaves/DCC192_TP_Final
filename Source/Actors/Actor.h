@@ -7,6 +7,7 @@
 // ----------------------------------------------------------------
 
 #pragma once
+#include <SDL_render.h>
 #include <vector>
 #include <SDL_stdinc.h>
 #include "../Math.h"
@@ -49,6 +50,9 @@ public:
     // State getter/setter
     ActorState GetState() const { return mState; }
     void SetState(ActorState state) { mState = state; }
+
+    SDL_RendererFlip GetFlip() const { return mFlip; }
+    void SetFlip(SDL_RendererFlip flip) { mFlip = flip; }
 
     // Game getter
     class Game* GetGame() { return mGame; }
@@ -97,6 +101,7 @@ protected:
     Vector2 mPosition;
     float mScale;
     float mRotation;
+    SDL_RendererFlip mFlip = SDL_FLIP_NONE;
 
     // Components
     std::vector<class Component*> mComponents;
@@ -105,6 +110,7 @@ protected:
     bool mIsOnGround;
     float mStepTimer;
     Vector2 mTargetPos;
+    Actor* mTarget;
     bool mIsLocked;
 
 private:

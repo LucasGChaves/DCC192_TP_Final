@@ -57,6 +57,12 @@ struct MapData {
     std::vector<DynamicObject> dynamicObjects;
 };
 
+struct TileRenderInfo {
+    uint32_t clean_gid;
+    double angle_deg;
+    SDL_RendererFlip flip;
+};
+
 MapData* LoadTileMap(const std::string& jsonPath, SDL_Renderer* renderer);
 
 int FindTilesetIndex(const MapData* map, int gid);
@@ -72,3 +78,5 @@ std::array<int,4> GetCameraTileBounds(
     int mapWidth, int mapHeight);
 
 int GetLayerIdx(MapData map, std::string layerName);
+
+TileRenderInfo GetTileFlipInfoFromGID(uint32_t gid_with_flags);

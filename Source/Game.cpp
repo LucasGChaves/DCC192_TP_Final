@@ -161,8 +161,6 @@ void Game::ChangeScene()
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
-        // Initialize main menu actors
-        mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
 
         mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
@@ -503,17 +501,21 @@ std::vector<AABBColliderComponent *> Game::GetNearbyColliders(const Vector2& pos
 void Game::GenerateOutput()
 {
     // Clear frame with background color
-    //SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
+    SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
 
     // Clear back buffer
     SDL_RenderClear(mRenderer);
 
     int roofIdx = -1;
+    int wallDetailsIdx = -1;
 
     if (mTileMap && !mTileMap->layers.empty()) {
         for (int i=0; i<mTileMap->layers.size(); i++) {
             if (mTileMap->layers[i].name == "roof") {
                 roofIdx = i;
+            }
+            else if (mTileMap->layers[i].name == "wallDetails") {
+                wallDetailsIdx = i;
             }
             else if (mTileMap->layers[i].type == LayerType::Block && mTileMap->layers[i].name != "staticObjects") {
                 RenderLayer(mRenderer, mTileMap, i, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
@@ -551,6 +553,9 @@ void Game::GenerateOutput()
 
     if (roofIdx > -1) {
         RenderLayer(mRenderer, mTileMap, roofIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+    }
+    if (wallDetailsIdx > -1) {
+        RenderLayer(mRenderer, mTileMap, wallDetailsIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
     }
 
     // Draw all UI screens
@@ -760,11 +765,12 @@ void Game::BuildActorsFromMap() {
         }
         else if (obj.name == "invisibleWall") {
             new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
-                TILE_SIZE * SCALE * 2, TILE_SIZE * SCALE * 2, obj.scene);
+                obj.width * SCALE, obj.height * SCALE, obj.scene);
         }
     }
 
     Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];
+    bool rotate = false;
 
     for (int y=0; y<staticObjectLayer.height; y++) {
         for (int x=0; x<staticObjectLayer.width; x++) {
@@ -773,9 +779,16 @@ void Game::BuildActorsFromMap() {
 
             if (gid == 0) continue;
 
-            int tsxIdx = FindTilesetIndex(mTileMap, gid);
+            TileRenderInfo tsInfo = GetTileFlipInfoFromGID(gid);
+            uint32_t clean_gid = tsInfo.clean_gid;
+
+            int tsxIdx = FindTilesetIndex(mTileMap, clean_gid);
             const auto& ts = mTileMap->tilesets[tsxIdx];
-            int localId = gid - ts.firstGid;
+            int localId = clean_gid - ts.firstGid;
+
+            if (clean_gid != gid) {
+                rotate = true;
+            }
 
             if (!ts.isCollection) {
                 int row = localId / ts.columns;
@@ -784,7 +797,7 @@ void Game::BuildActorsFromMap() {
                 Vector2 pos{static_cast<float>(x*TILE_SIZE*SCALE), static_cast<float>(y*TILE_SIZE*SCALE)};
                 Vector2 srcPos{static_cast<float>(col * TILE_SIZE), static_cast<float>(row * TILE_SIZE)};
 
-                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture);
+                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture, rotate);
             }
             else {
                 const SDL_Rect& size = ts.sizes[localId];
