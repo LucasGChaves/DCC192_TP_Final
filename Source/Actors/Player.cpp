@@ -5,11 +5,14 @@
 #include "../Components/RigidBodyComponent.h"
 #include <SDL_mixer.h>
 #include <algorithm>
+#include "../Math.h"
 
 #include "Attack.h"
+#include "Dog.h"
+#include "../Components/DrawComponents/DrawPolygonComponent.h"
 #include "../UIElements/UIGameOver.h"
 
-Player::Player(Game* game, const float forwardSpeed)
+Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
         : Actor(game)
         , mIsRunning(false)
         , mIsDying(false)
@@ -19,24 +22,29 @@ Player::Player(Game* game, const float forwardSpeed)
         , mInvincibleTime(.0f)
         , mBlinkTimer(0.0f)
         , mIsBlinkVisible(true)
+        , mScore(0)
 {
-    SetPosition(Vector2(100.0f, 100.0f));
-    float scale = mGame->GetWindowHeight() / 240.0f;
-    SetScale(scale);
+    SetPosition(pos);
+    SetScale(Game::SCALE);
 
+    // int dx = (Game::TILE_SIZE * Game::SCALE * 2) / 3;
+    // int dy = (Game::TILE_SIZE * Game::SCALE) / 4;
+    // int width = (Game::TILE_SIZE * Game::SCALE * 2) / 3;
+    // int height = (Game::TILE_SIZE * Game::SCALE) / 2;
+
+
+    auto [dx, dy, w, h] = ComputeColliderParams(Game::TILE_SIZE * 2, Game::TILE_SIZE * 2);
     mRigidBodyComponent = new RigidBodyComponent(this);
-    mColliderComponent = new AABBColliderComponent(
-            this,
-            0, 0,
-            32, 32,
-            ColliderLayer::Player,
-            false,
-            100
-    );
+    mColliderComponent = new AABBColliderComponent(this,dx, dy, w, h, ColliderLayer::Player, false, 100);
 
-    mColliderComponent->SetEnabled(true);
-
-    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json");
+    // std::vector<Vector2> vertices = {
+    //     Vector2(dx, dy),                     // Top-left
+    //     Vector2(dx + w, dy),            // Top-right
+    //     Vector2(dx + w, dy + h),   // Bottom-right
+    //     Vector2(dx, dy + h)            // Bottom-left
+    // };
+    //new DrawPolygonComponent(this, vertices);
+    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json", 6);
 
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
@@ -63,29 +71,50 @@ void Player::OnProcessInput(const uint8_t* state)
     Vector2 velocity = Vector2::Zero;
     mIsRunning = false;
 
-    if (state[SDL_SCANCODE_UP])
-    {
-        velocity.y -= 1.0f;
-        mLastDirection = "Up";
-    }
-    else if (state[SDL_SCANCODE_DOWN])
-    {
-        velocity.y += 1.0f;
-        mLastDirection = "Down";
-    }
+    if (!mIsLocked) {
+        if (state[SDL_SCANCODE_UP])
+        {
+            velocity.y -= 1.0f;
+            mLastDirection = "Up";
+        }
+        else if (state[SDL_SCANCODE_DOWN])
+        {
+            velocity.y += 1.0f;
+            mLastDirection = "Down";
+        }
 
-    if (state[SDL_SCANCODE_LEFT])
-    {
-        velocity.x -= 1.0f;
-        mLastDirection = "Side";
-        SetRotation(Math::Pi);
+        if (state[SDL_SCANCODE_LEFT])
+        {
+            velocity.x -= 1.0f;
+            mLastDirection = "Side";
+            SetRotation(Math::Pi);
 
+        }
+        else if (state[SDL_SCANCODE_RIGHT])
+        {
+            velocity.x += 1.0f;
+            mLastDirection = "Side";
+            SetRotation(0.0f);
+        }
     }
-    else if (state[SDL_SCANCODE_RIGHT])
-    {
-        velocity.x += 1.0f;
-        mLastDirection = "Side";
-        SetRotation(0.0f);
+    else if (mTriggeredAnimation){
+        if (Math::NearZero(Math::Abs(mTargetPos.x-mPosition.x), 5.f)) {
+            velocity.y -= 1.0f;
+            mLastDirection = "Up";
+        }
+        else if ((mPosition.x > mTargetPos.x) && !Math::NearZero(Math::Abs(mTargetPos.x-mPosition.x), 5.f))
+        {
+            velocity.x -= 1.0f;
+            mLastDirection = "Side";
+            SetRotation(Math::Pi);
+
+        }
+        else if ((mPosition.x < mTargetPos.x) && !Math::NearZero(Math::Abs(mTargetPos.x-mPosition.x), 5.f))
+        {
+            velocity.x += 1.0f;
+            mLastDirection = "Side";
+            SetRotation(0.0f);
+        }
     }
 
     if (!Math::NearZero(velocity.Length()))
@@ -113,7 +142,7 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
 
         Vector2 base = GetPosition();
-        float w = 40.0f, h = 40.0f, offset = 40.0f;
+        float w = 48.0f, h = 48.0f, offset = -8.0f;
         std::vector<Vector2> poly;
         if (mLastDirection == "Up") {
             poly = { Vector2(base.x, base.y - offset), Vector2(base.x + w, base.y - offset), Vector2(base.x + w, base.y - offset + h), Vector2(base.x, base.y - offset + h) };
@@ -145,6 +174,12 @@ void Player::OnUpdate(float deltaTime)
 {
     if (mHearts <= 0) Kill();
 
+    if (mGame->GetGameScene() == Game::GameScene::Level1 &&
+        mGame->GetDog()->GetState() == Dog::State::Dying &&
+        mIsLocked) {
+        mIsLocked = false;
+    }
+
     if (mInvincibleTime >= .0f) {
         mInvincibleTime -= deltaTime;
         // Blinking logic: toggle every 0.1s
@@ -175,6 +210,20 @@ void Player::OnUpdate(float deltaTime)
         mStepTimer -= deltaTime;
     }
 
+    if (mGame->GetGamePlayState() == Game::GamePlayState::Leaving && mPosition.y <= mTargetPos.y &&
+        mGame->GetGameScene() == Game::GameScene::Level1) {
+        mState = ActorState::Destroy;
+        mGame->SetGameScene(Game::GameScene::Level2, 1.5f);
+        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+    }
+    else if (mGame->GetGamePlayState() == Game::GamePlayState::EnteringMap &&
+        mPosition.y <= (mTargetPos.y - ((Game::TILE_SIZE + Game::TILE_SIZE/2) * Game::SCALE)) &&
+        mGame->GetGameScene() == Game::GameScene::Level2) {
+        mIsLocked = false;
+        mGame->SetGamePlayState(Game::GamePlayState::Playing);
+        mRigidBodyComponent->SetVelocity(Vector2::Zero);
+        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+    }
     ManageAnimations();
 }
 
@@ -256,6 +305,18 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
     if (other->GetLayer() == ColliderLayer::Enemy)
     {
         Hit();
+    }
+
+    if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
+        mIsLocked = true;
+        mTriggeredAnimation = true;
+        other->SetEnabled(false);
+        mTargetPos = other->GetOwner()->GetPosition();
+        mTarget = other->GetOwner();
+
+        if (mGame->GetGameScene() == Game::GameScene::Level1) {
+            mGame->SetGamePlayState(Game::GamePlayState::Leaving);
+        }
     }
 }
 

@@ -5,13 +5,15 @@
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 #include "../Components/RigidBodyComponent.h"
 
-Skeleton::Skeleton(Game* game, Player* target)
+Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
         : Actor(game)
         , mTarget(target)
         , mSpeed(120.0f)
         , mIsDying(false)
 {
-    SetScale(4.0f);
+
+    SetPosition(pos);
+    SetScale(Game::SCALE);
 
     // Draw e animações
     mDrawComponent = new DrawAnimatedComponent(this,
@@ -29,8 +31,10 @@ Skeleton::Skeleton(Game* game, Player* target)
     mDrawComponent->SetAnimation("IdleDown");
     mDrawComponent->SetAnimFPS(10.0f);
 
+    auto [dx, dy, w, h] = ComputeColliderParams(Game::TILE_SIZE * 2, Game::TILE_SIZE * 2);
+
     // Colisor
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, 32, 32, ColliderLayer::Enemy, false);
+    mColliderComponent = new AABBColliderComponent(this, dx, dy, w, h, ColliderLayer::Enemy, false);
 }
 
 void Skeleton::OnUpdate(float deltaTime)

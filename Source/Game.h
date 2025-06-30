@@ -12,15 +12,22 @@
 #include <unordered_map>
 #include "AudioSystem.h"
 #include "Math.h"
+#include "MapHelper.h"
 
-class Game
-{
+class Game {
 public:
-    static const int LEVEL_WIDTH = 1600;
-    static const int LEVEL_HEIGHT = 1600;
-    static const int TILE_SIZE = 32;
+    static const int LEVEL_WIDTH = 46;
+    static const int LEVEL_HEIGHT = 23;
+    static const int TILE_SIZE = 16;
     static const int SPAWN_DISTANCE = 700;
     static const int TRANSITION_TIME = 1;
+
+    //Screen dimension constants
+    static const int SCREEN_WIDTH = 1400;
+    static const int SCREEN_HEIGHT = 800;
+
+    static const int SCALE = 3;
+    //static const int SCALE = 1;
 
     enum class GameScene
     {
@@ -43,7 +50,14 @@ public:
         Paused,
         GameOver,
         LevelComplete,
-        Leaving
+        Leaving,
+        EnteringMap
+    };
+
+    enum class FadeState {
+        FadeOut,
+        FadeIn,
+        None
     };
 
     Game(int windowWidth, int windowHeight);
@@ -95,13 +109,28 @@ public:
     void SetBackgroundImage(const std::string& imagePath, const Vector2 &position = Vector2::Zero, const Vector2& size = Vector2::Zero);
     void TogglePause();
 
+    GameScene GetGameScene() { return mGameScene; }
+
     // Game-specific
     const class Player* GetPlayer() { return mPlayer; }
+
 
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
 
+    void DecreaseSkeletonNum();
+
     UIScreen* CreatePauseMenu();
+
+    int GetNumSkeletons() const { return mSkeletonNum; }
+
+    MapData* mTileMap;
+    int mSkeletonNum;
+
+    void SetSpikeGateLowered(bool cond) {mIsSpikeGateLowered = cond;}
+    bool GetSpikeGateLowered() {return mIsSpikeGateLowered;}
+
+    const class Dog* GetDog() { return mDog; }
 
 private:
     void ProcessInput();
@@ -124,6 +153,8 @@ private:
 
     // Spatial Hashing for collision detection
     class SpatialHashing* mSpatialHashing;
+
+    void BuildActorsFromMap();
 
     // All the UI elements
     std::vector<class UIScreen*> mUIStack;
@@ -156,19 +187,21 @@ private:
 
     // Game-specific
     class Player *mPlayer;
+    class Dog *mDog;
     class HUD *mHUD;
     SoundHandle mMusicHandle;
 
     float mGameTimer;
     int mGameTimeLimit;
 
+    FadeState mFadeState;
+    float mFadeTime;
+
     SDL_Texture *mBackgroundTexture;
     Vector2 mBackgroundSize;
     Vector2 mBackgroundPosition;
 
-    int mNumSkeletons = 0;
-
     bool mShowWinScreen = true;
-public:
-    int GetNumSkeletons() const { return mNumSkeletons; }
+
+    bool mIsSpikeGateLowered = false;
 };

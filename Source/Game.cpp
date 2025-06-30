@@ -22,7 +22,9 @@
 #include "Actors/Actor.h"
 #include "Actors/Skeleton.h"
 #include "Actors/Player.h"
-//#include "Actors/Block.h"
+#include "Actors/ColliderBlock.h"
+#include "Actors/InvisibleWall.h"
+#include "Actors/SpikeGate.h"
 #include "Actors/Spawner.h"
 #include "Actors/Dog.h"
 #include "UIElements/UIScreen.h"
@@ -54,6 +56,10 @@ Game::Game(int windowWidth, int windowHeight)
         ,mBackgroundTexture(nullptr)
         ,mBackgroundSize(Vector2::Zero)
         ,mBackgroundPosition(Vector2::Zero)
+        ,mFadeState(FadeState::None)
+        ,mFadeTime(0.f)
+        ,mTileMap(nullptr)
+        ,mSkeletonNum(0)
 {
 
 }
@@ -105,13 +111,10 @@ bool Game::Initialize()
 
     mAudio = new AudioSystem(8);
 
+    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f * SCALE,
+                                         LEVEL_WIDTH * TILE_SIZE * SCALE,
+                                         LEVEL_HEIGHT * TILE_SIZE * SCALE);
 
-    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f,
-                                         LEVEL_WIDTH * TILE_SIZE,
-                                         LEVEL_HEIGHT * TILE_SIZE);
-    mTicksCount = SDL_GetTicks();
-
-    //mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
     mTicksCount = SDL_GetTicks();
 
     // Init all game actors
@@ -138,7 +141,6 @@ void Game::SetGameScene(Game::GameScene scene, float transitionTime)
 
 void Game::ResetGameScene(float transitionTime)
 {
-    // TODO
     SetGameScene(mGameScene, transitionTime);
 }
 
@@ -153,17 +155,17 @@ void Game::ChangeScene()
     // Reset game timer
     mGameTimer = 0.0f;
 
-    // Reset gameplau state
+    // Reset gameplay state
     mGamePlayState = GamePlayState::Playing;
 
     // Reset scene manager state
-    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f, LEVEL_WIDTH * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE);
+    mSpatialHashing = new SpatialHashing(TILE_SIZE * 4.0f * SCALE,
+                                         LEVEL_WIDTH * TILE_SIZE * SCALE,
+                                         LEVEL_HEIGHT * TILE_SIZE * SCALE);
 
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
-        // Initialize main menu actors
-        mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
 
         mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
@@ -173,55 +175,34 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
-        mShowWinScreen = true;
+        // float hudScale = 2.0f;
+        // mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
+        //
+        mAudio->StopSound(mMusicHandle);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+
+        SDL_Log("Loading level 1 map...");
+
+        // Initialize level and actors
+        LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
+        BuildActorsFromMap();
+
+        mPlayer->LockActor();
+        mDog->SetState(Dog::State::Wander);
+    }
+    else if (mNextScene == GameScene::Level2)
+    {
+        //mShowWinScreen = false;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopSound(mMusicHandle);
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
-        // Initialize actors
-        //LoadLevel("../Assets/Levels/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
-        mPlayer = new Player(this);
-        mPlayer->SetPosition(Vector2(mWindowWidth / 2.0f, mWindowHeight / 2.0f));
-
-
-        const float minDistance = 200.0f;
-        Vector2 minBounds(0.0f, 0.0f);
-        Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
-
-        int numSkeletons = Random::GetIntRange(4, 15);
-        // Store the number of skeletons for win condition
-        mNumSkeletons = numSkeletons;
-        for (int i = 0; i < numSkeletons; ++i) {
-            Vector2 spawnPos;
-            bool validPos = false;
-
-            while (!validPos) {
-                spawnPos = Random::GetVector(minBounds, maxBounds);
-
-                Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
-                float distance = toPlayer.Length();
-
-                if (distance >= minDistance) {
-                    validPos = true;
-                }
-            }
-
-            auto* newSkeleton = new Skeleton(this, mPlayer);
-            newSkeleton->SetPosition(spawnPos);
-        }
-
-        // Spawn a Dog near the player
-        Dog* dog = new Dog(this);
-        dog->SetPosition(mPlayer->GetPosition() + Vector2(80.0f, 0.0f));
-    }
-    else if (mNextScene == GameScene::Level2)
-    {
-        // TODO
-
-        // Initialize actors
-        //LoadLevel("../Assets/Levels/level1-2.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+        LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
+        BuildActorsFromMap();
+        mDog->SetState(Dog::State::Idle);
+        mGamePlayState = GamePlayState::EnteringMap;
     }
 
     // Set new scene
@@ -243,107 +224,23 @@ void Game::LoadMainMenu()
 
 
     auto button1 = mainMenu->AddButton("Begin Quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f), Vector2(400.0f, 80.0f),
-                                       [this]() {SetGameScene(GameScene::Level1);});
+                                       [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");});
 
 }
 
-void Game::LoadLevel(const std::string& levelName, const int levelWidth, const int levelHeight)
+void Game::LoadLevel(const std::string& mapPath, const int levelWidth, const int levelHeight)
 {
     // Load level data
-    int **mLevelData = ReadLevelData(levelName, levelWidth, levelHeight);
+    mTileMap = LoadTileMap(mapPath, mRenderer);
 
-    if (!mLevelData) {
-        SDL_Log("Failed to load level data");
+    if (!mTileMap) {
+        SDL_Log("Failed to load map data");
         return;
     }
 
     // Instantiate level actors
-    BuildLevel(mLevelData, levelWidth, levelHeight);
-}
-
-void Game::BuildLevel(int** levelData, int width, int height)
-{
-
-    // Const map to convert tile ID to block type
-    const std::map<int, const std::string> tileMap = {
-            //{0, "../Assets/Sprites/Blocks/BlockA.png"},
-    };
-
-    for (int y = 0; y < LEVEL_HEIGHT; ++y)
-    {
-        for (int x = 0; x < LEVEL_WIDTH; ++x)
-        {
-            // int tile = levelData[y][x];
-
-            // TODO - Mudar posição inicial do player e verificar IDs dos tiles nos CSVs
-            // if(tile == 16) // Player
-            // {
-            //     mPlayer = new Player(this);
-            //     mPlayer->SetPosition(Vector2(x * TILE_SIZE, y * TILE_SIZE));
-            // }
-            // else if(tile == 10) // Spawner
-            // {
-            //     Spawner* spawner = new Spawner(this, SPAWN_DISTANCE);
-            //     spawner->SetPosition(Vector2(x * TILE_SIZE, y * TILE_SIZE));
-            // }
-            // else // Blocks
-            // {
-            //     auto it = tileMap.find(tile);
-            //     if (it != tileMap.end())
-            //     {
-            //         // Create a block actor
-            //         //Block* block = new Block(this, it->second);
-            //         //block->SetPosition(Vector2(x * TILE_SIZE, y * TILE_SIZE));
-            //     }
-            // }
-        }
-    }
-}
-
-int **Game::ReadLevelData(const std::string& fileName, int width, int height)
-{
-    std::ifstream file(fileName);
-    if (!file.is_open())
-    {
-        SDL_Log("Failed to load paths: %s", fileName.c_str());
-        return nullptr;
-    }
-
-    // Create a 2D array of size width and height to store the level data
-    int** levelData = new int*[height];
-    for (int i = 0; i < height; ++i)
-    {
-        levelData[i] = new int[width];
-    }
-
-    // Read the file line by line
-    int row = 0;
-
-    std::string line;
-    while (!file.eof())
-    {
-        std::getline(file, line);
-        if(!line.empty())
-        {
-            auto tiles = CSVHelper::Split(line);
-
-            if (tiles.size() != width) {
-                SDL_Log("Invalid level data");
-                return nullptr;
-            }
-
-            for (int i = 0; i < width; ++i) {
-                levelData[row][i] = tiles[i];
-            }
-        }
-
-        ++row;
-    }
-
-    // Close the file
-    file.close();
-
-    return levelData;
+    //BuildLevel(mLevelData, levelWidth, levelHeight);
+    //BuildActorsFromMap();
 }
 
 void Game::RunLoop()
@@ -376,7 +273,7 @@ void Game::ProcessInput()
 
                 // Check if the Return key has been pressed to pause/unpause the game
                 // if (event.key.keysym.sym == SDLK_RETURN)
-                if (event.key.keysym.sym == SDLK_ESCAPE) // troquei para não termos conflito com o input especifico da tela (ver 'if' acima)
+                if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_p) // troquei para não termos conflito com o input especifico da tela (ver 'if' acima)
                 {
                     TogglePause();
                 }
@@ -389,7 +286,9 @@ void Game::ProcessInput()
 
 void Game::ProcessInputActors()
 {
-    if(mGamePlayState == GamePlayState::Playing)
+    if(mGamePlayState == GamePlayState::Playing ||
+        mGamePlayState == GamePlayState::Leaving ||
+        mGamePlayState == GamePlayState::EnteringMap)
     {
         // Get actors on camera
         std::vector<Actor*> actorsOnCamera =
@@ -400,9 +299,12 @@ void Game::ProcessInputActors()
         bool isPlayerOnCamera = false;
         for (auto actor: actorsOnCamera)
         {
-            actor->ProcessInput(state);
+            if (mGamePlayState == GamePlayState::Playing && actor != mPlayer) {
+                actor->ProcessInput(state);
+            }
 
             if (actor == mPlayer) {
+                actor->ProcessInput(state);
                 isPlayerOnCamera = true;
             }
         }
@@ -475,6 +377,20 @@ void Game::UpdateGame()
     // Reinsert audio system
     mAudio->Update(deltaTime);
 
+    if (mPlayer && mGameScene == GameScene::Level2
+        && mPlayer->GetScore() == mSkeletonNum
+        && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
+        && mDog->GetState() == Dog::State::Follow) {
+        if (mShowWinScreen) {
+            mShowWinScreen = false;
+            new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+            mAudio->StopSound(mMusicHandle);
+            mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
+            mMusicHandle = mAudio->PlaySound("win.wav", false);
+
+        }
+    }
+
     // Reinsert UI screens
     for (auto ui : mUIStack) {
         if (ui->GetState() == UIScreen::UIState::Active) {
@@ -500,17 +416,6 @@ void Game::UpdateGame()
     if (mGameScene != GameScene::MainMenu && mGamePlayState == GamePlayState::Playing){
         UpdateLevelTime(deltaTime);
     }
-
-    if (mGameScene == GameScene::Level1 && mPlayer && mPlayer->GetScore() == mNumSkeletons) {
-        if (mShowWinScreen) {
-            mShowWinScreen = false;
-            new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
-            // Spawn a Dog that follows the player and walks randomly near them
-            Dog* winDog = new Dog(this);
-            winDog->SetPosition(mPlayer->GetPosition() + Vector2(Random::GetFloatRange(-60, 60), Random::GetFloatRange(-60, 60)));
-            winDog->StartCircleAround(mPlayer, 120.0f, 2.5f); // Circle around player at win
-        }
-    }
 }
 
 void Game::UpdateSceneManager(float deltaTime)
@@ -521,6 +426,10 @@ void Game::UpdateSceneManager(float deltaTime)
         if (mSceneManagerTimer <= 0.0f){
             mSceneManagerTimer = TRANSITION_TIME;
             mSceneManagerState = SceneManagerState::Active;
+
+            if (mFadeState == FadeState::None || mGamePlayState == GamePlayState::GameOver) {
+                mFadeState = FadeState::FadeOut;
+                }
         }
     }
 
@@ -529,6 +438,21 @@ void Game::UpdateSceneManager(float deltaTime)
         if (mSceneManagerTimer <= 0.0f){
             ChangeScene();
             mSceneManagerState = SceneManagerState::None;
+        }
+    }
+
+    if (mFadeState == FadeState::FadeOut) {
+        mFadeTime += deltaTime;
+        if (mFadeTime >= TRANSITION_TIME) {
+            mFadeTime = 0.f;
+            mFadeState = FadeState::FadeIn;
+        }
+    }
+    else if (mFadeState == FadeState::FadeIn) {
+        mFadeTime += deltaTime;
+        if (mFadeTime >= TRANSITION_TIME) {
+            mFadeTime = 0.f;
+            mFadeState = FadeState::None;
         }
     }
 }
@@ -542,8 +466,8 @@ void Game::UpdateCamera()
 {
     if (!mPlayer) return;
 
-    mCameraPos.x = mPlayer->GetPosition().x - (mWindowWidth / 2.0f);
-    mCameraPos.y = mPlayer->GetPosition().y - (mWindowHeight / 2.0f);
+    SetCameraPos(Vector2{mPlayer->GetPosition().x - (mWindowWidth / 2.0f),
+        mPlayer->GetPosition().y - (mWindowHeight / 2.0f)});
 }
 
 void Game::UpdateActors(float deltaTime)
@@ -612,15 +536,21 @@ void Game::GenerateOutput()
     // Clear back buffer
     SDL_RenderClear(mRenderer);
 
-    // Draw background texture considering camera position
-    if (mBackgroundTexture)
-    {
-        SDL_Rect dstRect = { static_cast<int>(mBackgroundPosition.x - mCameraPos.x),
-                             static_cast<int>(mBackgroundPosition.y - mCameraPos.y),
-                             static_cast<int>(mBackgroundSize.x),
-                             static_cast<int>(mBackgroundSize.y) };
+    int roofIdx = -1;
+    int wallDetailsIdx = -1;
 
-        SDL_RenderCopy(mRenderer, mBackgroundTexture, nullptr, &dstRect);
+    if (mTileMap && !mTileMap->layers.empty()) {
+        for (int i=0; i<mTileMap->layers.size(); i++) {
+            if (mTileMap->layers[i].name == "roof") {
+                roofIdx = i;
+            }
+            else if (mTileMap->layers[i].name == "wallDetails") {
+                wallDetailsIdx = i;
+            }
+            else if (mTileMap->layers[i].type == LayerType::Block && mTileMap->layers[i].name != "staticObjects") {
+                RenderLayer(mRenderer, mTileMap, i, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+            }
+        }
     }
 
     // Get actors on camera
@@ -651,16 +581,37 @@ void Game::GenerateOutput()
         drawable->Draw(mRenderer, mModColor);
     }
 
+    if (roofIdx > -1) {
+        RenderLayer(mRenderer, mTileMap, roofIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+    }
+    if (wallDetailsIdx > -1) {
+        RenderLayer(mRenderer, mTileMap, wallDetailsIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+    }
+
     // Draw all UI screens
     for (auto ui :mUIStack)
     {
         ui->Draw(mRenderer);
     }
 
-    if (mSceneManagerState == SceneManagerState::Active) {
-        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
-        SDL_Rect fullScreenRect = {0, 0, mWindowWidth, mWindowHeight};
-        SDL_RenderFillRect(mRenderer, &fullScreenRect);
+    // if (mSceneManagerState == SceneManagerState::Active) {
+    //     SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
+    //     SDL_Rect fullScreenRect = {0, 0, mWindowWidth, mWindowHeight};
+    //     SDL_RenderFillRect(mRenderer, &fullScreenRect);
+    // }
+
+    if (mFadeState == FadeState::FadeOut) {
+        float alphaOut = mFadeTime/TRANSITION_TIME;
+        SDL_SetRenderDrawBlendMode(mRenderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255 * alphaOut);
+        SDL_RenderFillRect(mRenderer, nullptr);
+    }
+
+    if (mFadeState == FadeState::FadeIn) {
+        float alphaIn = mFadeTime/TRANSITION_TIME;
+        SDL_SetRenderDrawBlendMode(mRenderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255 * (1 - alphaIn));
+        SDL_RenderFillRect(mRenderer, nullptr);
     }
 
     // Swap front buffer and back buffer
@@ -734,12 +685,14 @@ void Game::UnloadScene()
 
     mHUD = nullptr;
     mPlayer = nullptr;
+    mDog = nullptr;
 
     // Delete UI screens
     for (auto ui : mUIStack) {
         delete ui;
         mUIStack.pop_back();
     }
+    mUIStack.clear();
 
     // Delete background texture
     if (mBackgroundTexture) {
@@ -826,6 +779,9 @@ UIScreen* Game::CreatePauseMenu()
         [this, pauseMenu]() {
             if (pauseMenu->GetState() != UIScreen::UIState::Active) return;
             pauseMenu->Close();
+            mIsSpikeGateLowered = false;
+            mSkeletonNum = 0;
+            mShowWinScreen = true;
             SetGameScene(GameScene::MainMenu);
         }
     );
@@ -841,3 +797,86 @@ UIScreen* Game::CreatePauseMenu()
 
     return pauseMenu;
 }
+
+
+void Game::BuildActorsFromMap() {
+    if (!mTileMap) {
+        return;
+    }
+
+    int dynamicObjectsLayerIdx = GetLayerIdx(*mTileMap, "dynamicObjects");
+    int staticObjectsLayerIdx = GetLayerIdx(*mTileMap, "staticObjects");
+
+    for (auto obj : mTileMap->layers[dynamicObjectsLayerIdx].objects) {
+        if (obj.name == "player") {
+            mPlayer = new Player(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+        }
+        else if (obj.name == "invisibleWall") {
+            new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                obj.width * SCALE, obj.height * SCALE, obj.scene);
+        }
+        else if (obj.name.find("spike-gate") != std::string::npos)
+        {
+            int drawOrder = obj.name.back() - '0';
+            new SpikeGate(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                obj.width * SCALE, obj.height * SCALE, drawOrder);
+        }
+        else if (obj.name == "skeleton") {
+            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+            mSkeletonNum++;
+        }
+        else if (obj.name == "dog")
+        {
+            mDog = new Dog(this, Vector2(obj.pos.x * SCALE - 48.0f, obj.pos.y * SCALE - 48.0f));
+            if (mPlayer) mDog->SetOwner(mPlayer);
+        }
+    }
+
+    Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];
+    bool rotate = false;
+
+    for (int y=0; y<staticObjectLayer.height; y++) {
+        for (int x=0; x<staticObjectLayer.width; x++) {
+
+            int gid = staticObjectLayer.data[y*staticObjectLayer.width + x];
+
+            if (gid == 0) continue;
+
+            TileRenderInfo tsInfo = GetTileFlipInfoFromGID(gid);
+            uint32_t clean_gid = tsInfo.clean_gid;
+
+            int tsxIdx = FindTilesetIndex(mTileMap, clean_gid);
+            const auto& ts = mTileMap->tilesets[tsxIdx];
+            int localId = clean_gid - ts.firstGid;
+
+            if (clean_gid != gid) {
+                rotate = true;
+            }
+
+            if (!ts.isCollection) {
+                int row = localId / ts.columns;
+                int col = localId % ts.columns;
+
+                Vector2 pos{static_cast<float>(x*TILE_SIZE*SCALE), static_cast<float>(y*TILE_SIZE*SCALE)};
+                Vector2 srcPos{static_cast<float>(col * TILE_SIZE), static_cast<float>(row * TILE_SIZE)};
+
+                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture, rotate);
+            }
+            else {
+                const SDL_Rect& size = ts.sizes[localId];
+                Vector2 pos{static_cast<float>(x * TILE_SIZE * SCALE),
+                    static_cast<float>(((y*TILE_SIZE) - size.h + TILE_SIZE) * SCALE)};
+
+                new ColliderBlock(this, pos, Vector2::Zero, size.w * SCALE, size.h * SCALE, ts.textures[localId]);
+            }
+        }
+    }
+}
+
+void Game::DecreaseSkeletonNum() {
+    mSkeletonNum--;
+    if (mSkeletonNum <= 0) {
+        mSkeletonNum = 0;
+    }
+};

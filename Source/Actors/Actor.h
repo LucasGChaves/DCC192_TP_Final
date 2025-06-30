@@ -7,6 +7,7 @@
 // ----------------------------------------------------------------
 
 #pragma once
+#include <SDL_render.h>
 #include <vector>
 #include <SDL_stdinc.h>
 #include "../Math.h"
@@ -50,6 +51,14 @@ public:
     ActorState GetState() const { return mState; }
     void SetState(ActorState state) { mState = state; }
 
+    SDL_RendererFlip GetFlip() const { return mFlip; }
+    void SetFlip(SDL_RendererFlip flip) { mFlip = flip; }
+
+    std::tuple<int, int, int, int> ComputeColliderParams(
+    int spriteWidthOriginal,
+    int spriteHeightOriginal
+);
+
     // Game getter
     class Game* GetGame() { return mGame; }
 
@@ -74,6 +83,9 @@ public:
     void SetOffGround() { mIsOnGround = false; };
     bool IsOnGround() const { return mIsOnGround; };
     bool IsVisibleOnCamera() const;
+    Vector2 GetTargetPos() const { return mTargetPos; }
+    bool IsActorLocked() const { return mIsLocked; }
+    void LockActor() { mIsLocked = true; }
 
     // Any actor-specific collision code (overridable)
     virtual void OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other);
@@ -95,6 +107,7 @@ protected:
     Vector2 mPosition;
     float mScale;
     float mRotation;
+    SDL_RendererFlip mFlip = SDL_FLIP_NONE;
 
     // Components
     std::vector<class Component*> mComponents;
@@ -102,6 +115,9 @@ protected:
     // Game specific
     bool mIsOnGround;
     float mStepTimer;
+    Vector2 mTargetPos;
+    Actor* mTarget;
+    bool mIsLocked;
 
 private:
     friend class Component;
