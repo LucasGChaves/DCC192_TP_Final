@@ -57,6 +57,7 @@ Game::Game(int windowWidth, int windowHeight)
         ,mFadeState(FadeState::None)
         ,mFadeTime(0.f)
         ,mTileMap(nullptr)
+        ,mSkeletonNum(0)
 {
 
 }
@@ -799,7 +800,7 @@ void Game::BuildActorsFromMap() {
         else if (obj.name == "skeleton") {
             if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
-            // TODO: add mSkeletonNum
+            mSkeletonNum++;
         }
     }
 
@@ -843,3 +844,10 @@ void Game::BuildActorsFromMap() {
         }
     }
 }
+
+void Game::DecreaseSkeletonNum() {
+    mSkeletonNum--;
+    if (mSkeletonNum <= 0) {
+        mSkeletonNum = 0;
+    }
+};

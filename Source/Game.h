@@ -119,6 +119,8 @@ public:
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
 
+    void DecreaseSkeletonNum();
+
     UIScreen* CreatePauseMenu();
 
 private:
@@ -190,4 +192,5 @@ private:
     Vector2 mBackgroundPosition;
 
     MapData* mTileMap;
+    int mSkeletonNum;
 };
