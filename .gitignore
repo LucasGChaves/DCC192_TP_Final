@@ -5,6 +5,8 @@ Assets/Images/mapDrafts/assets/*
 Assets/Images/mapDrafts.zip
 Assets/Images/mapDrafts/tileset.zip
 Assets/Images/mapDrafts/assets.zip
+Assets/Sounds/Level1.wav
+Assets/Sounds/MainMenu.wav
 
 # User-specific stuff
 .idea/**/workspace.xml
