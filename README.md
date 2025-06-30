@@ -24,18 +24,15 @@ During playtesting, please pay attention to the following features:
 🖼️ In-Game Screenshots:
 
 [![Title](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/title.png "Title")](https://github.com/LucasGChaves/DCC192_TP_Final)
-
 [![intro](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/intro.png "intro")](https://github.com/LucasGChaves/DCC192_TP_Final)
-
 [![caveEntrance](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/caveEntrance.png "caveEntrance")](https://github.com/LucasGChaves/DCC192_TP_Final)
-
 [![dungeonStage](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/dungeonStage.png "dungeonStage")](https://github.com/LucasGChaves/DCC192_TP_Final)
 
 ### 👥 Team Credits
 - Adalberto Vieira – {TODO};
 - Felipe Gonçalves – {TODO};
-- Iago Rios – Level Design, HUD, Sound system, Spike gate and dog actors, Testing and Debugging;
-- Lucas Chaves – {TODO}.
+- Iago Rios – Level Design, HUD, Sound system, Spike gate and dog actors, Ending's Logic, Cinematics (Dog's automatic wandering on Scene 1) Testing and Debugging;
+- Lucas Chaves – Level Design, Level Building, Sound effects (Dog barking and Win Music), Collisions (Scenery, Player Bounding-Box), Camera, Scaling, Ending's Logic, Sprite Component adjustments, Cinematics (Automatic Leaving on Scene 1 and Automatic Entering on Scene 2), Testing and Debugging.
 
 ### 🛠️ Tools
 - **Graphics**: [GIMP](https://www.gimp.org/), [Aseprite](https://www.aseprite.org/), [Tiled](https://www.mapeditor.org/), [Piskel](https://www.piskelapp.com/)  
@@ -55,8 +52,10 @@ During playtesting, please pay attention to the following features:
 ### 🔊 Audio Assets:
 - [Minifantasy – Dungeon Audio Pack](https://leohpaz.itch.io/minifantasy-dungeon-sfx-pack)
 - [Yubatake – JRPG Collection](https://opengameart.org/content/jrpg-collection)
-
+- [Canari Games - CanariPack 8BIT TopDown](https://canarigames.itch.io/canaripack-8bit-topdown)
+- [OpenGameArt.org - User:remaxim - Win Music #2](https://opengameart.org/content/win-music-2)
+  
 ### 🔤 Font:
 - [Emhuo – Peaberry Font Family](https://emhuo.itch.io/peaberry-pixel-font)
 
-All assets are either free or commercially usable, and properly credited according to their respective licenses.
+All assets are either free or commercially usable, and properly credited according to their respective licenses. Only free license sprites have been added to the repository.
