@@ -177,36 +177,13 @@ void Game::ChangeScene()
         // mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
         //
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         SDL_Log("Loading level 1 map...");
 
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
-
-        //OBS: Inicialização do esqueleto comentada para fins de debug //TODO - descomentar depois
-        //  const float minDistance = 200.0f;
-        //  Vector2 minBounds(0.0f, 0.0f);
-        //  Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
-        //
-        //  for (int i = 0; i < 5; ++i) {
-        //      Vector2 spawnPos;
-        //      bool validPos = false;
-        //
-        //      while (!validPos) {
-        //          spawnPos = Random::GetVector(minBounds, maxBounds);
-        //
-        //          Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
-        //          float distance = toPlayer.Length();
-        //
-        //          if (distance >= minDistance) {
-        //              validPos = true;
-        //          }
-        //      }
-        //
-        //      new Skeleton(this, mPlayer, spawnPos);
-        // }
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -214,7 +191,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
@@ -818,6 +795,11 @@ void Game::BuildActorsFromMap() {
             int drawOrder = obj.name.back() - '0';
             new SpikeGate(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
                 obj.width * SCALE, obj.height * SCALE, drawOrder);
+        }
+        else if (obj.name == "skeleton") {
+            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+            // TODO: add mSkeletonNum
         }
     }
 
