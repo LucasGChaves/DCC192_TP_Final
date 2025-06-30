@@ -119,6 +119,8 @@ public:
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
 
+    void DecreaseSkeletonNum();
+
     UIScreen* CreatePauseMenu();
 
 private:
@@ -197,4 +199,5 @@ public:
     int GetNumSkeletons() const { return mNumSkeletons; }
 
     MapData* mTileMap;
+    int mSkeletonNum;
 };

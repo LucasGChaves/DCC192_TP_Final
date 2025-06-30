@@ -59,6 +59,7 @@ Game::Game(int windowWidth, int windowHeight)
         ,mFadeState(FadeState::None)
         ,mFadeTime(0.f)
         ,mTileMap(nullptr)
+        ,mSkeletonNum(0)
 {
 
 }
@@ -167,7 +168,7 @@ void Game::ChangeScene()
     if (mNextScene == GameScene::MainMenu)
     {
 
-        //mAudio->StopAllSounds();
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
 
         LoadMainMenu();
@@ -223,7 +224,7 @@ void Game::LoadMainMenu()
 
 
     auto button1 = mainMenu->AddButton("Begin Quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f), Vector2(400.0f, 80.0f),
-                                       [this]() {SetGameScene(GameScene::Level1);});
+                                       [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");});
 
 }
 
@@ -805,7 +806,7 @@ void Game::BuildActorsFromMap() {
         else if (obj.name == "skeleton") {
             if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
-            // TODO: add mSkeletonNum
+            mSkeletonNum++;
         }
         else if (obj.name == "dog")
         {
@@ -854,3 +855,10 @@ void Game::BuildActorsFromMap() {
         }
     }
 }
+
+void Game::DecreaseSkeletonNum() {
+    mSkeletonNum--;
+    if (mSkeletonNum <= 0) {
+        mSkeletonNum = 0;
+    }
+};
