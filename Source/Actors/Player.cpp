@@ -201,6 +201,19 @@ void Player::OnUpdate(float deltaTime)
         mStepTimer -= deltaTime;
     }
 
+    if (mGame->GetGamePlayState() == Game::GamePlayState::Leaving && mPosition.y <= mTargetPos.y &&
+        mGame->GetGameScene() == Game::GameScene::Level1) {
+        mState = ActorState::Destroy;
+        mGame->SetGameScene(Game::GameScene::Level2, 1.5f);
+    }
+    else if (mGame->GetGamePlayState() == Game::GamePlayState::EnteringMap &&
+        mPosition.y <= (mTargetPos.y - ((Game::TILE_SIZE + Game::TILE_SIZE/2) * Game::SCALE)) &&
+        mGame->GetGameScene() == Game::GameScene::Level2) {
+        mIsLocked = false;
+        mGame->SetGamePlayState(Game::GamePlayState::Playing);
+        mRigidBodyComponent->SetVelocity(Vector2::Zero);
+        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+    }
     ManageAnimations();
 }
 
@@ -284,10 +297,15 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
         Hit();
     }
 
-    if (other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
+    if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
         mIsLocked = true;
         other->SetEnabled(false);
         mTargetPos = other->GetOwner()->GetPosition();
+        mTarget = other->GetOwner();
+
+        if (mGame->GetGameScene() == Game::GameScene::Level1) {
+            mGame->SetGamePlayState(Game::GamePlayState::Leaving);
+        }
     }
 }
 

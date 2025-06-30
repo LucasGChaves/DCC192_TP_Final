@@ -170,9 +170,9 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
-        float hudScale = 2.0f;
-        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
-
+        // float hudScale = 2.0f;
+        // mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
+        //
         mAudio->StopSound(mMusicHandle);
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
@@ -207,10 +207,15 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level2)
     {
+        float hudScale = 2.0f;
+        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
+        mAudio->StopSound(mMusicHandle);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
-        // Initialize actors
-        //LoadLevel("../Assets/Levels/level1-2.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+        LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
+        BuildActorsFromMap();
+        mGamePlayState = GamePlayState::EnteringMap;
     }
 
     // Set new scene
@@ -294,7 +299,9 @@ void Game::ProcessInput()
 
 void Game::ProcessInputActors()
 {
-    if(mGamePlayState == GamePlayState::Playing)
+    if(mGamePlayState == GamePlayState::Playing ||
+        mGamePlayState == GamePlayState::Leaving ||
+        mGamePlayState == GamePlayState::EnteringMap)
     {
         // Get actors on camera
         std::vector<Actor*> actorsOnCamera =
@@ -305,9 +312,12 @@ void Game::ProcessInputActors()
         bool isPlayerOnCamera = false;
         for (auto actor: actorsOnCamera)
         {
-            actor->ProcessInput(state);
+            if (mGamePlayState == GamePlayState::Playing && actor != mPlayer) {
+                actor->ProcessInput(state);
+            }
 
             if (actor == mPlayer) {
+                actor->ProcessInput(state);
                 isPlayerOnCamera = true;
             }
         }

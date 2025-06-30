@@ -51,7 +51,8 @@ public:
         Paused,
         GameOver,
         LevelComplete,
-        Leaving
+        Leaving,
+        EnteringMap
     };
 
     Game(int windowWidth, int windowHeight);
@@ -103,8 +104,11 @@ public:
     void SetBackgroundImage(const std::string& imagePath, const Vector2 &position = Vector2::Zero, const Vector2& size = Vector2::Zero);
     void TogglePause();
 
+    GameScene GetGameScene() { return mGameScene; }
+
     // Game-specific
     const class Player* GetPlayer() { return mPlayer; }
+
 
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
