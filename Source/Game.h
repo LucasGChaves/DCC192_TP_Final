@@ -55,6 +55,12 @@ public:
         EnteringMap
     };
 
+    enum class FadeState {
+        FadeOut,
+        FadeIn,
+        None
+    };
+
     Game(int windowWidth, int windowHeight);
 
     bool Initialize();
@@ -175,6 +181,9 @@ private:
 
     float mGameTimer;
     int mGameTimeLimit;
+
+    FadeState mFadeState;
+    float mFadeTime;
 
     SDL_Texture *mBackgroundTexture;
     Vector2 mBackgroundSize;

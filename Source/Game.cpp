@@ -54,6 +54,8 @@ Game::Game(int windowWidth, int windowHeight)
         ,mBackgroundTexture(nullptr)
         ,mBackgroundSize(Vector2::Zero)
         ,mBackgroundPosition(Vector2::Zero)
+        ,mFadeState(FadeState::None)
+        ,mFadeTime(0.f)
         ,mTileMap(nullptr)
 {
 
@@ -163,7 +165,7 @@ void Game::ChangeScene()
     if (mNextScene == GameScene::MainMenu)
     {
 
-        mAudio->StopAllSounds();
+        //mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
 
         LoadMainMenu();
@@ -175,7 +177,7 @@ void Game::ChangeScene()
         // mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
         //
         mAudio->StopSound(mMusicHandle);
-        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         SDL_Log("Loading level 1 map...");
 
@@ -212,7 +214,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopSound(mMusicHandle);
-        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
@@ -426,6 +428,10 @@ void Game::UpdateSceneManager(float deltaTime)
         if (mSceneManagerTimer <= 0.0f){
             mSceneManagerTimer = TRANSITION_TIME;
             mSceneManagerState = SceneManagerState::Active;
+
+            if (mFadeState == FadeState::None || mGamePlayState == GamePlayState::GameOver) {
+                mFadeState = FadeState::FadeOut;
+                }
         }
     }
 
@@ -434,6 +440,21 @@ void Game::UpdateSceneManager(float deltaTime)
         if (mSceneManagerTimer <= 0.0f){
             ChangeScene();
             mSceneManagerState = SceneManagerState::None;
+        }
+    }
+
+    if (mFadeState == FadeState::FadeOut) {
+        mFadeTime += deltaTime;
+        if (mFadeTime >= TRANSITION_TIME) {
+            mFadeTime = 0.f;
+            mFadeState = FadeState::FadeIn;
+        }
+    }
+    else if (mFadeState == FadeState::FadeIn) {
+        mFadeTime += deltaTime;
+        if (mFadeTime >= TRANSITION_TIME) {
+            mFadeTime = 0.f;
+            mFadeState = FadeState::None;
         }
     }
 }
@@ -575,10 +596,24 @@ void Game::GenerateOutput()
         ui->Draw(mRenderer);
     }
 
-    if (mSceneManagerState == SceneManagerState::Active) {
-        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
-        SDL_Rect fullScreenRect = {0, 0, mWindowWidth, mWindowHeight};
-        SDL_RenderFillRect(mRenderer, &fullScreenRect);
+    // if (mSceneManagerState == SceneManagerState::Active) {
+    //     SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
+    //     SDL_Rect fullScreenRect = {0, 0, mWindowWidth, mWindowHeight};
+    //     SDL_RenderFillRect(mRenderer, &fullScreenRect);
+    // }
+
+    if (mFadeState == FadeState::FadeOut) {
+        float alphaOut = mFadeTime/TRANSITION_TIME;
+        SDL_SetRenderDrawBlendMode(mRenderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255 * alphaOut);
+        SDL_RenderFillRect(mRenderer, nullptr);
+    }
+
+    if (mFadeState == FadeState::FadeIn) {
+        float alphaIn = mFadeTime/TRANSITION_TIME;
+        SDL_SetRenderDrawBlendMode(mRenderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255 * (1 - alphaIn));
+        SDL_RenderFillRect(mRenderer, nullptr);
     }
 
     // Swap front buffer and back buffer
