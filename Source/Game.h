@@ -14,8 +14,7 @@
 #include "Math.h"
 #include "MapHelper.h"
 
-class Game
-{
+class Game {
 public:
     static const int LEVEL_WIDTH = 46;
     static const int LEVEL_HEIGHT = 23;
@@ -123,6 +122,16 @@ public:
 
     UIScreen* CreatePauseMenu();
 
+    int GetNumSkeletons() const { return mSkeletonNum; }
+
+    MapData* mTileMap;
+    int mSkeletonNum;
+
+    void SetSpikeGateLowered(bool cond) {mIsSpikeGateLowered = cond;}
+    bool GetSpikeGateLowered() {return mIsSpikeGateLowered;}
+
+    const class Dog* GetDog() { return mDog; }
+
 private:
     void ProcessInput();
     void UpdateGame();
@@ -192,12 +201,7 @@ private:
     Vector2 mBackgroundSize;
     Vector2 mBackgroundPosition;
 
-    int mNumSkeletons = 0;
-
     bool mShowWinScreen = true;
-public:
-    int GetNumSkeletons() const { return mNumSkeletons; }
 
-    MapData* mTileMap;
-    int mSkeletonNum;
+    bool mIsSpikeGateLowered = false;
 };

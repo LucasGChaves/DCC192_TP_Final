@@ -100,7 +100,6 @@ void Skeleton::Die()
 {
     if (mIsDying) return;
     mIsDying = true;
-    mGame->DecreaseSkeletonNum();
     mDrawComponent->SetAnimation("Dead");
     mColliderComponent->SetEnabled(false); 
     mDeathTimer = 0.5f; 

@@ -41,6 +41,8 @@ private:
     float mBlinkTimer = 0.0f;
     bool mIsBlinkVisible = true;
 
+    bool mTriggeredAnimation = false;
+
     class RigidBodyComponent* mRigidBodyComponent;
     class DrawAnimatedComponent* mDrawComponent;
     class AABBColliderComponent* mColliderComponent;

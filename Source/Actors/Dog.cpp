@@ -6,22 +6,24 @@
 #include <SDL_log.h>
 #include <cmath>
 
+#include "Player.h"
+
 Dog::Dog(Game* game, Vector2 pos)
     : Actor(game)
 {
     SetPosition(pos);
     SetScale(Game::SCALE);
 
-    mColliderComponent = new AABBColliderComponent(
-        this,
-        (Game::TILE_SIZE * 4 * Game::SCALE) / 3, (Game::TILE_SIZE * 4 * Game::SCALE) / 2,
-        (Game::TILE_SIZE * 2 * Game::SCALE) / 3, (Game::TILE_SIZE * 2 * Game::SCALE) / 2,
-        ColliderLayer::Player,
-        false,
-        100
-    );
+    // mColliderComponent = new AABBColliderComponent(
+    //     this,
+    //     (Game::TILE_SIZE * 4 * Game::SCALE) / 3, (Game::TILE_SIZE * 4 * Game::SCALE) / 2,
+    //     (Game::TILE_SIZE * 2 * Game::SCALE) / 3, (Game::TILE_SIZE * 2 * Game::SCALE) / 2,
+    //     ColliderLayer::Player,
+    //     false,
+    //     100
+    // );
 
-    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Dog/dog.png", "../Assets/Sprites/Dog/dog.json", 0);
+    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Dog/dog.png", "../Assets/Sprites/Dog/dog.json", 6);
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("idleDown", 4));
     mDrawComponent->AddAnimation("IdleLeft", GetAnimationFramesByNamePrefix("idleLeft", 4));
     mDrawComponent->AddAnimation("IdleRight", GetAnimationFramesByNamePrefix("idleRight", 4));
@@ -59,6 +61,10 @@ void Dog::OnUpdate(float dt)
 {
     if (mIsDying) return;
 
+    if (mGame->GetSpikeGateLowered()) {
+        SetState(State::Follow);
+    }
+
     switch (mState) {
         case State::Wander: UpdateWander(dt); break;
         case State::Follow: UpdateFollow(dt); break;
@@ -76,6 +82,7 @@ void Dog::UpdateWander(float dt)
 
     if (pos.y + 32 < 0) {
         Actor::SetState(ActorState::Destroy);
+        SetState(State::Dying);
         SDL_Log("[Dog] Destroyed (wander exit)");
     }
 }
@@ -88,9 +95,9 @@ void Dog::UpdateFollow(float dt)
     }
 
     Vector2 toOwner = mOwner->GetPosition() - GetPosition();
-    float dist = toOwner.Length();
+    mDistanceWithOwner = toOwner.Length();
 
-    if (dist > mMaxFollowDistance) {
+    if (mDistanceWithOwner > mMaxFollowDistance) {
         toOwner.Normalize();
         SetPosition(GetPosition() + toOwner * mSpeed * dt);
         mDrawComponent->SetAnimation("Walk" + GetDirectionFromVector(toOwner));

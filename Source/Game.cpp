@@ -141,7 +141,6 @@ void Game::SetGameScene(Game::GameScene scene, float transitionTime)
 
 void Game::ResetGameScene(float transitionTime)
 {
-    // TODO
     SetGameScene(mGameScene, transitionTime);
 }
 
@@ -188,6 +187,7 @@ void Game::ChangeScene()
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
 
+        mPlayer->LockActor();
         mDog->SetState(Dog::State::Wander);
     }
     else if (mNextScene == GameScene::Level2)
@@ -376,6 +376,20 @@ void Game::UpdateGame()
 
     // Reinsert audio system
     mAudio->Update(deltaTime);
+
+    if (mPlayer && mGameScene == GameScene::Level2
+        && mPlayer->GetScore() == mSkeletonNum
+        && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
+        && mDog->GetState() == Dog::State::Follow) {
+        if (mShowWinScreen) {
+            mShowWinScreen = false;
+            new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+            mAudio->StopSound(mMusicHandle);
+            mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
+            mMusicHandle = mAudio->PlaySound("win.wav", false);
+
+        }
+    }
 
     // Reinsert UI screens
     for (auto ui : mUIStack) {
@@ -671,6 +685,7 @@ void Game::UnloadScene()
 
     mHUD = nullptr;
     mPlayer = nullptr;
+    mDog = nullptr;
 
     // Delete UI screens
     for (auto ui : mUIStack) {
@@ -764,6 +779,9 @@ UIScreen* Game::CreatePauseMenu()
         [this, pauseMenu]() {
             if (pauseMenu->GetState() != UIScreen::UIState::Active) return;
             pauseMenu->Close();
+            mIsSpikeGateLowered = false;
+            mSkeletonNum = 0;
+            mShowWinScreen = true;
             SetGameScene(GameScene::MainMenu);
         }
     );

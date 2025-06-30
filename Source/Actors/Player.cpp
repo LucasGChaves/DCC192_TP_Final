@@ -8,6 +8,7 @@
 #include "../Math.h"
 
 #include "Attack.h"
+#include "Dog.h"
 #include "../Components/DrawComponents/DrawPolygonComponent.h"
 #include "../UIElements/UIGameOver.h"
 
@@ -21,6 +22,7 @@ Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
         , mInvincibleTime(.0f)
         , mBlinkTimer(0.0f)
         , mIsBlinkVisible(true)
+        , mScore(0)
 {
     SetPosition(pos);
     SetScale(Game::SCALE);
@@ -95,7 +97,7 @@ void Player::OnProcessInput(const uint8_t* state)
             SetRotation(0.0f);
         }
     }
-    else {
+    else if (mTriggeredAnimation){
         if (Math::NearZero(Math::Abs(mTargetPos.x-mPosition.x), 5.f)) {
             velocity.y -= 1.0f;
             mLastDirection = "Up";
@@ -172,6 +174,12 @@ void Player::OnUpdate(float deltaTime)
 {
     if (mHearts <= 0) Kill();
 
+    if (mGame->GetGameScene() == Game::GameScene::Level1 &&
+        mGame->GetDog()->GetState() == Dog::State::Dying &&
+        mIsLocked) {
+        mIsLocked = false;
+    }
+
     if (mInvincibleTime >= .0f) {
         mInvincibleTime -= deltaTime;
         // Blinking logic: toggle every 0.1s
@@ -206,6 +214,7 @@ void Player::OnUpdate(float deltaTime)
         mGame->GetGameScene() == Game::GameScene::Level1) {
         mState = ActorState::Destroy;
         mGame->SetGameScene(Game::GameScene::Level2, 1.5f);
+        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
     }
     else if (mGame->GetGamePlayState() == Game::GamePlayState::EnteringMap &&
         mPosition.y <= (mTargetPos.y - ((Game::TILE_SIZE + Game::TILE_SIZE/2) * Game::SCALE)) &&
@@ -300,6 +309,7 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
 
     if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
         mIsLocked = true;
+        mTriggeredAnimation = true;
         other->SetEnabled(false);
         mTargetPos = other->GetOwner()->GetPosition();
         mTarget = other->GetOwner();

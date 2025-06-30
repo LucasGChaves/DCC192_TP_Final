@@ -28,7 +28,9 @@ public:
     void SetFollowDistance(float distance) { mMaxFollowDistance = distance; }
     void SetSpeed(float speed) { mSpeed = speed; }
 
-    AABBColliderComponent* GetColliderComponent() const { return mColliderComponent; }
+    float GetDistanceWithOwner() const { return mDistanceWithOwner; }
+
+    //AABBColliderComponent* GetColliderComponent() const { return mColliderComponent; }
 
 private:
     DrawAnimatedComponent* mDrawComponent;
@@ -44,6 +46,8 @@ private:
 
     float mChangeDirTimer = 0.0f;
     Vector2 mRandomDir = Vector2(0, -1);
+
+    float mDistanceWithOwner = 0.f;
 
     void UpdateWander(float dt);
     void UpdateFollow(float dt);

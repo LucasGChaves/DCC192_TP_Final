@@ -3,6 +3,7 @@
 //
 #include "SpikeGate.h"
 
+#include "Player.h"
 #include "../Components/DrawComponents/DrawAnimatedComponent.h"
 
 
@@ -32,8 +33,8 @@ SpikeGate::SpikeGate(Game* game, Vector2 pos, int width, int height, int drawOrd
 
 void SpikeGate::OnUpdate(float deltaTime)
 {
-    // if (mGame->GetPlayer()->GetScore() != mGame->GetNumSkeletons()) return; // TODO: ativar após o merge com o PR do Adalbas
-    // return;
+    if (mGame->GetPlayer()->GetScore() != mGame->GetNumSkeletons()) return;
+
     std::string animationName = mDrawComponent->GetAnimationName();
 
     if (animationName != "Lowering" && animationName != "Lowered") {
@@ -43,5 +44,6 @@ void SpikeGate::OnUpdate(float deltaTime)
     {
         mDrawComponent->SetAnimation("Lowered");
         mColliderComponent->SetEnabled(false);
+        mGame->SetSpikeGateLowered(true);
     }
 }

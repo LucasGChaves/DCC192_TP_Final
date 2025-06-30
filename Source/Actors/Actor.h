@@ -85,6 +85,7 @@ public:
     bool IsVisibleOnCamera() const;
     Vector2 GetTargetPos() const { return mTargetPos; }
     bool IsActorLocked() const { return mIsLocked; }
+    void LockActor() { mIsLocked = true; }
 
     // Any actor-specific collision code (overridable)
     virtual void OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other);
