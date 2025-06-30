@@ -181,29 +181,6 @@ void Game::ChangeScene()
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
-
-        //OBS: Inicialização do esqueleto comentada para fins de debug //TODO - descomentar depois
-        //  const float minDistance = 200.0f;
-        //  Vector2 minBounds(0.0f, 0.0f);
-        //  Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
-        //
-        //  for (int i = 0; i < 5; ++i) {
-        //      Vector2 spawnPos;
-        //      bool validPos = false;
-        //
-        //      while (!validPos) {
-        //          spawnPos = Random::GetVector(minBounds, maxBounds);
-        //
-        //          Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
-        //          float distance = toPlayer.Length();
-        //
-        //          if (distance >= minDistance) {
-        //              validPos = true;
-        //          }
-        //      }
-        //
-        //      new Skeleton(this, mPlayer, spawnPos);
-        // }
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -776,6 +753,11 @@ void Game::BuildActorsFromMap() {
         else if (obj.name == "invisibleWall") {
             new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
                 obj.width * SCALE, obj.height * SCALE, obj.scene);
+        }
+        else if (obj.name == "skeleton") {
+            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+            // TODO: add mSkeletonNum
         }
     }
 

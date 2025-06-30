@@ -139,7 +139,7 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
 
         Vector2 base = GetPosition();
-        float w = 40.0f, h = 40.0f, offset = 40.0f;
+        float w = 48.0f, h = 48.0f, offset = -8.0f;
         std::vector<Vector2> poly;
         if (mLastDirection == "Up") {
             poly = { Vector2(base.x, base.y - offset), Vector2(base.x + w, base.y - offset), Vector2(base.x + w, base.y - offset + h), Vector2(base.x, base.y - offset + h) };
