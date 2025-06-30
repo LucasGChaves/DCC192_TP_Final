@@ -177,7 +177,7 @@ void Game::ChangeScene()
     else if (mNextScene == GameScene::Level1)
     {
         // TODO
-        mShowWinScreen = true;
+        mShowWinScreen = false;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
@@ -414,6 +414,7 @@ void Game::UpdateGame()
         UpdateLevelTime(deltaTime);
     }
 
+/*
     if (mGameScene == GameScene::Level1 && mPlayer && mPlayer->GetScore() == mNumSkeletons) {
         if (mShowWinScreen) {
             mShowWinScreen = false;
@@ -424,6 +425,7 @@ void Game::UpdateGame()
             winDog->StartCircleAround(mPlayer, 120.0f, 2.5f); // Circle around player at win
         }
     }
+    */
 }
 
 void Game::UpdateSceneManager(float deltaTime)
@@ -779,7 +781,19 @@ void Game::BuildActorsFromMap() {
             new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
                 TILE_SIZE * SCALE * 2, TILE_SIZE * SCALE * 2, obj.scene);
         }
+        else if (obj.name == "dog")
+        {
+            auto dog = new Dog(this, Vector2(obj.pos.x * SCALE - 48.0f, obj.pos.y * SCALE - 48.0f));
+            if (mPlayer) dog->SetOwner(mPlayer);
+            // dog->SetPosition(mPlayer->GetPosition() + Vector2(Random::GetFloatRange(-60, 60), Random::GetFloatRange(-60, 60)));
+            // winDog->StartCircleAround(mPlayer, 120.0f, 2.5f); // Circle around player at win
+        }
     }
+
+
+
+
+
 
     Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];
 
