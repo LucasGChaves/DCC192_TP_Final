@@ -166,7 +166,7 @@ void Game::ChangeScene()
     if (mNextScene == GameScene::MainMenu)
     {
 
-        //mAudio->StopAllSounds();
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
 
         LoadMainMenu();
@@ -218,7 +218,7 @@ void Game::LoadMainMenu()
 
 
     auto button1 = mainMenu->AddButton("Begin Quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f), Vector2(400.0f, 80.0f),
-                                       [this]() {SetGameScene(GameScene::Level1);});
+                                       [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");});
 
 }
 
