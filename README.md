@@ -40,7 +40,7 @@ During playtesting, please pay attention to the following features:
 
 ### 👥 Team Credits
 - Adalberto Vieira – Base setup for project, Player actor, Skelleton actor, Dog actor, Enemy AI, HUD(kill counter), Main menu, Win and Lose menus;
-- Felipe Gonçalves – {TODO};
+- Felipe Gonçalves – Player attack, Skelleton spawning, Win menu, Player-Skelleton collision, Player lifes, Player hit receiving and invencibility, Testing and Debbuging;
 - Iago Rios – Level Design, HUD, Sound system, Spike gate and dog actors, Ending's Logic, Cinematics (Dog's automatic wandering on Scene 1) Testing and Debugging;
 - Lucas Chaves – Base setup for project, Level Design, Level Building, Sound effects (Dog barking and Win Music), Collisions (Scenery, Player Bounding-Box), Camera, Scaling, Ending's Logic, Sprite Component adjustments, Cinematics (Automatic Leaving on Scene 1 and Automatic Entering on Scene 2), Testing and Debugging.
 
