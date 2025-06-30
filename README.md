@@ -11,7 +11,7 @@ Victory is achieved by clearing all enemies from the dungeon. The game ends in d
 
 ### 💻 Running
 - Insert `assets` folder into `Assets/Images/mapDrafts/`
-- Insert `Level'.wav` and `MainMenu.wav` into `Assets/Sounds/`
+- Insert `Level1.wav` and `MainMenu.wav` into `Assets/Sounds/`
   
 ### 🎮 Tutorial
 - Start: Enter [Return]
