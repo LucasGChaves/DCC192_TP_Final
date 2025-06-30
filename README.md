@@ -23,13 +23,13 @@ During playtesting, please pay attention to the following features:
 
 🖼️ In-Game Screenshots:
 
-[![Title](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/main/Demo/title.png "Title")](https://github.com/LucasGChaves/DCC192_TP_Final)
+[![Title](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/title.png "Title")](https://github.com/LucasGChaves/DCC192_TP_Final)
 
-[![intro](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/main/Demo/intro.png "intro")](https://github.com/LucasGChaves/DCC192_TP_Final)
+[![intro](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/intro.png "intro")](https://github.com/LucasGChaves/DCC192_TP_Final)
 
-[![caveEntrance](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/main/Demo/caveEntrance.png "caveEntrance")](https://github.com/LucasGChaves/DCC192_TP_Final)
+[![caveEntrance](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/caveEntrance.png "caveEntrance")](https://github.com/LucasGChaves/DCC192_TP_Final)
 
-[![dungeonStage](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/main/Demo/dungeonStage.png "dungeonStage")](https://github.com/LucasGChaves/DCC192_TP_Final)
+[![dungeonStage](https://raw.githubusercontent.com/LucasGChaves/DCC192_TP_Final/dev/Assets/Demo/dungeonStage.png "dungeonStage")](https://github.com/LucasGChaves/DCC192_TP_Final)
 
 ### 👥 Team Credits
 - Adalberto Vieira – {TODO};
