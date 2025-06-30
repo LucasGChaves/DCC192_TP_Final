@@ -6,7 +6,7 @@
 #include "../Components/DrawComponents/DrawAnimatedComponent.h"
 
 
-SpikeGate::SpikeGate(Game* game, Vector2 pos, int width, int height)
+SpikeGate::SpikeGate(Game* game, Vector2 pos, int width, int height, int drawOrder)
     : Actor(game) {
 
     const int maxFrameHeight = 32; // Altura máxima (em pixels) de um frame da animação
@@ -16,8 +16,8 @@ SpikeGate::SpikeGate(Game* game, Vector2 pos, int width, int height)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, width * Game::SCALE, height * Game::SCALE / 2.0f, ColliderLayer::Blocks, true);
-    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/SpikeGate/texture.png", "../Assets/Sprites/SpikeGate/texture.json", 1);
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, width, height, ColliderLayer::Blocks, true);
+    mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/SpikeGate/texture.png", "../Assets/Sprites/SpikeGate/texture.json", 2+drawOrder);
 
     mDrawComponent->AddAnimation("Raised", {0});
     mDrawComponent->AddAnimation("Lowered", {47});
@@ -33,7 +33,7 @@ SpikeGate::SpikeGate(Game* game, Vector2 pos, int width, int height)
 void SpikeGate::OnUpdate(float deltaTime)
 {
     // if (mGame->GetPlayer()->GetScore() != mGame->GetNumSkeletons()) return; // TODO: ativar após o merge com o PR do Adalbas
-
+    // return;
     std::string animationName = mDrawComponent->GetAnimationName();
 
     if (animationName != "Lowering" && animationName != "Lowered") {

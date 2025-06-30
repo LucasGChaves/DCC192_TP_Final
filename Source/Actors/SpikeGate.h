@@ -10,7 +10,7 @@
 
 class SpikeGate : public Actor {
     public:
-        explicit SpikeGate(Game* game,  Vector2 pos, int width, int height);
+        explicit SpikeGate(Game* game,  Vector2 pos, int width, int height, int drawOrder = 0);
 
         void OnUpdate(float deltaTime) override;
 

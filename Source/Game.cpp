@@ -24,6 +24,7 @@
 #include "Actors/Player.h"
 #include "Actors/ColliderBlock.h"
 #include "Actors/InvisibleWall.h"
+#include "Actors/SpikeGate.h"
 #include "Actors/Spawner.h"
 #include "UIElements/UIScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
@@ -776,6 +777,12 @@ void Game::BuildActorsFromMap() {
         else if (obj.name == "invisibleWall") {
             new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
                 obj.width * SCALE, obj.height * SCALE, obj.scene);
+        }
+        else if (obj.name.find("spike-gate") != std::string::npos)
+        {
+            int drawOrder = obj.name.back() - '0';
+            new SpikeGate(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                obj.width * SCALE, obj.height * SCALE, drawOrder);
         }
     }
 
