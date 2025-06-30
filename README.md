@@ -9,6 +9,16 @@ The gameplay features a classic top-down view with 4-directional movement and re
 
 Victory is achieved by clearing all enemies from the dungeon. The game ends in defeat if the player loses all lives.
 
+### 💻 Running
+- Insert `assets` folder into `Assets/Images/mapDrafts/`
+- Insert `Level'.wav` and `MainMenu.wav` into `Assets/Sounds/`
+  
+### 🎮 Tutorial
+- Start: Enter [Return]
+- Movimentação em quatro direções: [← ↑ → ↓]
+- Ataque: [barra de espaço]
+- Pause: [ESC]
+
 ### ✅ Features to Test
 During playtesting, please pay attention to the following features:
 - 4-directional character movement and control responsiveness;
