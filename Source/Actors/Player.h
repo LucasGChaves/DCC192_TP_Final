@@ -21,6 +21,8 @@ public:
 
     void Hit();
     int GetHearts() const { return mHearts; }
+    int GetScore() const { return mScore; }
+    void AddScore(int value) { mScore += value; }
 
 private:
     float mDeathTimer = -1.0f;
@@ -33,8 +35,9 @@ private:
     std::string mLastDirection;
 
     int mHearts;
+    int mScore = 0;
     float mInvincibleTime;
-    // Blinking effect variables
+
     float mBlinkTimer = 0.0f;
     bool mIsBlinkVisible = true;
 

@@ -102,8 +102,12 @@ void Skeleton::Die()
     mIsDying = true;
     mGame->DecreaseSkeletonNum();
     mDrawComponent->SetAnimation("Dead");
-    mColliderComponent->SetEnabled(false); // Disable collision after death
-    mDeathTimer = 0.5f; // Adjust to match animation duration (in seconds)
+    mColliderComponent->SetEnabled(false); 
+    mDeathTimer = 0.5f; 
+
+    if (mTarget) {
+        mTarget->AddScore(1);
+    }
 }
 
 std::vector<int> Skeleton::GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount)

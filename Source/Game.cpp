@@ -26,7 +26,9 @@
 #include "Actors/InvisibleWall.h"
 #include "Actors/SpikeGate.h"
 #include "Actors/Spawner.h"
+#include "Actors/Dog.h"
 #include "UIElements/UIScreen.h"
+#include "UIElements/UIWinScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Components/DrawComponents/DrawSpriteComponent.h"
 #include "Components/DrawComponents/DrawPolygonComponent.h"
@@ -185,9 +187,12 @@ void Game::ChangeScene()
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
+
+        mDog->SetState(Dog::State::Wander);
     }
     else if (mNextScene == GameScene::Level2)
     {
+        //mShowWinScreen = false;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
@@ -196,6 +201,7 @@ void Game::ChangeScene()
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
+        mDog->SetState(Dog::State::Idle);
         mGamePlayState = GamePlayState::EnteringMap;
     }
 
@@ -801,6 +807,11 @@ void Game::BuildActorsFromMap() {
             if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             mSkeletonNum++;
+        }
+        else if (obj.name == "dog")
+        {
+            mDog = new Dog(this, Vector2(obj.pos.x * SCALE - 48.0f, obj.pos.y * SCALE - 48.0f));
+            if (mPlayer) mDog->SetOwner(mPlayer);
         }
     }
 
