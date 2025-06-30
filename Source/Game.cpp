@@ -26,7 +26,9 @@
 #include "Actors/InvisibleWall.h"
 #include "Actors/SpikeGate.h"
 #include "Actors/Spawner.h"
+#include "Actors/Dog.h"
 #include "UIElements/UIScreen.h"
+#include "UIElements/UIWinScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Components/DrawComponents/DrawSpriteComponent.h"
 #include "Components/DrawComponents/DrawPolygonComponent.h"
@@ -187,6 +189,7 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level2)
     {
+        //mShowWinScreen = false;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
@@ -800,6 +803,13 @@ void Game::BuildActorsFromMap() {
             if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             // TODO: add mSkeletonNum
+        }
+        else if (obj.name == "dog")
+        {
+            auto dog = new Dog(this, Vector2(obj.pos.x * SCALE - 48.0f, obj.pos.y * SCALE - 48.0f));
+            if (mPlayer) dog->SetOwner(mPlayer);
+            // dog->SetPosition(mPlayer->GetPosition() + Vector2(Random::GetFloatRange(-60, 60), Random::GetFloatRange(-60, 60)));
+            // winDog->StartCircleAround(mPlayer, 120.0f, 2.5f); // Circle around player at win
         }
     }
 
