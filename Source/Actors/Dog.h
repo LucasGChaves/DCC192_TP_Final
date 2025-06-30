@@ -11,7 +11,6 @@ public:
     enum class State {
         Wander,
         Follow,
-        Circle,
         Dying
     };
 
@@ -19,56 +18,41 @@ public:
 
     void OnUpdate(float deltaTime) override;
 
-    // Relacionamento
     void SetOwner(Actor* owner);
     Actor* GetOwner() const;
 
-    // Estado
     void SetState(State newState);
     State GetState() const;
 
-    // Movimento
-    void StartCircleAround(Actor* target, float radius = 100.0f, float speed = 2.0f);
     void SetFollowDistance(float distance) { mMaxFollowDistance = distance; }
     void SetSpeed(float speed) { mSpeed = speed; }
 
     AABBColliderComponent* GetColliderComponent() const { return mColliderComponent; }
 
 private:
-    // Componentes principais
     DrawAnimatedComponent* mDrawComponent;
     AABBColliderComponent* mColliderComponent;
 
-    // Estado e dono
-    State mState = State::Wander;
     Actor* mOwner = nullptr;
+    State mState = State::Wander;
 
-    // Comportamento
     float mSpeed = 100.0f;
-    float mMaxFollowDistance = 200.0f;
+    float mMaxFollowDistance = 20.0f;
     bool mIsDying = false;
     float mDeathTimer = -1.0f;
 
-    // Modo circular
-    Actor* mCircleTarget = nullptr;
-    float mCircleRadius = 100.0f;
-    float mCircleAngle = 0.0f;
-    float mCircleAngularSpeed = 2.0f;
-
-    // Variação
     float mChangeDirTimer = 0.0f;
     Vector2 mRandomDir = Vector2(0, -1);
 
-    // Comportamentos
     void UpdateWander(float dt);
     void UpdateFollow(float dt);
-    void UpdateCircle(float dt);
 
-    // Utilitários
     std::string GetDirectionFromVector(const Vector2& dir) const;
-    std::string GetDirectionFromAngle(float degrees) const;
     std::vector<int> GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount);
 };
+
+
+
 
 
 

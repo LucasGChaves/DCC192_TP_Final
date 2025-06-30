@@ -12,19 +12,16 @@ Dog::Dog(Game* game, Vector2 pos)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
-    // mColliderComponent = new AABBColliderComponent(this, 0, 0, 32, 32, ColliderLayer::Player, false);
     mColliderComponent = new AABBColliderComponent(
         this,
-        (Game::TILE_SIZE * Game::SCALE * 2) / 3, (Game::TILE_SIZE * Game::SCALE) / 4,
-        (Game::TILE_SIZE * Game::SCALE * 2) / 3,
-        (Game::TILE_SIZE * Game::SCALE) / 2,
+        (Game::TILE_SIZE * 4 * Game::SCALE) / 3, (Game::TILE_SIZE * 4 * Game::SCALE) / 2,
+        (Game::TILE_SIZE * 2 * Game::SCALE) / 3, (Game::TILE_SIZE * 2 * Game::SCALE) / 2,
         ColliderLayer::Player,
         false,
         100
     );
 
     mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Dog/dog.png", "../Assets/Sprites/Dog/dog.json", 0);
-
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("idleDown", 4));
     mDrawComponent->AddAnimation("IdleLeft", GetAnimationFramesByNamePrefix("idleLeft", 4));
     mDrawComponent->AddAnimation("IdleRight", GetAnimationFramesByNamePrefix("idleRight", 4));
@@ -38,7 +35,6 @@ Dog::Dog(Game* game, Vector2 pos)
     mDrawComponent->SetAnimFPS(10.0f);
 
     mState = State::Follow;
-    mMaxFollowDistance = 50.0f;
 }
 
 void Dog::SetOwner(Actor* owner)
@@ -61,15 +57,6 @@ Dog::State Dog::GetState() const
     return mState;
 }
 
-void Dog::StartCircleAround(Actor* target, float radius, float speed)
-{
-    mCircleTarget = target;
-    mCircleRadius = radius;
-    mCircleAngularSpeed = speed;
-    mCircleAngle = Random::GetFloatRange(0, 2 * Math::Pi);
-    mState = State::Circle;
-}
-
 void Dog::OnUpdate(float dt)
 {
     if (mIsDying) return;
@@ -77,7 +64,6 @@ void Dog::OnUpdate(float dt)
     switch (mState) {
         case State::Wander: UpdateWander(dt); break;
         case State::Follow: UpdateFollow(dt); break;
-        case State::Circle: UpdateCircle(dt); break;
         default: break;
     }
 }
@@ -109,7 +95,8 @@ void Dog::UpdateFollow(float dt)
         toOwner.Normalize();
         SetPosition(GetPosition() + toOwner * mSpeed * dt);
         mDrawComponent->SetAnimation("Walk" + GetDirectionFromVector(toOwner));
-    } else {
+    }
+    else {
         mChangeDirTimer -= dt;
         if (mChangeDirTimer <= 0.0f) {
             float angle = Random::GetFloatRange(0.0f, 2 * Math::Pi);
@@ -126,39 +113,12 @@ void Dog::UpdateFollow(float dt)
     }
 }
 
-void Dog::UpdateCircle(float dt)
-{
-    if (!mCircleTarget) {
-        mState = State::Wander;
-        return;
-    }
-
-    mCircleAngle += mCircleAngularSpeed * dt;
-    if (mCircleAngle > 2 * Math::Pi)
-        mCircleAngle -= 2 * Math::Pi;
-
-    Vector2 center = mCircleTarget->GetPosition();
-    Vector2 offset(std::cos(mCircleAngle) * mCircleRadius, std::sin(mCircleAngle) * mCircleRadius);
-    SetPosition(center + offset);
-
-    float deg = mCircleAngle * 180.0f / Math::Pi;
-    mDrawComponent->SetAnimation("Walk" + GetDirectionFromAngle(deg));
-}
-
 std::string Dog::GetDirectionFromVector(const Vector2& dir) const
 {
     if (std::fabs(dir.x) > std::fabs(dir.y))
         return dir.x > 0 ? "Right" : "Left";
     else
         return dir.y > 0 ? "Down" : "Up";
-}
-
-std::string Dog::GetDirectionFromAngle(float deg) const
-{
-    if (deg > 45 && deg <= 135) return "Down";
-    if (deg > 135 && deg <= 225) return "Left";
-    if (deg > 225 && deg <= 315) return "Up";
-    return "Right";
 }
 
 std::vector<int> Dog::GetAnimationFramesByNamePrefix(const std::string& prefix, int count)
@@ -173,6 +133,8 @@ std::vector<int> Dog::GetAnimationFramesByNamePrefix(const std::string& prefix, 
     if ((int)frames.size() > count) frames.resize(count);
     return frames;
 }
+
+
 
 
 // #include "Dog.h"
