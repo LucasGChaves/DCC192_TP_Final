@@ -48,8 +48,6 @@ add_executable(${PROJECT_NAME}
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
         Source/Components/DrawComponents/DrawAnimatedComponent.h
-        Source/Actors/Spawner.cpp
-        Source/Actors/Spawner.h
         Source/AudioSystem.cpp
         Source/AudioSystem.h
         Source/UIElements/UIScreen.h

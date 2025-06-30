@@ -144,8 +144,6 @@ private:
     SceneManagerState mSceneManagerState;
     float mSceneManagerTimer;
 
-    // HUD functions
-    void UpdateLevelTime(float deltaTime);
 
     // Load the level from a CSV file as a 2D array
     int **ReadLevelData(const std::string& fileName, int width, int height);

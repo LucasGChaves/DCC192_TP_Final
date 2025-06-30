@@ -25,7 +25,6 @@
 #include "Actors/ColliderBlock.h"
 #include "Actors/InvisibleWall.h"
 #include "Actors/SpikeGate.h"
-#include "Actors/Spawner.h"
 #include "Actors/Dog.h"
 #include "UIElements/UIScreen.h"
 #include "UIElements/UIWinScreen.h"
@@ -174,10 +173,6 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level1)
     {
-        // TODO
-        // float hudScale = 2.0f;
-        // mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
-        //
         mAudio->StopSound(mMusicHandle);
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
@@ -212,7 +207,6 @@ void Game::ChangeScene()
 
 void Game::LoadMainMenu()
 {
-    // TODO
 
     auto mainMenu = new UIScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
     const Vector2 backgroundSize = Vector2(1600.0f, 900.0f);
@@ -413,9 +407,6 @@ void Game::UpdateGame()
 
     UpdateSceneManager(deltaTime);
 
-    if (mGameScene != GameScene::MainMenu && mGamePlayState == GamePlayState::Playing){
-        UpdateLevelTime(deltaTime);
-    }
 }
 
 void Game::UpdateSceneManager(float deltaTime)
@@ -457,10 +448,6 @@ void Game::UpdateSceneManager(float deltaTime)
     }
 }
 
-void Game::UpdateLevelTime(float deltaTime)
-{
-    // TODO
-}
 
 void Game::UpdateCamera()
 {
@@ -703,7 +690,6 @@ void Game::UnloadScene()
 
 void Game::Shutdown()
 {
-    // TODO - descomentar e alterar depois
     UnloadScene();
     for (auto font : mFonts) {
          font.second->Unload();
