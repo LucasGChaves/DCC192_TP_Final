@@ -9,6 +9,7 @@
 
 #include "Attack.h"
 #include "Dog.h"
+#include "InvisibleWall.h"
 #include "../Components/DrawComponents/DrawPolygonComponent.h"
 #include "../UIElements/UIGameOver.h"
 
@@ -163,8 +164,8 @@ void Player::OnUpdate(float deltaTime)
     if (mHearts <= 0) Kill();
 
     if (mGame->GetGameScene() == Game::GameScene::Level1 &&
-        mGame->GetDog()->GetState() == Dog::State::Dying &&
-        mIsLocked) {
+        mGame->GetDog() && mGame->GetDog()->GetState() == Dog::State::Dying &&
+        mIsLocked && mGame->GetTopInvisibleWall()->GetComponent<AABBColliderComponent>()->IsEnabled()) {
         mIsLocked = false;
     }
 
@@ -198,19 +199,19 @@ void Player::OnUpdate(float deltaTime)
         mStepTimer -= deltaTime;
     }
 
-    if (mGame->GetGamePlayState() == Game::GamePlayState::Leaving && mPosition.y <= mTargetPos.y &&
-        mGame->GetGameScene() == Game::GameScene::Level1) {
+    if (mGame->GetTopInvisibleWall() && mGame->GetGamePlayState() == Game::GamePlayState::Leaving
+        && mPosition.y <= mGame->GetTopInvisibleWall()->GetPosition().y &&
+        mGame->GetGameScene() != Game::GameScene::MainMenu) {
         mState = ActorState::Destroy;
-        mGame->SetGameScene(Game::GameScene::Level2, 1.5f);
-        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+        mGame->SetGameScene(static_cast<Game::GameScene>(static_cast<int>(mGame->GetGameScene())+1), 1.5f);
     }
-    else if (mGame->GetGamePlayState() == Game::GamePlayState::EnteringMap &&
-        mPosition.y <= (mTargetPos.y - ((Game::TILE_SIZE + Game::TILE_SIZE/2) * Game::SCALE)) &&
-        mGame->GetGameScene() == Game::GameScene::Level2) {
+    else if (mGame->GetBottomInvisibleWall() && mGame->GetGamePlayState() == Game::GamePlayState::EnteringMap &&
+        mPosition.y <= (mGame->GetBottomInvisibleWall()->GetPosition().y - ((Game::TILE_SIZE + Game::TILE_SIZE/2) * Game::SCALE)) &&
+        mGame->GetGameScene() != Game::GameScene::MainMenu) {
         mIsLocked = false;
         mGame->SetGamePlayState(Game::GamePlayState::Playing);
         mRigidBodyComponent->SetVelocity(Vector2::Zero);
-        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+        mGame->GetBottomInvisibleWall()->GetComponent<AABBColliderComponent>()->SetEnabled(true);
     }
     ManageAnimations();
 }
@@ -239,7 +240,7 @@ void Player::ManageAnimations()
     {
         if (mStepTimer <= 0.0f)
         {
-            mGame->GetAudio()->PlaySound("PlayerWalk.wav");
+            //mGame->GetAudio()->PlaySound("PlayerWalk.wav");
             mStepTimer = 0.2f;
         }
         mDrawComponent->SetAnimation("Walk" + mLastDirection);
@@ -278,6 +279,18 @@ void Player::OnHorizontalCollision(const float minOverlap, AABBColliderComponent
     {
         Hit();
     }
+
+    if (other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
+        mIsLocked = true;
+        mTriggeredAnimation = true;
+        mTargetPos = other->GetOwner()->GetPosition();
+        other->SetEnabled(false);
+        InvisibleWall* wall = dynamic_cast<InvisibleWall*>(other->GetOwner());
+        wall->SetColliding(true);
+        if (wall->GetType() == InvisibleWall::Type::Top) {
+            mGame->SetGamePlayState(Game::GamePlayState::Leaving);
+        }
+    }
 }
 
 void Player::EnableCollision(bool enabled)
@@ -296,11 +309,11 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
     if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
         mIsLocked = true;
         mTriggeredAnimation = true;
-        other->SetEnabled(false);
         mTargetPos = other->GetOwner()->GetPosition();
-        mTarget = other->GetOwner();
-
-        if (mGame->GetGameScene() == Game::GameScene::Level1) {
+        other->SetEnabled(false);
+        InvisibleWall* wall = dynamic_cast<InvisibleWall*>(other->GetOwner());
+        wall->SetColliding(true);
+        if (wall->GetType() == InvisibleWall::Type::Top) {
             mGame->SetGamePlayState(Game::GamePlayState::Leaving);
         }
     }

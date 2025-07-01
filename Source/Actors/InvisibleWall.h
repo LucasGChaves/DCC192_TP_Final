@@ -10,10 +10,23 @@
 
 class InvisibleWall : public Actor {
 public:
-    explicit InvisibleWall(Game* game,  Vector2 pos, int width, int height, std::string sceneString);
+    enum class Type {
+        Top,
+        Bottom
+    };
+
+    explicit InvisibleWall(Game* game,  Vector2 pos, int width, int height, std::string sceneString, std::string topOrBottom);
 
     Game::GameScene GetInvisibleWallScene() {return mScene;}
+    void SetType(Type type) { mType = type; }
+    Type GetType() { return mType; }
+    void SetColliding(bool colliding) {mIsColliding = colliding;}
+    bool IsColliding() {return mIsColliding; }
+    void OnUpdate(float deltaTime) override;
 private:
     class AABBColliderComponent* mColliderComponent;
     Game::GameScene mScene;
+    Type mType;
+    bool mIsColliding = false;
+
 };
