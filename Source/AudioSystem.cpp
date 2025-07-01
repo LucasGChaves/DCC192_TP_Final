@@ -46,18 +46,10 @@ void AudioSystem::Update(float deltaTime)
 	}
 }
 
-// Plays the sound with the specified name and loops if looping is true
-// Returns the SoundHandle which is used to perform any other actions on the
-// sound when active
-// NOTE: The soundName is without the "Assets/Sounds/" part of the file
-//       For example, pass in "ChompLoop.wav" rather than
-//       "Assets/Sounds/ChompLoop.wav".
 SoundHandle AudioSystem::PlaySound(const std::string& soundName, bool looping)
 {
     // Get the sound with the given name
     Mix_Chunk *sound = GetSound(soundName);
-
-    // TODO
 
 	if (!sound)
 	{
@@ -67,27 +59,6 @@ SoundHandle AudioSystem::PlaySound(const std::string& soundName, bool looping)
 
     int availableChannel = -1;
 
-	// int sameSoundCount = 0;
-	// auto oldestSameSound = mHandleMap.begin();
-	//
-	// for (auto it = mHandleMap.begin(); it != mHandleMap.end();)
-	// {
-	// 	if (it->second.mSoundName == soundName)
-	// 	{
-	// 		sameSoundCount++;
-	//
-	// 		if (sameSoundCount == 1) {
-	// 			oldestSameSound = it;
-	// 		}
-	// 		if (sameSoundCount == 3)
-	// 		{
-	// 			availableChannel = oldestSameSound->second.mChannel;
-	// 			mHandleMap.erase(oldestSameSound);
-	// 			break;
-	// 		}
-	// 	}
-	// 	++it;
-	// }
 
 	for (size_t i = 0; i < mChannels.size(); ++i)
 	{
@@ -244,21 +215,11 @@ void AudioSystem::CacheAllSounds()
 #endif
 }
 
-// Used to preload the sound data of a sound
-// NOTE: The soundName is without the "Assets/Sounds/" part of the file
-//       For example, pass in "ChompLoop.wav" rather than
-//       "Assets/Sounds/ChompLoop.wav".
 void AudioSystem::CacheSound(const std::string& soundName)
 {
 	GetSound(soundName);
 }
 
-// If the sound is already loaded, returns Mix_Chunk from the map.
-// Otherwise, will attempt to load the file and save it in the map.
-// Returns nullptr if sound is not found.
-// NOTE: The soundName is without the "Assets/Sounds/" part of the file
-//       For example, pass in "ChompLoop.wav" rather than
-//       "Assets/Sounds/ChompLoop.wav".
 Mix_Chunk* AudioSystem::GetSound(const std::string& soundName)
 {
 	std::string fileName = "../Assets/Sounds/";

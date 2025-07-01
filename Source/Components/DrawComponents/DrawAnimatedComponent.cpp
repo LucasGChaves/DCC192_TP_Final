@@ -86,7 +86,7 @@ void DrawAnimatedComponent::ForceSetAnimation(const std::string& name)
     }
     else if (mAnimations.find(name) == mAnimations.end())
     {
-        SDL_Log("❌ Animacao '%s' nao encontrada!", name.c_str());
+        SDL_Log("Animacao '%s' nao encontrada!", name.c_str());
     }
 }
 
