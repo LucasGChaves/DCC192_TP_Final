@@ -110,7 +110,6 @@
         {
          "draworder":"topdown",
          "id":19,
-         "locked":true,
          "name":"dynamicObjects",
          "objects":[
                 {
@@ -118,7 +117,7 @@
                  "id":73,
                  "name":"player",
                  "rotation":0,
-                 "type":"scene1",
+                 "type":"scene-1",
                  "visible":true,
                  "width":32,
                  "x":288,
@@ -129,7 +128,7 @@
                  "id":74,
                  "name":"dog",
                  "rotation":0,
-                 "type":"scene1",
+                 "type":"scene-1",
                  "visible":true,
                  "width":32,
                  "x":352,
@@ -138,9 +137,9 @@
                 {
                  "height":70,
                  "id":75,
-                 "name":"invisibleWall",
+                 "name":"invisibleWall-top",
                  "rotation":0,
-                 "type":"scene1",
+                 "type":"scene-1",
                  "visible":true,
                  "width":32,
                  "x":352,
