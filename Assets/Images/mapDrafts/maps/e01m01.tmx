@@ -90,7 +90,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="6" name="dynamicObjects">
+ <objectgroup id="6" name="dynamicObjects" locked="1">
   <object id="3" name="player" type="scene-3" x="352" y="333.75" width="32" height="32"/>
   <object id="26" name="skeleton" type="scene-3" x="501.333" y="72" width="32" height="32"/>
   <object id="27" name="skeleton" type="scene-3" x="216" y="66" width="32" height="32"/>

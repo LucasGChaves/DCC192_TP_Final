@@ -159,80 +159,14 @@
                 }, 
                 {
                  "height":32,
-                 "id":20,
+                 "id":30,
                  "name":"skeleton",
                  "rotation":0,
-                 "type":"scene_2",
+                 "type":"scene-3",
                  "visible":true,
                  "width":32,
-                 "x":454.5,
-                 "y":81
-                }, 
-                {
-                 "height":32,
-                 "id":21,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene_2",
-                 "visible":true,
-                 "width":32,
-                 "x":355,
-                 "y":130.5
-                }, 
-                {
-                 "height":32,
-                 "id":22,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene_2",
-                 "visible":true,
-                 "width":32,
-                 "x":471,
-                 "y":230
-                }, 
-                {
-                 "height":32,
-                 "id":23,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene_2",
-                 "visible":true,
-                 "width":32,
-                 "x":250.5,
-                 "y":248.5
-                }, 
-                {
-                 "height":32,
-                 "id":24,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene_2",
-                 "visible":true,
-                 "width":32,
-                 "x":244.5,
-                 "y":85.5
-                }, 
-                {
-                 "height":32,
-                 "id":26,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene_2",
-                 "visible":true,
-                 "width":32,
-                 "x":246,
-                 "y":134.5
-                }, 
-                {
-                 "height":32,
-                 "id":27,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene_2",
-                 "visible":true,
-                 "width":32,
-                 "x":454.5,
-                 "y":131
+                 "x":353,
+                 "y":197
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -276,7 +210,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":28,
+ "nextobjectid":31,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
