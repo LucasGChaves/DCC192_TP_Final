@@ -82,7 +82,7 @@ void Skeleton::OnUpdate(float deltaTime)
     }
 }
 
-void Skeleton::OnHorizontalCollision(float, AABBColliderComponent* other)
+void Skeleton::OnHorizontalCollision(float overlap, AABBColliderComponent* other)
 {
     if (mIsDying) return;
     else if (other->GetLayer() == ColliderLayer::Player)
@@ -91,7 +91,7 @@ void Skeleton::OnHorizontalCollision(float, AABBColliderComponent* other)
     }
 }
 
-void Skeleton::OnVerticalCollision(float, AABBColliderComponent* other)
+void Skeleton::OnVerticalCollision(float overlap, AABBColliderComponent* other)
 {
     OnHorizontalCollision(0.0f, other);
 }

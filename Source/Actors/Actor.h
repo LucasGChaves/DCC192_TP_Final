@@ -116,7 +116,6 @@ protected:
     bool mIsOnGround;
     float mStepTimer;
     Vector2 mTargetPos;
-    Actor* mTarget;
     bool mIsLocked;
 
 private:

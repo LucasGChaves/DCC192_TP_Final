@@ -44,10 +44,14 @@ add_executable(${PROJECT_NAME}
         Source/Actors/InvisibleWall.h
         Source/Actors/SpikeGate.cpp
         Source/Actors/SpikeGate.h
+        Source/Actors/Boss.cpp
+        Source/Actors/Boss.h
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
         Source/Components/DrawComponents/DrawAnimatedComponent.h
+        Source/Components/DrawComponents/DrawBossAnimatedComponent.cpp
+        Source/Components/DrawComponents/DrawBossAnimatedComponent.h
         Source/AudioSystem.cpp
         Source/AudioSystem.h
         Source/UIElements/UIScreen.h

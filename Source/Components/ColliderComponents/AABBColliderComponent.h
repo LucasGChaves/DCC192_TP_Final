@@ -39,6 +39,7 @@ public:
     bool IsEnabled() const;
     void SetStatic(bool isStatic) { mIsStatic = isStatic; }
     ColliderLayer GetLayer() const;
+    void SetSize(Vector2 pos) { mWidth = pos.x; mHeight = pos.y; } //Public?
 
     // AABB básico
     Vector2 GetMin() const;

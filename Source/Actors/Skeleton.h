@@ -14,8 +14,8 @@ public:
     Skeleton(class Game* game, Player* target, Vector2 pos);
 
     void OnUpdate(float deltaTime) override;
-    void OnHorizontalCollision(float, class AABBColliderComponent* other) override;
-    void OnVerticalCollision(float, class AABBColliderComponent* other) override;
+    void OnHorizontalCollision(float overlap, class AABBColliderComponent* other) override;
+    void OnVerticalCollision(float overlap, class AABBColliderComponent* other) override;
 
     AABBColliderComponent* GetColliderComponent() const { return mColliderComponent; }
     void Die();
