@@ -28,4 +28,5 @@ private:
     float mDeathTimer = -1.0f;
     class DrawAnimatedComponent* mDrawComponent;
     class AABBColliderComponent* mColliderComponent;
+    class RigidBodyComponent* mRigidBodyComponent;
 };
