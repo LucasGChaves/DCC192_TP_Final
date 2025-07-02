@@ -141,21 +141,16 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
 
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
 
-        Vector2 base = GetPosition();
-        float w = 48.0f, h = 48.0f, offset = -8.0f;
-        std::vector<Vector2> poly;
-        if (mLastDirection == "Up") {
-            poly = { Vector2(base.x, base.y - offset), Vector2(base.x + w, base.y - offset), Vector2(base.x + w, base.y - offset + h), Vector2(base.x, base.y - offset + h) };
-        } else if (mLastDirection == "Down") {
-            poly = { Vector2(base.x, base.y + offset), Vector2(base.x + w, base.y + offset), Vector2(base.x + w, base.y + offset + h), Vector2(base.x, base.y + offset + h) };
-        } else if (mLastDirection == "Side") {
-            if (GetRotation() == 0.0f) {
-                poly = { Vector2(base.x + offset, base.y), Vector2(base.x + offset + w, base.y), Vector2(base.x + offset + w, base.y + h), Vector2(base.x + offset, base.y + h) };
-            } else {
-                poly = { Vector2(base.x - offset - w, base.y), Vector2(base.x - offset, base.y), Vector2(base.x - offset, base.y + h), Vector2(base.x - offset - w, base.y + h) };
-            }
+        float x = 0.f, y = 0.f;
+
+        if (mLastDirection == "Up") y = -1.f;
+        else if (mLastDirection == "Down") y = 1.f;
+        else if (mLastDirection == "Side") {
+            if (GetRotation() == 0.f) x = 1.f;
+            else x = -1.f;
         }
-        new Attack(mGame, poly);
+
+        new Attack(mGame, GetPosition(), Vector2(x, y));
     }
 }
 
@@ -288,10 +283,6 @@ void Player::Win(AABBColliderComponent *poleCollider)
 
 void Player::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Enemy)
-    {
-        Hit();
-    }
 }
 
 void Player::EnableCollision(bool enabled)
@@ -302,11 +293,6 @@ void Player::EnableCollision(bool enabled)
 
 void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Enemy)
-    {
-        Hit();
-    }
-
     if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
         mIsLocked = true;
         mTriggeredAnimation = true;

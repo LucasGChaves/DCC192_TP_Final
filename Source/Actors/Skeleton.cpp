@@ -33,6 +33,8 @@ Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
 
     auto [dx, dy, w, h] = ComputeColliderParams(Game::TILE_SIZE * 2, Game::TILE_SIZE * 2);
 
+    mRigidBodyComponent = new RigidBodyComponent(this);
+
     // Colisor
     mColliderComponent = new AABBColliderComponent(this, dx, dy, w, h, ColliderLayer::Enemy, false);
 }
@@ -54,6 +56,7 @@ void Skeleton::OnUpdate(float deltaTime)
     {
         toPlayer.Normalize();
         SetPosition(GetPosition() + toPlayer * mSpeed * deltaTime);
+        mRigidBodyComponent->SetVelocity(Vector2(.1f, .1f));
 
         if (std::abs(toPlayer.x) > std::abs(toPlayer.y))
         {
@@ -84,16 +87,16 @@ void Skeleton::OnUpdate(float deltaTime)
 
 void Skeleton::OnHorizontalCollision(float, AABBColliderComponent* other)
 {
-    if (mIsDying) return;
-    else if (other->GetLayer() == ColliderLayer::Player)
-    {
-        mTarget->Kill();
+    if (other->GetLayer() == ColliderLayer::Player) {
+        if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
     }
 }
 
 void Skeleton::OnVerticalCollision(float, AABBColliderComponent* other)
 {
-    OnHorizontalCollision(0.0f, other);
+    if (other->GetLayer() == ColliderLayer::Player) {
+        if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
+    }
 }
 
 void Skeleton::Die()
