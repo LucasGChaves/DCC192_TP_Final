@@ -9,7 +9,7 @@
 
 class Attack : public Actor {
 public:
-    explicit Attack(Game* game, const std::vector<Vector2>& polygon);
+    explicit Attack(Game* game, Vector2 base, Vector2 forward);
 
 private:
     class AABBColliderComponent* mColliderComponent;
