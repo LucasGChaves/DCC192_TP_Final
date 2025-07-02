@@ -18,6 +18,7 @@ class DrawBossAnimatedComponent : public DrawAnimatedComponent
 
   void Draw(SDL_Renderer* renderer, const Vector3& modColor) override;
   Vector2 GetFrameSize(int frameIdx);
+    Vector2 GetFrameCenter() { return mOriginalFrameCenter; };
   private:
     Vector2 mOriginalSize;
     Vector2 mOriginalFrameCenter;

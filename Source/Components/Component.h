@@ -25,6 +25,7 @@ public:
     virtual void HandleKeyPress(const int key, const bool isPressed);
 
     int GetUpdateOrder() const { return mUpdateOrder; }
+    void SetUpdateOrder(int order) { mUpdateOrder = order; }
     class Actor* GetOwner() const { return mOwner; }
     class Game* GetGame() const;
 

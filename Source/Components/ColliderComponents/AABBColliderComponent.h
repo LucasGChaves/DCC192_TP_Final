@@ -40,6 +40,7 @@ public:
     void SetStatic(bool isStatic) { mIsStatic = isStatic; }
     ColliderLayer GetLayer() const;
     void SetSize(Vector2 pos) { mWidth = pos.x; mHeight = pos.y; } //Public?
+    void SetOffset(Vector2 offset) {mOffset.x = offset.x; mOffset.y = offset.y; }
 
     // AABB básico
     Vector2 GetMin() const;

@@ -193,6 +193,7 @@ private:
     class InvisibleWall *mTopInvisibleWall;
     class InvisibleWall *mBottomInvisibleWall;
     class HUD *mHUD;
+    class Boss *mBoss;
     SoundHandle mMusicHandle;
 
     float mGameTimer;

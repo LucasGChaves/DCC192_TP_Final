@@ -9,10 +9,14 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
+    SDL_Log("Position Before: %f %f", mPosition.x, mPosition.y);
+    float fullPx = Game::TILE_SIZE * 4 * Game::SCALE;
+    Vector2 centerFull = pos + Vector2{ fullPx * 0.5f, fullPx * 0.5f };
+
     mDrawComponent = new DrawBossAnimatedComponent(this,
         "../Assets/Sprites/Boss/boss.png", "../Assets/Sprites/Boss/boss.json",
-        Vector2(Game::TILE_SIZE * Game::SCALE * 4, Game::TILE_SIZE * Game::SCALE * 4));
-
+        Vector2(Game::TILE_SIZE * Game::SCALE * 4, Game::TILE_SIZE * Game::SCALE * 4), 0);
+    mDrawComponent->SetUpdateOrder(0);
     mDrawComponent->AddAnimation("IdleDown", {0, 1, 2, 3, 4, 5});
     mDrawComponent->AddAnimation("IdleSide", {8, 9, 10, 11, 12, 13});
     mDrawComponent->AddAnimation("IdleUp", {16, 17, 18, 19, 20, 21});
@@ -29,20 +33,26 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     mDrawComponent->AddAnimation("BeginSpAttack", {104});
     mDrawComponent->AddAnimation("LooSpAttack", {106, 107, 108, 109});
 
-    mDrawComponent->SetAnimation("IdleDown");
+    mDrawComponent->SetAnimation("LooSpAttack");
     mDrawComponent->SetAnimFPS(10.0f);
 
-    Vector2 InitialFrameSizeScaled = mDrawComponent->GetFrameSize(0);
-    Vector2 offset{
-        ((Game::TILE_SIZE * Game::SCALE * 4) - InitialFrameSizeScaled.x) * 0.5f,
-        ((Game::TILE_SIZE * Game::SCALE * 4) - InitialFrameSizeScaled.y) * 0.5f
-    };
+    Vector2 frameInitSz = mDrawComponent->GetFrameSize(106);
+    // e recua mPosition para alinhar o canto do trim ao centerFull
+    Vector2 newPos = centerFull - (frameInitSz * 0.5f);
+    SetPosition(newPos);
 
-    mColliderComponent = new AABBColliderComponent(this, offset.x, offset.y,
-        InitialFrameSizeScaled.x, InitialFrameSizeScaled.y, ColliderLayer::Enemy, false, 1);
+    // --- passo 4: cria RigidBody e AABB sem offset interno (dx=dy=0) ---
+    mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false, 1);
+    mColliderComponent = new AABBColliderComponent(
+        this,0,0, static_cast<int>(std::round(frameInitSz.x)), static_cast<int>(std::round(frameInitSz.y)),
+        ColliderLayer::Enemy, false,2);
+
 }
 
 void Boss::OnUpdate(float deltaTime) {
+    //SDL_Log("TEST");
+    //mRigidBodyComponent->SetVelocity(Vector2{-25.f, 0.f});
+    //SetPosition(GetPosition() + Vector2{-1.f, 0.f});
     // if (mIsDying) {
     //     mDeathTimer -= deltaTime;
     //     if (mDeathTimer <= 0.0f) {

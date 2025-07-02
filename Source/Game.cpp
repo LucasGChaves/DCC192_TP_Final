@@ -26,6 +26,7 @@
 #include "Actors/InvisibleWall.h"
 #include "Actors/SpikeGate.h"
 #include "Actors/Dog.h"
+#include "Actors/Boss.h"
 #include "UIElements/UIScreen.h"
 #include "UIElements/UIWinScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
@@ -42,6 +43,7 @@ Game::Game(int windowWidth, int windowHeight)
         ,mWindowHeight(windowHeight)
         ,mPlayer(nullptr)
         ,mHUD(nullptr)
+        ,mBoss(nullptr)
         ,mTopInvisibleWall(nullptr)
         ,mBottomInvisibleWall(nullptr)
         ,mBackgroundColor(0, 0, 0)
@@ -839,9 +841,12 @@ void Game::BuildActorsFromMap() {
                 obj.width * SCALE, obj.height * SCALE, drawOrder);
         }
         else if (obj.name == "skeleton") {
-            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            //if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             mSkeletonNum++;
+        }
+        else if (obj.name == "boss") {
+            mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
     }
 

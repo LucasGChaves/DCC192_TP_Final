@@ -8,10 +8,10 @@
 Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
         : Actor(game)
         , mTarget(target)
-        , mSpeed(120.0f)
+        , mSpeed(50.0f)
         , mIsDying(false)
 {
-
+    mIsLocked = false;
     SetPosition(pos);
     SetScale(Game::SCALE);
 
@@ -39,6 +39,88 @@ Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
     mColliderComponent = new AABBColliderComponent(this, dx, dy, w, h, ColliderLayer::Enemy, false);
 }
 
+// void Skeleton::OnUpdate(float deltaTime) {
+//     if (mIsDying) {
+//         mDeathTimer -= deltaTime;
+//         if (mDeathTimer <= 0.0f) {
+//             SetState(ActorState::Destroy);
+//         }
+//         return;
+//     }
+//
+//     if (mIsDying || !mTarget) return;
+//
+//     Vector2 toPlayer = mTarget->GetPosition() - GetPosition();
+//     float dist = toPlayer.Length();
+//     toPlayer.Normalize();
+//     Vector2 velocity = Vector2::Zero;
+//
+//     std::string animation = "";
+//
+//     if (Math::NearZero(toPlayer.x, 1)) {
+//         toPlayer.x = 0.0f;
+//     }
+//     if (Math::NearZero(toPlayer.y, 1)) {
+//         toPlayer.y = 0.0f;
+//     }
+//
+//     if (toPlayer.y < 0) {
+//         velocity.y = -1.f;
+//         animation = "WalkUp";
+//     }
+//     else if (toPlayer.y > 0) {
+//         velocity.y = 1.f;
+//         animation = "WalkDown";
+//     }
+//
+//     if (toPlayer.x < 0) {
+//         velocity.x = -1.f;
+//         SetRotation(Math::Pi);
+//         animation = "WalkSide";
+//     }
+//     else if (toPlayer.x > 0) {
+//         velocity.x = 1.f;
+//         SetRotation(0.f);
+//         animation = "WalkSide";
+//     }
+//
+//     if (velocity.x != 0.0f && velocity.y != 0.0f) {
+//         animation = "WalkSide";
+//         if (velocity.x == -1.f) {
+//             SetRotation(Math::Pi);
+//         }
+//         else {
+//             SetRotation(0.f);
+//         }
+//     }
+//     else if (velocity.x != 0) {
+//         animation = "WalkSide";
+//         if (velocity.x == -1.f) {
+//             SetRotation(Math::Pi);
+//         }
+//         else {
+//             SetRotation(0.f);
+//         }
+//     }
+//     else {
+//         if (velocity.y == -1.f) {
+//             animation = "WalkUp";
+//         }
+//         else {
+//             animation = "WalkDown";
+//         }
+//     }
+//
+//     if (!Math::NearZero(velocity.Length()))
+//     {
+//         velocity.Normalize();
+//         velocity *= mSpeed;
+//     }
+//
+//     mDrawComponent->SetAnimation(animation);
+//     mRigidBodyComponent->SetVelocity(velocity);
+// }
+
 void Skeleton::OnUpdate(float deltaTime)
 {
     if (mIsDying) {
@@ -52,18 +134,40 @@ void Skeleton::OnUpdate(float deltaTime)
     if (mIsDying || !mTarget) return;
 
     Vector2 toPlayer = mTarget->GetPosition() - GetPosition();
+    Vector2 vel = Vector2::Zero;
+    Vector2 normalizedToPlayer = toPlayer;
+    normalizedToPlayer.Normalize();
+
     if (toPlayer.Length() > 1.0f)
     {
         toPlayer.Normalize();
-        SetPosition(GetPosition() + toPlayer * mSpeed * deltaTime);
-        mRigidBodyComponent->SetVelocity(Vector2(.1f, .1f));
 
-        if (std::abs(toPlayer.x) > std::abs(toPlayer.y))
-        {
-            SetRotation(toPlayer.x > 0 ? 0.0f : Math::Pi);
+        vel = normalizedToPlayer * mSpeed;
+
+        //SetPosition(GetPosition() + toPlayer * mSpeed * deltaTime);
+        //mRigidBodyComponent->SetVelocity(Vector2(.1f, .1f));
+
+        //SDL_Log("toPlayer: %f %f", toPlayer.x, toPlayer.y);
+        // if (Math::NearZero(toPlayer.x), 0.1) {
+        //     toPlayer.x = 0.f;
+        // }
+        // if (Math::NearZero(toPlayer.y), 0.1) {
+        //     toPlayer.y = 0.f;
+        // }
+
+        float diff = std::abs(std::abs(toPlayer.x) - std::abs(toPlayer.y));
+
+        if (diff >= 0.f && diff <= 0.5f) {
+            SetRotation(normalizedToPlayer.x > 0 ? 0.0f : Math::Pi);
             mDrawComponent->SetAnimation("WalkSide");
         }
-        else if (toPlayer.y < 0)
+
+        else if (std::abs(normalizedToPlayer.x) > std::abs(normalizedToPlayer.y))
+        {
+            SetRotation(normalizedToPlayer.x > 0 ? 0.0f : Math::Pi);
+            mDrawComponent->SetAnimation("WalkSide");
+        }
+        else if (normalizedToPlayer.y < 0)
         {
             mDrawComponent->SetAnimation("WalkUp");
         }
@@ -78,6 +182,7 @@ void Skeleton::OnUpdate(float deltaTime)
             // mGame->GetAudio()->PlaySound("PlayerWalk.wav");
             mStepTimer = 0.2f;
         }
+        mRigidBodyComponent->SetVelocity(vel);
     }
     else
     {

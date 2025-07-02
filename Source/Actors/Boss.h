@@ -8,6 +8,8 @@
 #include "../Components/DrawComponents/DrawBossAnimatedComponent.h"
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/DrawComponents/DrawPolygonComponent.h"
+#include "../Components/RigidBodyComponent.h"
 
 class Player;
 class DrawBossAnimatedComponent;
@@ -30,5 +32,6 @@ class Boss : public Actor {
   float mDeathTimer = -1.0f;
   class DrawBossAnimatedComponent* mDrawComponent;
   class AABBColliderComponent* mColliderComponent;
+  class RigidBodyComponent* mRigidBodyComponent;
 
 };

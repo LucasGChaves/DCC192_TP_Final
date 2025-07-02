@@ -26,21 +26,33 @@ void DrawBossAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modC
 
     SDL_Rect* srcRect = mSpriteSheetData[frames[frameIndex]];
 
-    Vector2 center = mOwner->GetPosition() + (mOriginalSize * 0.5f);
-    Vector2 renderPos{ center.x - (srcRect->w * 0.5f * Game::SCALE),
-                       center.y - (srcRect->h * 0.5f * Game::SCALE) };
+    if (auto bb = mOwner->GetComponent<AABBColliderComponent>()) {
+        bb->SetSize(Vector2{
+            static_cast<float>(srcRect->w) * Game::SCALE,
+            static_cast<float>(srcRect->h) * Game::SCALE
+        });
+    }
 
+    // 2) monta o dstRect partindo de mOwner->GetPosition() (canto sup-esq)
+    Vector2 worldPos = mOwner->GetPosition();
+    Vector2 cam      = mOwner->GetGame()->GetCameraPos();
     SDL_Rect dstRect = {
-        static_cast<int>(renderPos.x - mOwner->GetGame()->GetCameraPos().x),
-        static_cast<int>(renderPos.y - mOwner->GetGame()->GetCameraPos().y),
+        int(worldPos.x - cam.x),
+        int(worldPos.y - cam.y),
         srcRect->w * Game::SCALE,
         srcRect->h * Game::SCALE
     };
 
+    // SDL_Rect dstRect = {
+    //     static_cast<int>(mOwner->GetPosition().x - mOwner->GetGame()->GetCameraPos().x),
+    //     static_cast<int>(mOwner->GetPosition().y - mOwner->GetGame()->GetCameraPos().y),
+    //     srcRect->w * Game::SCALE,
+    //     srcRect->h * Game::SCALE
+    // };
+
     auto ownerBoundingBox = mOwner->GetComponent<AABBColliderComponent>();
     if (ownerBoundingBox) {
-        ownerBoundingBox->SetSize(Vector2{static_cast<float>(srcRect->w),
-        static_cast<float>(srcRect->h)});
+        //Colocar código aqui com o SetSize
     }
 
     SDL_RendererFlip flip = SDL_FLIP_NONE;
