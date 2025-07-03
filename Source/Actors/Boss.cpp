@@ -1,5 +1,5 @@
 #include "Boss.h"
-
+#include "FireballSpawner.h"
 int count = 0;
 
 Boss::Boss(Game* game, Player* target, Vector2 pos)
@@ -181,6 +181,7 @@ void Boss::OnUpdate(float deltaTime) {
         else {
             mRigidBodyComponent->SetVelocity(Vector2::Zero);
             mAtSpAttackPos = true;
+            new FireballSpawner(mGame, GetPosition(), 12, 0.1f);
         }
     }
 }

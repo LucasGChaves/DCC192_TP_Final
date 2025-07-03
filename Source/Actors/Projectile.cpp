@@ -18,8 +18,9 @@ Projectile::Projectile(Game* game, Vector2 pos, float angle, float speed, float 
 {
     SetPosition(pos);
 
+    float visualAngle = Math::ToDegrees(mAngle) + 90.0f + 180.0f;
     mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Projectile/projectile.png", "../Assets/Sprites/Projectile/projectile.json", 6);
-    mDrawComponent->SetAngle(angle);
+    mDrawComponent->SetAngle(visualAngle);
     mDrawComponent->AddAnimation("Flaming", {0,1,2,3,4,5,6,7});
     mDrawComponent->SetAnimation("Flaming");
     mDrawComponent->SetAnimFPS(10.0f);
