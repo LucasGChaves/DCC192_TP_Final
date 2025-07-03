@@ -14,7 +14,7 @@ UIGameOver::UIGameOver(Game* game)
         this->Close();
         game->SetGameScene(Game::GameScene::MainMenu);
     });
-    game->GetAudio()->PlaySound("SkeletorLaughs.wav", false);
+    game->GetAudio()->PlaySound("SpinalLaugh.wav", false);
 }
 
 void UIGameOver::Update(float deltaTime)

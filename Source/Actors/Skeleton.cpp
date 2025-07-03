@@ -84,7 +84,6 @@ void Skeleton::OnUpdate(float deltaTime)
         mStepTimer -= deltaTime;
         if (mStepTimer <= 0.0f)
         {
-            // mGame->GetAudio()->PlaySound("PlayerWalk.wav");
             mStepTimer = 0.2f;
         }
         mRigidBodyComponent->SetVelocity(vel);
