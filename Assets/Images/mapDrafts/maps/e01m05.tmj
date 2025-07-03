@@ -110,6 +110,7 @@
         {
          "draworder":"topdown",
          "id":19,
+         "locked":true,
          "name":"dynamicObjects",
          "objects":[
                 {
@@ -153,8 +154,19 @@
                  "type":"scene-1",
                  "visible":true,
                  "width":64,
-                 "x":437.666666666667,
-                 "y":139.333333333333
+                 "x":437.667,
+                 "y":139.333
+                }, 
+                {
+                 "height":32,
+                 "id":82,
+                 "name":"spAttackPlaceholder",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":352.666666666667,
+                 "y":112.666666666667
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -268,7 +280,7 @@
          "y":0
         }],
  "nextlayerid":22,
- "nextobjectid":78,
+ "nextobjectid":83,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

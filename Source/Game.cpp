@@ -850,6 +850,9 @@ void Game::BuildActorsFromMap() {
         else if (obj.name == "boss") {
             mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
+        else if (obj.name == "spAttackPlaceholder" && mBoss) {
+            mBoss->SetSpAttackPos(Vector2{obj.pos.x * SCALE, obj.pos.y * SCALE});
+        }
     }
 
     Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];

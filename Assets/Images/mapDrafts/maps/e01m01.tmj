@@ -110,6 +110,7 @@
         {
          "draworder":"topdown",
          "id":6,
+         "locked":true,
          "name":"dynamicObjects",
          "objects":[
                 {
@@ -122,171 +123,6 @@
                  "width":32,
                  "x":352,
                  "y":333.75
-                }, 
-                {
-                 "height":32,
-                 "id":26,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":501.333,
-                 "y":72
-                }, 
-                {
-                 "height":32,
-                 "id":27,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":216,
-                 "y":66
-                }, 
-                {
-                 "height":32,
-                 "id":28,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":182.667,
-                 "y":102.667
-                }, 
-                {
-                 "height":32,
-                 "id":29,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":180,
-                 "y":218.667
-                }, 
-                {
-                 "height":32,
-                 "id":30,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":214.667,
-                 "y":250
-                }, 
-                {
-                 "height":32,
-                 "id":31,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":234,
-                 "y":136.333
-                }, 
-                {
-                 "height":32,
-                 "id":33,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":275.333,
-                 "y":108
-                }, 
-                {
-                 "height":32,
-                 "id":34,
-                 "name":"boss",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":352.667,
-                 "y":160.667
-                }, 
-                {
-                 "height":32,
-                 "id":35,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":412.667,
-                 "y":108.667
-                }, 
-                {
-                 "height":32,
-                 "id":36,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":534.667,
-                 "y":112.667
-                }, 
-                {
-                 "height":32,
-                 "id":37,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":496.667,
-                 "y":156.667
-                }, 
-                {
-                 "height":32,
-                 "id":38,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":554,
-                 "y":154.667
-                }, 
-                {
-                 "height":32,
-                 "id":39,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":540.667,
-                 "y":200.667
-                }, 
-                {
-                 "height":32,
-                 "id":40,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":506,
-                 "y":234.667
-                }, 
-                {
-                 "height":32,
-                 "id":41,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":450.667,
-                 "y":180
                 }, 
                 {
                  "height":32,
@@ -345,61 +181,6 @@
                 }, 
                 {
                  "height":32,
-                 "id":50,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":464,
-                 "y":48
-                }, 
-                {
-                 "height":32,
-                 "id":51,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":256,
-                 "y":48
-                }, 
-                {
-                 "height":32,
-                 "id":52,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":153.333,
-                 "y":148
-                }, 
-                {
-                 "height":32,
-                 "id":53,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":461.333,
-                 "y":132
-                }, 
-                {
-                 "height":32,
-                 "id":54,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":222.333,
-                 "y":174
-                }, 
-                {
-                 "height":32,
                  "id":55,
                  "name":"dog",
                  "rotation":0,
@@ -421,26 +202,26 @@
                  "y":304
                 }, 
                 {
-                 "height":32,
-                 "id":58,
-                 "name":"skeleton",
+                 "height":64,
+                 "id":60,
+                 "name":"boss",
                  "rotation":0,
-                 "type":"scene-3",
+                 "type":"scene-1",
                  "visible":true,
-                 "width":32,
-                 "x":309.5,
-                 "y":171
+                 "width":64,
+                 "x":335,
+                 "y":159
                 }, 
                 {
                  "height":32,
-                 "id":59,
-                 "name":"skeleton",
+                 "id":61,
+                 "name":"spAttackPlaceholder",
                  "rotation":0,
-                 "type":"scene-3",
+                 "type":"",
                  "visible":true,
                  "width":32,
-                 "x":396.5,
-                 "y":173
+                 "x":352.5,
+                 "y":167
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -519,7 +300,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":60,
+ "nextobjectid":62,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
