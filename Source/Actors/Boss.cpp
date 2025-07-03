@@ -1,5 +1,7 @@
 #include "Boss.h"
 
+int count = 0;
+
 Boss::Boss(Game* game, Player* target, Vector2 pos)
         : Actor(game)
         , mTarget(target)
@@ -10,12 +12,8 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     SetScale(Game::SCALE);
 
     SDL_Log("Position Before: %f %f", mPosition.x, mPosition.y);
-    float fullPx = Game::TILE_SIZE * 4 * Game::SCALE;
-    Vector2 centerFull = pos + Vector2{ fullPx * 0.5f, fullPx * 0.5f };
-
     mDrawComponent = new DrawBossAnimatedComponent(this,
-        "../Assets/Sprites/Boss/boss.png", "../Assets/Sprites/Boss/boss.json",
-        Vector2(Game::TILE_SIZE * Game::SCALE * 4, Game::TILE_SIZE * Game::SCALE * 4), 0);
+        "../Assets/Sprites/Boss/boss.png", "../Assets/Sprites/Boss/boss.json", 100, 1);
     mDrawComponent->SetUpdateOrder(0);
     mDrawComponent->AddAnimation("IdleDown", {0, 1, 2, 3, 4, 5});
     mDrawComponent->AddAnimation("IdleSide", {8, 9, 10, 11, 12, 13});
@@ -31,37 +29,52 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     mDrawComponent->AddAnimation("HurtUp", {88, 89, 90, 91});
     mDrawComponent->AddAnimation("Dead", {96, 97, 98, 99});
     mDrawComponent->AddAnimation("BeginSpAttack", {104});
-    mDrawComponent->AddAnimation("LooSpAttack", {106, 107, 108, 109});
+    mDrawComponent->AddAnimation("LoopSpAttack", {106, 107, 108, 109});
 
-    mDrawComponent->SetAnimation("LooSpAttack");
+    mDrawComponent->SetAnimation("IdleDown");
     mDrawComponent->SetAnimFPS(10.0f);
 
-    Vector2 frameInitSz = mDrawComponent->GetFrameSize(106);
-    // e recua mPosition para alinhar o canto do trim ao centerFull
-    Vector2 newPos = centerFull - (frameInitSz * 0.5f);
+    float fullPx = Game::TILE_SIZE * 4 * Game::SCALE;
+    Vector2 centerFull = pos + Vector2{ fullPx * 0.5f, fullPx * 0.5f };
+    mDrawComponent->SetDefaultFrameSize(mDrawComponent->GetFrameSize(0));
+    mDrawComponent->SetDefaultSpAttackFrameSize(mDrawComponent->GetFrameSize(106));
+
+    Vector2 newPos = centerFull - (mDrawComponent->GetDefaultFrameSize() * 0.5f);
     SetPosition(newPos);
 
-    // --- passo 4: cria RigidBody e AABB sem offset interno (dx=dy=0) ---
-    mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false, 1);
+
+    mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false);
     mColliderComponent = new AABBColliderComponent(
-        this,0,0, static_cast<int>(std::round(frameInitSz.x)), static_cast<int>(std::round(frameInitSz.y)),
-        ColliderLayer::Enemy, false,2);
+        this,0,0, static_cast<int>(std::round(mDrawComponent->GetDefaultFrameSize().x)),
+        static_cast<int>(std::round(mDrawComponent->GetDefaultFrameSize().y)),
+        ColliderLayer::Enemy, false);
 
 }
 
 void Boss::OnUpdate(float deltaTime) {
-    //SDL_Log("TEST");
-    //mRigidBodyComponent->SetVelocity(Vector2{-25.f, 0.f});
-    //SetPosition(GetPosition() + Vector2{-1.f, 0.f});
-    // if (mIsDying) {
-    //     mDeathTimer -= deltaTime;
-    //     if (mDeathTimer <= 0.0f) {
-    //         SetState(ActorState::Destroy);
-    //     }
-    //     return;
-    // }
-    //
-    // if (mIsDying || !mTarget) return;
+    const std::string& anim = mDrawComponent->GetAnimationName();
+
+    if (mRigidBodyComponent) {
+        mRigidBodyComponent->SetVelocity(Vector2{-25.f, 0.f});
+    }
+
+    if (anim == "LoopSpAttack") {
+        Vector2 centerFull = mPosition + Vector2{ mDrawComponent->GetDefaultFrameSize().x * 0.5f,
+            mDrawComponent->GetDefaultFrameSize().y * 0.5f };
+
+        Vector2 framePos = centerFull - (mDrawComponent->GetSpAttackFrameSize() * 0.5f);
+
+        Vector2 offset =  framePos - mPosition;
+
+        if (mColliderComponent) {
+            mColliderComponent->SetOffset(offset);
+            mColliderComponent->SetSize(mDrawComponent->GetSpAttackFrameSize());
+        }
+    }
+    else if (mColliderComponent) {
+        mColliderComponent->SetOffset(Vector2::Zero);
+        mColliderComponent->SetSize(mDrawComponent->GetDefaultFrameSize());
+    }
 }
 
 void Boss::OnHorizontalCollision(float overlap, class AABBColliderComponent* other) {};

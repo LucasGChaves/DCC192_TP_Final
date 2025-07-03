@@ -25,6 +25,8 @@ class Boss : public Actor {
     void OnVerticalCollision(float overlap, class AABBColliderComponent* other) override;
     void Die();
 
+
+
   private:
   Player* mTarget;
   float mSpeed;
