@@ -171,14 +171,14 @@ void Game::ChangeScene()
     {
 
         mAudio->StopAllSounds();
-        //mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
+        mMusicHandle = mAudio->PlaySound("MainMenu.mp3", true);
 
         LoadMainMenu();
     }
     else if (mNextScene == GameScene::Level1)
     {
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -195,7 +195,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level2.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m04.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
@@ -210,7 +210,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level3.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         mSkeletonNum = 0;
@@ -235,10 +235,15 @@ void Game::LoadMainMenu()
     const Vector2 titlePos = Vector2(mWindowWidth/2.0f - titleSize.x/2.0f, 50.0f);
     mainMenu->AddImage(mRenderer, "../Assets/Images/Background.png", backgroundPos, backgroundSize);
     mainMenu->AddImage(mRenderer, "../Assets/Images/Logo.png", titlePos, titleSize);
+    mainMenu->AddImage(mRenderer, "../Assets/Images/howToPlay.png",
+        Vector2{mWindowWidth * 0.70f, mWindowHeight * 0.02f}, Vector2{377.f, 463.f});
 
-
-    auto button1 = mainMenu->AddButton("Begin Quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f), Vector2(400.0f, 80.0f),
-                                       [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");});
+    auto button1 = mainMenu->AddButton("Press 'Enter' to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
+        Vector2(400.0f, 80.0f),
+        [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");},
+        Vector2{350.f, 20.f});
+    auto button2 = mainMenu->AddButton("Quit", Vector2(mWindowWidth/2.0f - 200.0f, 700.0f),
+        Vector2(400.0f, 80.0f),[this]() {Quit();},Vector2{50.f, 20.f});
 
 }
 
@@ -387,8 +392,9 @@ void Game::UpdateGame()
     }
     // Reinsert audio system
     mAudio->Update(deltaTime);
-    if (mPlayer && mDog && mGameScene == GameScene::Level3
+    if (mPlayer && mDog && mBoss && mGameScene == GameScene::Level3
         && mPlayer->GetScore() == mSkeletonNum
+        && mBoss->IsDying()
         && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
         && mDog->GetState() == Dog::State::Follow) {
         if (mShowWinScreen) {
@@ -686,6 +692,7 @@ void Game::UnloadScene()
     mHUD = nullptr;
     mPlayer = nullptr;
     mDog = nullptr;
+    mBoss = nullptr;
     mTopInvisibleWall = nullptr;
     mBottomInvisibleWall = nullptr;
 
@@ -847,6 +854,9 @@ void Game::BuildActorsFromMap() {
         }
         else if (obj.name == "boss") {
             mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+        }
+        else if (obj.name == "spAttackPlaceholder" && mBoss) {
+            mBoss->SetSpAttackPos(Vector2{obj.pos.x * SCALE, obj.pos.y * SCALE});
         }
     }
 

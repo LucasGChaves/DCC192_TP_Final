@@ -29,6 +29,12 @@ void UIText::SetText(const std::string &text)
 
     mTextTexture = mFont->RenderText(text, mColor, mPointSize, mWrapLength);
 
+    // int tw, th;
+    // SDL_QueryTexture(mTextTexture, nullptr, nullptr, &tw, &th);
+    // // define o tamanho real do texto
+    // mSize.x = static_cast<float>(tw);
+    // mSize.y = static_cast<float>(th);
+
     if (!mTextTexture){
         SDL_Log("Failed to create text texture for text: %s", text.c_str());
         return;

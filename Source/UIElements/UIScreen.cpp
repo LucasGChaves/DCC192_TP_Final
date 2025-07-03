@@ -114,11 +114,14 @@ UIText* UIScreen::AddText(const std::string &name, const Vector2 &pos, const Vec
     return t;
 }
 
-UIButton* UIScreen::AddButton(const std::string& name, const Vector2 &pos, const Vector2& dims, std::function<void()> onClick)
+UIButton* UIScreen::AddButton(const std::string& name, const Vector2 &pos, const Vector2& dims,
+    std::function<void()> onClick, Vector2 textSize)
 {
     Vector3 buttonColor(1.0f, 0.5f, 0.0f);
     Vector3 textColor(1.0f, 1.0f, 1.0f);
-    auto* b = new UIButton(name, mFont, onClick, pos, dims, buttonColor, 30, 1024);
+
+    auto* b = new UIButton(name, mFont, onClick, pos, dims, buttonColor, 30, 1024,
+        Vector2::Zero, textSize);
     mButtons.emplace_back(b);
 
     if (mButtons.size() == 1){

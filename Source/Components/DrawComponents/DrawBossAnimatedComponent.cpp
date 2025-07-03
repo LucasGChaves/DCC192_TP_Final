@@ -5,13 +5,8 @@
 #include "DrawBossAnimatedComponent.h"
 
 DrawBossAnimatedComponent::DrawBossAnimatedComponent(class Actor* owner, const std::string& spriteSheetPath,
-                              const std::string& spriteSheetData, Vector2 originalSize, int drawOrder)
-    : DrawAnimatedComponent(owner, spriteSheetPath, spriteSheetData, drawOrder), mOriginalSize(originalSize) {
-
-        // already scaled
-        mOriginalFrameCenter = Vector2{ mOwner->GetPosition().x + (mOriginalSize.x/2.f),
-            mOwner->GetPosition().y + (mOriginalSize.y/2.f)};
-    }
+                              const std::string& spriteSheetData, int drawOrder, int updateOrder)
+    : DrawAnimatedComponent(owner, spriteSheetPath, spriteSheetData, drawOrder) {}
 
 DrawBossAnimatedComponent::~DrawBossAnimatedComponent() {}
 
@@ -25,34 +20,32 @@ void DrawBossAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modC
     if (frameIndex >= static_cast<int>(frames.size())) return;
 
     SDL_Rect* srcRect = mSpriteSheetData[frames[frameIndex]];
+    SDL_Rect* dstRect = nullptr;
 
-    if (auto bb = mOwner->GetComponent<AABBColliderComponent>()) {
-        bb->SetSize(Vector2{
-            static_cast<float>(srcRect->w) * Game::SCALE,
-            static_cast<float>(srcRect->h) * Game::SCALE
-        });
+    if (mAnimName == "LoopSpAttack") {
+        Vector2 frameSizeScaled {static_cast<float>(srcRect->w * Game::SCALE),
+        static_cast<float>(srcRect->h * Game::SCALE)};
+
+        Vector2 center{mOwner->GetPosition().x + (mDefaultFrameSize.x * 0.5), mOwner->GetPosition().y + (mDefaultFrameSize.y * 0.5)};
+
+        Vector2 framePos = center - (frameSizeScaled * 0.5f);
+
+        SDL_Rect rect = {
+            static_cast<int>(framePos.x - mOwner->GetGame()->GetCameraPos().x),
+            static_cast<int>(framePos.y - mOwner->GetGame()->GetCameraPos().y),
+            static_cast<int>(frameSizeScaled.x),
+            static_cast<int>(frameSizeScaled.y)
+        };
+        dstRect = &rect;
     }
-
-    // 2) monta o dstRect partindo de mOwner->GetPosition() (canto sup-esq)
-    Vector2 worldPos = mOwner->GetPosition();
-    Vector2 cam      = mOwner->GetGame()->GetCameraPos();
-    SDL_Rect dstRect = {
-        int(worldPos.x - cam.x),
-        int(worldPos.y - cam.y),
-        srcRect->w * Game::SCALE,
-        srcRect->h * Game::SCALE
-    };
-
-    // SDL_Rect dstRect = {
-    //     static_cast<int>(mOwner->GetPosition().x - mOwner->GetGame()->GetCameraPos().x),
-    //     static_cast<int>(mOwner->GetPosition().y - mOwner->GetGame()->GetCameraPos().y),
-    //     srcRect->w * Game::SCALE,
-    //     srcRect->h * Game::SCALE
-    // };
-
-    auto ownerBoundingBox = mOwner->GetComponent<AABBColliderComponent>();
-    if (ownerBoundingBox) {
-        //Colocar código aqui com o SetSize
+    else {
+        SDL_Rect rect = {
+            static_cast<int>(mOwner->GetPosition().x - mOwner->GetGame()->GetCameraPos().x),
+            static_cast<int>(mOwner->GetPosition().y - mOwner->GetGame()->GetCameraPos().y),
+            srcRect->w * Game::SCALE,
+            srcRect->h * Game::SCALE
+        };
+        dstRect = &rect;
     }
 
     SDL_RendererFlip flip = SDL_FLIP_NONE;
@@ -65,7 +58,7 @@ void DrawBossAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modC
                            static_cast<Uint8>(modColor.y),
                            static_cast<Uint8>(modColor.z));
 
-    SDL_RenderCopyEx(renderer, mSpriteSheetSurface, srcRect, &dstRect, 0.0, nullptr, flip);
+    SDL_RenderCopyEx(renderer, mSpriteSheetSurface, srcRect, dstRect, 0.0, nullptr, flip);
 }
 
 Vector2 DrawBossAnimatedComponent::GetFrameSize(int frameIdx) {

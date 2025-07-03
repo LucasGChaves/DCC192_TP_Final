@@ -10,6 +10,7 @@
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 #include "../Game.h"
 #include "Skeleton.h"
+#include "Boss.h"
 
 Attack::Attack(Game *game, Vector2 base, Vector2 forward) : Actor(game) {
     float w = (std::abs(forward.y) == 1 ? 2.f : 1.f) * 16.f * Game::SCALE;
@@ -28,6 +29,12 @@ Attack::Attack(Game *game, Vector2 base, Vector2 forward) : Actor(game) {
         if (auto* enemy = dynamic_cast<Skeleton*>(actor)) {
             if (enemy->GetColliderComponent() && mColliderComponent->Intersect(*enemy->GetColliderComponent())) {
                 enemy->Die();
+            }
+        }
+        else if (auto* boss = dynamic_cast<Boss*>(actor)) {
+            auto aabb = boss->GetComponent<AABBColliderComponent>();
+            if (aabb && mColliderComponent->Intersect(*aabb)) {
+                boss->hit();
             }
         }
     }

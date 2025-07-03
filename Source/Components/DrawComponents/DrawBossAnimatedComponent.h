@@ -13,13 +13,21 @@ class DrawBossAnimatedComponent : public DrawAnimatedComponent
 {
   public:
   DrawBossAnimatedComponent(class Actor* owner, const std::string& spriteSheetPath,
-                              const std::string& spriteSheetData, Vector2 originalSize, int drawOrder = 100);
+                              const std::string& spriteSheetData, int drawOrder = 100, int updateOrder = 100);
   ~DrawBossAnimatedComponent();
 
   void Draw(SDL_Renderer* renderer, const Vector3& modColor) override;
+
+  Vector2 GetDefaultFrameSize() { return mDefaultFrameSize; }
+  Vector2 GetSpAttackFrameSize() { return mSpAttackFrameSize; }
+
+  void SetDefaultFrameSize(Vector2 frameSize) { mDefaultFrameSize = frameSize; }
+  void SetDefaultSpAttackFrameSize(Vector2 frameSize) { mSpAttackFrameSize = frameSize; }
+
   Vector2 GetFrameSize(int frameIdx);
-    Vector2 GetFrameCenter() { return mOriginalFrameCenter; };
+
   private:
-    Vector2 mOriginalSize;
-    Vector2 mOriginalFrameCenter;
+    float mOriginalSize;
+    Vector2 mDefaultFrameSize;
+    Vector2 mSpAttackFrameSize;
 };
