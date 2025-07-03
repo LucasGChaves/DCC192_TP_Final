@@ -125,15 +125,15 @@ void Boss::OnUpdate(float deltaTime) {
     }
     //------
 
-    if (mAtSpAttackPos) return;
+    if (mAtSpAttackPos && mSpAttackTimer >= 0.f) return;
 
     Vector2 distanceToTarget = Vector2::Zero;
 
-    float threshold = 0.5f;
+    float threshold = 1.0f;
 
     if (mChasingPlayer) {
         distanceToTarget = mTarget->GetPosition() - mPosition;
-        threshold = 1.0f;
+        //threshold = 1.0f;
     }
     else {
         distanceToTarget = mSpAttackPos - mPosition;
