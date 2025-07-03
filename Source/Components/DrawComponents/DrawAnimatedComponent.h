@@ -25,7 +25,7 @@ public:
     bool IsAnimationFinished() const;
     const std::vector<SDL_Rect*>& GetSpriteSheetData() const { return mSpriteSheetData; }
 
-private:
+protected:
     void LoadSpriteSheet(const std::string& texturePath, const std::string& dataPath);
 
     std::unordered_map<std::string, std::vector<int>> mAnimations;

@@ -33,6 +33,7 @@ SpikeGate::SpikeGate(Game* game, Vector2 pos, int width, int height, int drawOrd
 
 void SpikeGate::OnUpdate(float deltaTime)
 {
+    if (!mGame->GetPlayer()) return;
     if (mGame->GetPlayer()->GetScore() != mGame->GetNumSkeletons()) return;
 
     std::string animationName = mDrawComponent->GetAnimationName();

@@ -52,7 +52,7 @@ void Dog::OnUpdate(float dt)
 {
     if (mIsDying) return;
 
-    if (mGame->GetSpikeGateLowered()) {
+    if (mGame->GetSpikeGateLowered() && mGame->GetGameScene() != Game::GameScene::Level1) {
         SetState(State::Follow);
     }
 

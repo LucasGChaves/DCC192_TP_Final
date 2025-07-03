@@ -9,6 +9,7 @@
 
 #include "Attack.h"
 #include "Dog.h"
+#include "InvisibleWall.h"
 #include "../Components/DrawComponents/DrawPolygonComponent.h"
 #include "../UIElements/UIGameOver.h"
 
@@ -27,11 +28,23 @@ Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
+    // int dx = (Game::TILE_SIZE * Game::SCALE * 2) / 3;
+    // int dy = (Game::TILE_SIZE * Game::SCALE) / 4;
+    // int width = (Game::TILE_SIZE * Game::SCALE * 2) / 3;
+    // int height = (Game::TILE_SIZE * Game::SCALE) / 2;
+
 
     auto [dx, dy, w, h] = ComputeColliderParams(Game::TILE_SIZE * 2, Game::TILE_SIZE * 2);
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(this,dx, dy, w, h, ColliderLayer::Player, false, 100);
 
+    // std::vector<Vector2> vertices = {
+    //     Vector2(dx, dy),                     // Top-left
+    //     Vector2(dx + w, dy),            // Top-right
+    //     Vector2(dx + w, dy + h),   // Bottom-right
+    //     Vector2(dx, dy + h)            // Bottom-left
+    // };
+    //new DrawPolygonComponent(this, vertices);
     mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json", 6);
 
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
@@ -129,21 +142,16 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
 
         mDrawComponent->ForceSetAnimation("Strike" + mLastDirection);
 
-        Vector2 base = GetPosition();
-        float w = 48.0f, h = 48.0f, offset = -8.0f;
-        std::vector<Vector2> poly;
-        if (mLastDirection == "Up") {
-            poly = { Vector2(base.x, base.y - offset), Vector2(base.x + w, base.y - offset), Vector2(base.x + w, base.y - offset + h), Vector2(base.x, base.y - offset + h) };
-        } else if (mLastDirection == "Down") {
-            poly = { Vector2(base.x, base.y + offset), Vector2(base.x + w, base.y + offset), Vector2(base.x + w, base.y + offset + h), Vector2(base.x, base.y + offset + h) };
-        } else if (mLastDirection == "Side") {
-            if (GetRotation() == 0.0f) {
-                poly = { Vector2(base.x + offset, base.y), Vector2(base.x + offset + w, base.y), Vector2(base.x + offset + w, base.y + h), Vector2(base.x + offset, base.y + h) };
-            } else {
-                poly = { Vector2(base.x - offset - w, base.y), Vector2(base.x - offset, base.y), Vector2(base.x - offset, base.y + h), Vector2(base.x - offset - w, base.y + h) };
-            }
+        float x = 0.f, y = 0.f;
+
+        if (mLastDirection == "Up") y = -1.f;
+        else if (mLastDirection == "Down") y = 1.f;
+        else if (mLastDirection == "Side") {
+            if (GetRotation() == 0.f) x = 1.f;
+            else x = -1.f;
         }
-        new Attack(mGame, poly);
+
+        new Attack(mGame, GetPosition(), Vector2(x, y));
     }
 }
 
@@ -163,8 +171,8 @@ void Player::OnUpdate(float deltaTime)
     if (mHearts <= 0) Kill();
 
     if (mGame->GetGameScene() == Game::GameScene::Level1 &&
-        mGame->GetDog()->GetState() == Dog::State::Dying &&
-        mIsLocked) {
+        mGame->GetDog() && mGame->GetDog()->GetState() == Dog::State::Dying &&
+        mIsLocked && mGame->GetTopInvisibleWall()->GetComponent<AABBColliderComponent>()->IsEnabled()) {
         mIsLocked = false;
     }
 
@@ -198,19 +206,19 @@ void Player::OnUpdate(float deltaTime)
         mStepTimer -= deltaTime;
     }
 
-    if (mGame->GetGamePlayState() == Game::GamePlayState::Leaving && mPosition.y <= mTargetPos.y &&
-        mGame->GetGameScene() == Game::GameScene::Level1) {
+    if (mGame->GetTopInvisibleWall() && mGame->GetGamePlayState() == Game::GamePlayState::Leaving
+        && mPosition.y <= mGame->GetTopInvisibleWall()->GetPosition().y &&
+        mGame->GetGameScene() != Game::GameScene::MainMenu) {
         mState = ActorState::Destroy;
-        mGame->SetGameScene(Game::GameScene::Level2, 1.5f);
-        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+        mGame->SetGameScene(static_cast<Game::GameScene>(static_cast<int>(mGame->GetGameScene())+1), 1.5f);
     }
-    else if (mGame->GetGamePlayState() == Game::GamePlayState::EnteringMap &&
-        mPosition.y <= (mTargetPos.y - ((Game::TILE_SIZE + Game::TILE_SIZE/2) * Game::SCALE)) &&
-        mGame->GetGameScene() == Game::GameScene::Level2) {
+    else if (mGame->GetBottomInvisibleWall() && mGame->GetGamePlayState() == Game::GamePlayState::EnteringMap &&
+        mPosition.y <= (mGame->GetBottomInvisibleWall()->GetPosition().y - ((Game::TILE_SIZE + Game::TILE_SIZE/2) * Game::SCALE)) &&
+        mGame->GetGameScene() != Game::GameScene::MainMenu) {
         mIsLocked = false;
         mGame->SetGamePlayState(Game::GamePlayState::Playing);
         mRigidBodyComponent->SetVelocity(Vector2::Zero);
-        mTarget->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+        mGame->GetBottomInvisibleWall()->GetComponent<AABBColliderComponent>()->SetEnabled(true);
     }
     ManageAnimations();
 }
@@ -239,7 +247,7 @@ void Player::ManageAnimations()
     {
         if (mStepTimer <= 0.0f)
         {
-            mGame->GetAudio()->PlaySound("PlayerWalk.wav");
+            //mGame->GetAudio()->PlaySound("PlayerWalk.wav");
             mStepTimer = 0.2f;
         }
         mDrawComponent->SetAnimation("Walk" + mLastDirection);
@@ -262,7 +270,9 @@ void Player::Kill()
     mColliderComponent->SetEnabled(false);
 
     mGame->GetAudio()->StopAllSounds();
+    // mGame->GetAudio()->PlaySound("PlayerDead.wav");
 
+    // Show Game Over menu
     mGame->SetGamePlayState(Game::GamePlayState::GameOver);
     auto* gameOverScreen = new UIGameOver(mGame);
     gameOverScreen->Open();
@@ -274,9 +284,16 @@ void Player::Win(AABBColliderComponent *poleCollider)
 
 void Player::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Enemy)
-    {
-        Hit();
+    if (other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
+        mIsLocked = true;
+        mTriggeredAnimation = true;
+        mTargetPos = other->GetOwner()->GetPosition();
+        other->SetEnabled(false);
+        InvisibleWall* wall = dynamic_cast<InvisibleWall*>(other->GetOwner());
+        wall->SetColliding(true);
+        if (wall->GetType() == InvisibleWall::Type::Top) {
+            mGame->SetGamePlayState(Game::GamePlayState::Leaving);
+        }
     }
 }
 
@@ -288,19 +305,14 @@ void Player::EnableCollision(bool enabled)
 
 void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Enemy)
-    {
-        Hit();
-    }
-
     if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
         mIsLocked = true;
         mTriggeredAnimation = true;
-        other->SetEnabled(false);
         mTargetPos = other->GetOwner()->GetPosition();
-        mTarget = other->GetOwner();
-
-        if (mGame->GetGameScene() == Game::GameScene::Level1) {
+        other->SetEnabled(false);
+        InvisibleWall* wall = dynamic_cast<InvisibleWall*>(other->GetOwner());
+        wall->SetColliding(true);
+        if (wall->GetType() == InvisibleWall::Type::Top) {
             mGame->SetGamePlayState(Game::GamePlayState::Leaving);
         }
     }

@@ -33,7 +33,8 @@ public:
     {
         MainMenu,
         Level1,
-        Level2
+        Level2,
+        Level3
     };
 
     enum class SceneManagerState
@@ -132,6 +133,9 @@ public:
 
     const class Dog* GetDog() { return mDog; }
 
+    const class InvisibleWall* GetTopInvisibleWall() { return mTopInvisibleWall; }
+    const class InvisibleWall* GetBottomInvisibleWall() { return mBottomInvisibleWall; }
+
 private:
     void ProcessInput();
     void UpdateGame();
@@ -186,7 +190,10 @@ private:
     // Game-specific
     class Player *mPlayer;
     class Dog *mDog;
+    class InvisibleWall *mTopInvisibleWall;
+    class InvisibleWall *mBottomInvisibleWall;
     class HUD *mHUD;
+    class Boss *mBoss;
     SoundHandle mMusicHandle;
 
     float mGameTimer;

@@ -8,6 +8,8 @@ Assets/Images/mapDrafts/assets.zip
 Assets/Sounds/Level1.wav
 Assets/Sounds/MainMenu.wav
 Assets/Sounds/Sounds.zip
+Assets/Sprites/Projectile/*
+Assets/Sprites/Boss/*
 
 # User-specific stuff
 .idea/**/workspace.xml

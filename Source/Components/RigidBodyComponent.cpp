@@ -59,7 +59,7 @@ void RigidBodyComponent::Update(float deltaTime)
 
         //SDL_Log("Deltatime * velocity: %f", mVelocity.x * deltaTime);
         if (mOwner->IsActorLocked() &&
-            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), mVelocity.x * deltaTime) {
+            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x), mVelocity.x * deltaTime)) {
             SetVelocity(Vector2::Zero);
         }
 
@@ -75,7 +75,7 @@ void RigidBodyComponent::Update(float deltaTime)
 
 
         if (mOwner->IsActorLocked() &&
-            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x)), mVelocity.x * deltaTime) {
+            Math::NearZero((GetOwner()->GetPosition().x - GetOwner()->GetTargetPos().x), mVelocity.x * deltaTime)) {
             SetVelocity(Vector2::Zero);
         }
 
