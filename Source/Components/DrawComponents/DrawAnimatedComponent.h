@@ -25,6 +25,8 @@ public:
     bool IsAnimationFinished() const;
     const std::vector<SDL_Rect*>& GetSpriteSheetData() const { return mSpriteSheetData; }
 
+    void SetAngle(float angle) { mAngle = angle; }
+
 private:
     void LoadSpriteSheet(const std::string& texturePath, const std::string& dataPath);
 
@@ -37,4 +39,6 @@ private:
     std::vector<SDL_Rect*> mSpriteSheetData;
     std::vector<std::string> mFrameNames;
     bool mIsPaused = false;
+
+    float mAngle = 0.0f;
 };

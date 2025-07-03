@@ -34,6 +34,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/DrawComponents/DrawSpriteComponent.h
         Source/Components/DrawComponents/DrawPolygonComponent.cpp
         Source/Components/DrawComponents/DrawPolygonComponent.h
+        Source/Actors/Projectile.cpp
+        Source/Actors/Projectile.h
         Source/Actors/Player.cpp
         Source/Actors/Player.h
         Source/Actors/ColliderBlock.cpp
