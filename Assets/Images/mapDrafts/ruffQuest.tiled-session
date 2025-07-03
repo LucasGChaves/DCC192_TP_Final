@@ -3,12 +3,12 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "maps/e01m05.tmx",
+    "activeFile": "maps/e01m04.tmx",
     "expandedProjectPaths": [
         "tileset/teste",
         ".",
-        "tileset",
-        "maps"
+        "maps",
+        "tileset"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -72,7 +72,7 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 319.5,
+                "x": 288,
                 "y": 214.75
             }
         },
@@ -218,29 +218,20 @@
     "last.imagePath": "C:/Users/gabri/Documents/game-dev/DCC192_TP_Final/Assets/Images/mapDrafts/assets/Cute_Fantasy_Characters/Angels",
     "map.lastUsedExportFilter": "Arquivos de mapa JSON (*.tmj *.json)",
     "openFiles": [
-        "tileset/Dungeon_2_Door_anim.tsx",
-        "maps/e01m03.tmx",
-        "maps/e01m05.tmx",
-        "maps/e01m01.tmx",
-        "tileset/Player.tsx",
-        "tileset/Skeleton.tsx",
-        "tileset/Angel_2-Sheet_edit.tsx",
-        "maps/e01m04.tmx",
-        "tileset/Dungeon_1_Arch_Open.tsx",
-        "maps/e01m05.tmj"
+        "maps/e01m04.tmx"
     ],
     "project": "ruffQuest.tiled-project",
     "recentFiles": [
-        "tileset/Dungeon_2_Door_anim.tsx",
-        "maps/e01m03.tmx",
+        "maps/e01m04.tmx",
         "maps/e01m05.tmj",
         "tileset/Dungeon_1_Arch_Open.tsx",
-        "maps/e01m04.tmx",
         "tileset/Angel_2-Sheet_edit.tsx",
         "tileset/Skeleton.tsx",
         "tileset/Player.tsx",
         "maps/e01m01.tmx",
+        "maps/e01m03.tmx",
         "maps/e01m05.tmx",
+        "tileset/Dungeon_2_Door_anim.tsx",
         "tileset/dog_idle.tsx",
         "tileset/chars.tsx"
     ],
