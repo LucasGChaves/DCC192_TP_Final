@@ -237,8 +237,10 @@ void Game::LoadMainMenu()
     mainMenu->AddImage(mRenderer, "../Assets/Images/Logo.png", titlePos, titleSize);
 
 
-    auto button1 = mainMenu->AddButton("Begin Quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f), Vector2(400.0f, 80.0f),
-                                       [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");});
+    auto button1 = mainMenu->AddButton("Press 'Enter' to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
+        Vector2(400.0f, 80.0f),
+        [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");},
+        Vector2{350.f, 20.f});
 
 }
 
