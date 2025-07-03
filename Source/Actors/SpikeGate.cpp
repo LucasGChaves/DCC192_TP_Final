@@ -3,6 +3,7 @@
 //
 #include "SpikeGate.h"
 
+#include "Boss.h"
 #include "Player.h"
 #include "../Components/DrawComponents/DrawAnimatedComponent.h"
 
@@ -35,6 +36,7 @@ void SpikeGate::OnUpdate(float deltaTime)
 {
     if (!mGame->GetPlayer()) return;
     if (mGame->GetPlayer()->GetScore() != mGame->GetNumSkeletons()) return;
+    if (mGame->GetBoss() && mGame->GetGameScene() == Game::GameScene::Level3 && !mGame->GetBoss()->IsDying()) return;
 
     std::string animationName = mDrawComponent->GetAnimationName();
 

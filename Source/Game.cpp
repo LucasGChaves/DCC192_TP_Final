@@ -389,8 +389,9 @@ void Game::UpdateGame()
     }
     // Reinsert audio system
     mAudio->Update(deltaTime);
-    if (mPlayer && mDog && mGameScene == GameScene::Level3
+    if (mPlayer && mDog && mBoss && mGameScene == GameScene::Level3
         && mPlayer->GetScore() == mSkeletonNum
+        && mBoss->IsDying()
         && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
         && mDog->GetState() == Dog::State::Follow) {
         if (mShowWinScreen) {

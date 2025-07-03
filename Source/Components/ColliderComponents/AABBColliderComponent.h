@@ -12,6 +12,7 @@ enum class ColliderLayer
 {
     Player,
     Enemy,
+    Boss,
     Blocks,
     InvisibleWall,
     PlayerAttack // ✅ Adicionado
