@@ -247,7 +247,7 @@ void Player::ManageAnimations()
     {
         if (mStepTimer <= 0.0f)
         {
-            //mGame->GetAudio()->PlaySound("PlayerWalk.wav");
+            mGame->GetAudio()->PlaySound("PlayerWalk.wav");
             mStepTimer = 0.2f;
         }
         mDrawComponent->SetAnimation("Walk" + mLastDirection);
@@ -270,7 +270,7 @@ void Player::Kill()
     mColliderComponent->SetEnabled(false);
 
     mGame->GetAudio()->StopAllSounds();
-    // mGame->GetAudio()->PlaySound("PlayerDead.wav");
+    mGame->GetAudio()->PlaySound("PlayerDead.wav");
 
     // Show Game Over menu
     mGame->SetGamePlayState(Game::GamePlayState::GameOver);

@@ -171,14 +171,14 @@ void Game::ChangeScene()
     {
 
         mAudio->StopAllSounds();
-        //mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
+        mMusicHandle = mAudio->PlaySound("MainMenu.mp3", true);
 
         LoadMainMenu();
     }
     else if (mNextScene == GameScene::Level1)
     {
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -195,7 +195,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level2.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m04.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
@@ -210,7 +210,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopSound(mMusicHandle);
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level3.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         mSkeletonNum = 0;
@@ -389,8 +389,9 @@ void Game::UpdateGame()
     }
     // Reinsert audio system
     mAudio->Update(deltaTime);
-    if (mPlayer && mDog && mGameScene == GameScene::Level3
+    if (mPlayer && mDog && mBoss && mGameScene == GameScene::Level3
         && mPlayer->GetScore() == mSkeletonNum
+        && mBoss->IsDying()
         && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
         && mDog->GetState() == Dog::State::Follow) {
         if (mShowWinScreen) {

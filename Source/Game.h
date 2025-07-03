@@ -114,6 +114,7 @@ public:
 
     // Game-specific
     const class Player* GetPlayer() { return mPlayer; }
+    const class Boss* GetBoss() { return mBoss; }
 
 
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }

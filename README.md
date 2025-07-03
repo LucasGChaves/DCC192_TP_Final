@@ -10,7 +10,7 @@ The gameplay features a classic top-down view with 4-directional movement and re
 Victory is achieved by clearing all enemies from the dungeon. The game ends in defeat if the player loses all lives.
 
 ### 💻 Running
-- Download the .zip file and .wav files from this [gdrive](https://drive.google.com/drive/folders/1OGkt8D_h3TgShyAh01r-Ss8eNFrB1xzQ?usp=sharing)
+- Download the .zip file and .wav files of the assets
 - Decompress the assets.zip
 - Insert `assets` folder into `Assets/Images/mapDrafts/` the final result should be `Assets/Images/mapDrafts/assets/`
 - Insert `Level1.wav` and `MainMenu.wav` into `Assets/Sounds/`

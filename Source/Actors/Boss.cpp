@@ -49,16 +49,22 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     mColliderComponent = new AABBColliderComponent(
         this,0,0, static_cast<int>(std::round(mDrawComponent->GetDefaultFrameSize().x)),
         static_cast<int>(std::round(mDrawComponent->GetDefaultFrameSize().y)),
-        ColliderLayer::Enemy, false);
+        ColliderLayer::Boss, false);
 
 }
 
 void Boss::OnUpdate(float deltaTime) {
+
+    if (mLifePoints <= 0) {
+        Die();
+    }
+
     if (mIsDying) {
-        mDeathTimer -= deltaTime;
-        if (mDeathTimer <= 0.0f) {
-            SetState(ActorState::Destroy);
+        if (mDeathTimer >= 0.f) {
+            mDeathTimer -= deltaTime;
+            return;
         }
+        SetState(ActorState::Destroy);
         return;
     }
 
@@ -89,7 +95,7 @@ void Boss::OnUpdate(float deltaTime) {
             mAtSpAttackPos = false;
             mRunToMiddleTimer = Random::GetIntRange(10, 15);
             mSpAttackTimer = 30.f;
-            mBeginSpAttackTimer = 2.f;
+            mBeginSpAttackTimer = 1.f;
         }
     }
 
@@ -163,7 +169,6 @@ void Boss::OnUpdate(float deltaTime) {
         mStepTimer -= deltaTime;
         if (mStepTimer <= 0.0f)
         {
-            // mGame->GetAudio()->PlaySound("PlayerWalk.wav");
             mStepTimer = 0.2f;
         }
         mRigidBodyComponent->SetVelocity(vel);
@@ -197,12 +202,8 @@ void Boss::OnVerticalCollision(float overlap, AABBColliderComponent* other)
 void Boss::Die()
 {
     if (mIsDying) return;
-    mIsDying = true;
     mDrawComponent->SetAnimation("Dead");
+    mDrawComponent->SetAnimFPS(4.0f);
+    mIsDying = true;
     mColliderComponent->SetEnabled(false);
-    mDeathTimer = 0.5f;
-
-    if (mTarget) {
-        mTarget->AddScore(1);
-    }
 }
