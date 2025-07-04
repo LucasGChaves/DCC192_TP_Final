@@ -27,7 +27,7 @@ class Boss : public Actor {
     void Die();
     void SetSpAttackPos(Vector2 pos) { mSpAttackPos = pos; }
     bool IsDying() const { return mIsDying; }
-    void Hit() { mLifePoints--; }
+    void Hit();
     float GetSpAttackTimer() { return mSpAttackTimer; }
     bool IsAtSpAttackPos() { return mAtSpAttackPos; }
 
@@ -43,6 +43,7 @@ class Boss : public Actor {
   bool mChasingPlayer = true;
   float mBeginSpAttackTimer = 1.f;
   int mLifePoints = 10;
+  float mInvincibleTimer = 0.f;
   class DrawBossAnimatedComponent* mDrawComponent;
   class AABBColliderComponent* mColliderComponent;
   class RigidBodyComponent* mRigidBodyComponent;

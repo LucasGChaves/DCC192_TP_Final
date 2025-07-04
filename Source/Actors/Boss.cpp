@@ -5,7 +5,7 @@ int count = 0;
 Boss::Boss(Game* game, Player* target, Vector2 pos)
         : Actor(game)
         , mTarget(target)
-        , mSpeed(120.0f)
+        , mSpeed(200.0f)
         , mIsDying(false)
 {
     SetPosition(pos);
@@ -71,16 +71,14 @@ void Boss::OnUpdate(float deltaTime) {
 
     if (mIsDying || !mTarget) return;
 
+
     if (mRunToMiddleTimer >= 0.f) {
-        //SDL_Log("decreasing mRunToMiddleTimer");
         mRunToMiddleTimer -= deltaTime;
     }
     else {
-        //SDL_Log("going to middle");
         mChasingPlayer = false;
-
+        mSpeed = 300.f;
         if (mAtSpAttackPos && mSpAttackTimer >= 0.f) {
-            //SDL_Log("doing sp attack");
             mSpAttackTimer -= deltaTime;
             if (mBeginSpAttackTimer >= 0.f) {
                 mDrawComponent->SetAnimation("BeginSpAttack");
@@ -91,10 +89,10 @@ void Boss::OnUpdate(float deltaTime) {
             }
         }
         else if (mAtSpAttackPos) {
-            //SDL_Log("back to chase");
             mChasingPlayer = true;
             mAtSpAttackPos = false;
             mRunToMiddleTimer = Random::GetIntRange(25, 35);
+            mSpeed = 200.f;
             mSpAttackTimer = 30.f;
             mBeginSpAttackTimer = 1.f;
         }
@@ -150,25 +148,37 @@ void Boss::OnUpdate(float deltaTime) {
 
         if (diff >= 0.f && diff <= 0.5f) {
             SetRotation(distanceToTarget.x > 0 ? 0.0f : Math::Pi);
-            if (mChasingPlayer) mDrawComponent->SetAnimation("WalkSide");
-            else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtSide");
+            else {
+                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkSide");
+                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            }
         }
 
         else if (std::abs(distanceToTarget.x) > std::abs(distanceToTarget.y))
         {
             SetRotation(distanceToTarget.x > 0 ? 0.0f : Math::Pi);
-            if (mChasingPlayer) mDrawComponent->SetAnimation("WalkSide");
-            else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtSide");
+            else {
+                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkSide");
+                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            }
         }
         else if (distanceToTarget.y < 0)
         {
-            if (mChasingPlayer) mDrawComponent->SetAnimation("WalkUp");
-            else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtUp");
+            else {
+                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkUp");
+                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            }
         }
         else
         {
-            if (mChasingPlayer) mDrawComponent->SetAnimation("WalkDown");
-            else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtDown");
+            else {
+                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkDown");
+                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            }
         }
 
         mStepTimer -= deltaTime;
@@ -180,14 +190,19 @@ void Boss::OnUpdate(float deltaTime) {
     }
     else
     {
-        if (mChasingPlayer) {
-            mDrawComponent->SetAnimation("IdleDown");
-        }
+        if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtDown");
         else {
-            mDrawComponent->SetAnimation("GoingToSpAttackPos");
+            if (mChasingPlayer) mDrawComponent->SetAnimation("IdleDown");
+            else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+        }
+        if (!mChasingPlayer) {
             mRigidBodyComponent->SetVelocity(Vector2::Zero);
             mAtSpAttackPos = true;
         }
+    }
+
+    if (mInvincibleTimer > 0.f) {
+        mInvincibleTimer -= deltaTime;
     }
 }
 
@@ -212,4 +227,11 @@ void Boss::Die()
     mDrawComponent->SetAnimFPS(4.0f);
     mIsDying = true;
     mColliderComponent->SetEnabled(false);
+}
+
+void Boss::Hit() {
+    if (mInvincibleTimer > 0.f) return;
+    SDL_Log("DECREASING LIFEPOINTS");
+    mLifePoints--;
+    mInvincibleTimer = 2.f;
 }
