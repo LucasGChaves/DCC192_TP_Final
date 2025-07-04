@@ -27,7 +27,9 @@ class Boss : public Actor {
     void Die();
     void SetSpAttackPos(Vector2 pos) { mSpAttackPos = pos; }
     bool IsDying() const { return mIsDying; }
-    void hit() { mLifePoints--; }
+    void Hit() { mLifePoints--; }
+    float GetSpAttackTimer() { return mSpAttackTimer; }
+    bool IsAtSpAttackPos() { return mAtSpAttackPos; }
 
   private:
   Player* mTarget;
