@@ -516,6 +516,12 @@ void Game::UpdateActors(float deltaTime)
         {
             mPlayer = nullptr;
         }
+        else if (actor == mBoss) {
+            mBoss = nullptr;
+        }
+        else if (actor == mDog) {
+            mDog == nullptr;
+        }
         delete actor;
     }
 }
