@@ -17,7 +17,6 @@ UIScreen::UIScreen(Game* game, const std::string& fontName)
         ,mState(UIState::Active)
         ,mSelectedButtonIndex(-1)
 {
-    SDL_Log("Construtor UIScreen: Objeto %p está se auto-adicionando à pilha.", this);
     mGame->PushUI(this);
 
     mFont = mGame->LoadFont(fontName);
@@ -80,16 +79,19 @@ void UIScreen::HandleKeyPress(int key)
         mButtons[mSelectedButtonIndex]->SetHighlighted(false);
     }
     if (key == SDLK_UP){
+        mGame->GetAudio()->PlaySound("MenuSelection.wav");
         mSelectedButtonIndex--;
         if (mSelectedButtonIndex < 0){
             mSelectedButtonIndex = static_cast<int>(mButtons.size()) - 1;
         }
     }else if (key == SDLK_DOWN){
+        mGame->GetAudio()->PlaySound("MenuSelection.wav");
         mSelectedButtonIndex++;
         if (mSelectedButtonIndex >= static_cast<int>(mButtons.size())){
             mSelectedButtonIndex = 0;
         }
     }else if (key == SDLK_RETURN){
+        mGame->GetAudio()->PlaySound("dogBark.wav");
         if (mSelectedButtonIndex >= 0 && mSelectedButtonIndex < static_cast<int>(mButtons.size())){
             mButtons[mSelectedButtonIndex]->OnClick();
         }
@@ -115,12 +117,12 @@ UIText* UIScreen::AddText(const std::string &name, const Vector2 &pos, const Vec
 }
 
 UIButton* UIScreen::AddButton(const std::string& name, const Vector2 &pos, const Vector2& dims,
-    std::function<void()> onClick, Vector2 textSize)
+    std::function<void()> onClick, Vector2 textSize, int pointSize)
 {
     Vector3 buttonColor(1.0f, 0.5f, 0.0f);
     Vector3 textColor(1.0f, 1.0f, 1.0f);
 
-    auto* b = new UIButton(name, mFont, onClick, pos, dims, buttonColor, 30, 1024,
+    auto* b = new UIButton(name, mFont, onClick, pos, dims, buttonColor, pointSize, 1024,
         Vector2::Zero, textSize);
     mButtons.emplace_back(b);
 

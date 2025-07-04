@@ -177,7 +177,7 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level1)
     {
-        mAudio->StopSound(mMusicHandle);
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize level and actors
@@ -194,7 +194,7 @@ void Game::ChangeScene()
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
-        mAudio->StopSound(mMusicHandle);
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level2.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m04.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -205,11 +205,11 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level3)
     {
-        //mShowWinScreen = false;
+        mShowWinScreen = true;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
-        mAudio->StopSound(mMusicHandle);
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level3.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -235,12 +235,21 @@ void Game::LoadMainMenu()
     const Vector2 titlePos = Vector2(mWindowWidth/2.0f - titleSize.x/2.0f, 50.0f);
     mainMenu->AddImage(mRenderer, "../Assets/Images/Background.png", backgroundPos, backgroundSize);
     mainMenu->AddImage(mRenderer, "../Assets/Images/Logo.png", titlePos, titleSize);
+    mainMenu->AddImage(mRenderer, "../Assets/Images/howToPlay.png",
+        Vector2{mWindowWidth * 0.70f, mWindowHeight * 0.02f}, Vector2{377.f, 463.f});
 
-
-    auto button1 = mainMenu->AddButton("Press 'Enter' to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
+    mainMenu->AddButton("Press ENTER to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
         Vector2(400.0f, 80.0f),
-        [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");},
-        Vector2{350.f, 20.f});
+        [this]() {
+            mFadeState = FadeState::FadeOut;
+            mFadeTime  = 0.f;
+            SetGameScene(GameScene::Level1);
+            mAudio->PlaySound("dogBark.wav");
+        },
+        Vector2{350.f, 20.f}, 20);
+
+    mainMenu->AddButton("Quit", Vector2(mWindowWidth/2.0f - 200.0f, 700.0f),
+        Vector2(400.0f, 80.0f),[this]() {Quit();},Vector2{50.f, 20.f}, 20);
 
 }
 
@@ -291,7 +300,14 @@ void Game::ProcessInput()
                 // if (event.key.keysym.sym == SDLK_RETURN)
                 if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_p) // troquei para não termos conflito com o input especifico da tela (ver 'if' acima)
                 {
+                    mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
                     TogglePause();
+                    if (mGamePlayState == GamePlayState::Paused) {
+                        HandleVolumeLevelDuringPause(false);
+                    }
+                    else {
+                        HandleVolumeLevelDuringPause(true);
+                    }
                 }
                 break;
         }
@@ -389,19 +405,16 @@ void Game::UpdateGame()
     }
     // Reinsert audio system
     mAudio->Update(deltaTime);
-    if (mPlayer && mDog && mBoss && mGameScene == GameScene::Level3
+
+    if (mShowWinScreen && mPlayer && mDog && !mBoss && mGameScene == GameScene::Level3
         && mPlayer->GetScore() == mSkeletonNum
-        && mBoss->IsDying()
         && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
         && mDog->GetState() == Dog::State::Follow) {
-        if (mShowWinScreen) {
             mShowWinScreen = false;
             new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
-            mAudio->StopSound(mMusicHandle);
+            mAudio->StopAllSounds();
             mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
             mMusicHandle = mAudio->PlaySound("win.wav", false);
-
-        }
     }
 
     // Reinsert UI screens
@@ -503,6 +516,12 @@ void Game::UpdateActors(float deltaTime)
         {
             mPlayer = nullptr;
         }
+        else if (actor == mBoss) {
+            mBoss = nullptr;
+        }
+        else if (actor == mDog) {
+            mDog == nullptr;
+        }
         delete actor;
     }
 }
@@ -565,6 +584,8 @@ void Game::GenerateOutput()
 
     for (auto actor : actorsOnCamera)
     {
+        if (actor == mBoss) continue;
+
         auto drawable = actor->GetComponent<DrawComponent>();
         if (drawable && drawable->IsVisible())
         {
@@ -572,13 +593,11 @@ void Game::GenerateOutput()
         }
     }
 
-    // Sort drawables by draw order
     std::sort(drawables.begin(), drawables.end(),
               [](const DrawComponent* a, const DrawComponent* b) {
                   return a->GetDrawOrder() < b->GetDrawOrder();
               });
 
-    // Draw all drawables
     for (auto drawable : drawables)
     {
         drawable->Draw(mRenderer, mModColor);
@@ -591,7 +610,14 @@ void Game::GenerateOutput()
         RenderLayer(mRenderer, mTileMap, wallDetailsIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
     }
 
-    // Draw all UI screens
+    if (mBoss) {
+        auto drawable = mBoss->GetComponent<DrawComponent>();
+        if (drawable && drawable->IsVisible()) {
+            drawable->Draw(mRenderer, mModColor);
+        }
+
+    }
+
     for (auto ui :mUIStack)
     {
         ui->Draw(mRenderer);
@@ -689,6 +715,7 @@ void Game::UnloadScene()
     mHUD = nullptr;
     mPlayer = nullptr;
     mDog = nullptr;
+    mBoss = nullptr;
     mTopInvisibleWall = nullptr;
     mBottomInvisibleWall = nullptr;
 
@@ -783,10 +810,12 @@ UIScreen* Game::CreatePauseMenu()
         [this, pauseMenu]() {
             if (pauseMenu->GetState() != UIScreen::UIState::Active) return;
             pauseMenu->Close();
+            mFadeState = FadeState::FadeOut;
+            mFadeTime  = 0.f;
             mIsSpikeGateLowered = true;
             mSkeletonNum = 0;
-            mShowWinScreen = true;
             SetGameScene(GameScene::MainMenu);
+            HandleVolumeLevelDuringPause(true);
         }
     );
 
@@ -796,6 +825,7 @@ UIScreen* Game::CreatePauseMenu()
         buttonSize,
         [this]() {
             TogglePause();
+            HandleVolumeLevelDuringPause(true);
         }
     );
 
@@ -837,6 +867,9 @@ void Game::BuildActorsFromMap() {
 
             }
         }
+        else if (obj.name == "boss") {
+            mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+        }
         else if (obj.name.find("spike-gate") != std::string::npos)
         {
             int drawOrder = obj.name.back() - '0';
@@ -844,12 +877,9 @@ void Game::BuildActorsFromMap() {
                 obj.width * SCALE, obj.height * SCALE, drawOrder);
         }
         else if (obj.name == "skeleton") {
-            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            //if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             mSkeletonNum++;
-        }
-        else if (obj.name == "boss") {
-            mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
         else if (obj.name == "spAttackPlaceholder" && mBoss) {
             mBoss->SetSpAttackPos(Vector2{obj.pos.x * SCALE, obj.pos.y * SCALE});
@@ -903,3 +933,25 @@ void Game::DecreaseSkeletonNum() {
         mSkeletonNum = 0;
     }
 };
+
+void Game::HandleVolumeLevelDuringPause(bool resumingGame) {
+    if (mGameScene == GameScene::Level1 || mGameScene == GameScene::Level2 || mGameScene == GameScene::Level3) {
+        std::string soundName = "";
+        if (mGameScene == GameScene::Level1) {
+            soundName = "Level1.wav";
+        }
+        else if (mGameScene == GameScene::Level2) {
+            soundName = "Level2.wav";
+        }
+        else if (mGameScene == GameScene::Level3) {
+            soundName = "Level3.wav";
+        }
+        Mix_Chunk* chunk = mAudio->GetSound(soundName);
+
+        if (resumingGame) {
+            Mix_VolumeChunk(chunk, MIX_MAX_VOLUME);
+            return;
+        }
+        Mix_VolumeChunk(chunk, MIX_MAX_VOLUME/4);
+    }
+}

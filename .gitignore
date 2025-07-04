@@ -1,13 +1,21 @@
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
-Assets/Images/mapDrafts/assets/*
+Assets/Images/mapDrafts/assets/
 Assets/Images/mapDrafts.zip
 Assets/Images/mapDrafts/tileset.zip
 Assets/Images/mapDrafts/assets.zip
-Assets/Sounds/*
-Assets/Sprites/*
+Assets/Sprites/SpikeGate/
+Assets/Sprites/Projectile/
+Assets/Sprites/Boss/
+Assets/Sounds/Level1.wav
+Assets/Sounds/Level2.wav
+Assets/Sounds/PlayerDead.wav
+Assets/Sounds/PlayerWalk.wav
+Assets/Sounds/PlayerAttack.wav
+Assets/Sounds/Sounds.zip
 Assets/Sprites.zip
+Assets/Sounds.zip
 
 # User-specific stuff
 .idea/**/workspace.xml

@@ -74,7 +74,6 @@ void Dog::UpdateWander(float dt)
     if (pos.y + 32 < 0) {
         Actor::SetState(ActorState::Destroy);
         SetState(State::Dying);
-        SDL_Log("[Dog] Destroyed (wander exit)");
     }
 }
 

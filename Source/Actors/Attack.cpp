@@ -33,8 +33,9 @@ Attack::Attack(Game *game, Vector2 base, Vector2 forward) : Actor(game) {
         }
         else if (auto* boss = dynamic_cast<Boss*>(actor)) {
             auto aabb = boss->GetComponent<AABBColliderComponent>();
-            if (aabb && mColliderComponent->Intersect(*aabb)) {
-                boss->hit();
+            if (aabb && mColliderComponent->Intersect(*aabb) &&
+                (!boss->IsAtSpAttackPos() || (boss->IsAtSpAttackPos() && boss->GetSpAttackTimer() <= 0.f))) {
+                boss->Hit();
             }
         }
     }

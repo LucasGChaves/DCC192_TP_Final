@@ -9,11 +9,21 @@ UIGameOver::UIGameOver(Game* game)
 {
     mPos = Vector2(0, 0);
     mSize = Vector2(game->GetWindowWidth(), game->GetWindowHeight());
-    AddText("Game Over", Vector2(game->GetWindowWidth()/2 - 200, game->GetWindowHeight()/2 - 120), Vector2(400, 80), 64);
-    AddButton("Main Menu", Vector2(game->GetWindowWidth()/2 - 200, game->GetWindowHeight()/2 + 20), Vector2(400, 80), [game, this]() {
+    auto t = AddText("Game Over", Vector2(game->GetWindowWidth()/2 - 200, game->GetWindowHeight()/2 - 120), Vector2(400, 80), 64);
+
+    Vector2 sz = t->GetSize();
+    float centeredX = (game->GetWindowWidth() - sz.x) * 0.5f;
+    float centeredY = float(game->GetWindowHeight())/2.0f - sz.y/2.0f - 60.f;
+    t->SetPosition(Vector2{ centeredX, centeredY - 100});
+
+    auto btn = AddButton("Main Menu", Vector2(game->GetWindowWidth()/2 - 200, game->GetWindowHeight()/2 + 20), Vector2(400, 80), [game, this]() {
         this->Close();
         game->SetGameScene(Game::GameScene::MainMenu);
     });
+
+    Vector2 bSz = btn->GetSize();
+    btn->SetPosition(Vector2{(game->GetWindowWidth() - bSz.x) * 0.5f, (game->GetWindowHeight() * 0.5f) - 20.0f});
+
     game->GetAudio()->PlaySound("SpinalLaugh.wav", false);
 }
 

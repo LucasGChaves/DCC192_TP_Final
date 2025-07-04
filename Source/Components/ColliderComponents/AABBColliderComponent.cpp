@@ -5,7 +5,7 @@
 
 // Mapeamento de camadas que devem ignorar colisões entre si
 const std::map<ColliderLayer, const std::set<ColliderLayer>> ColliderIgnoreMap = {
-        { ColliderLayer::Player, {} },
+        { ColliderLayer::Player, {ColliderLayer::PlayerAttack} },
         { ColliderLayer::Enemy, {} },
         { ColliderLayer::Boss, {ColliderLayer::Blocks, ColliderLayer::Enemy} },
         { ColliderLayer::Blocks, { ColliderLayer::Blocks, ColliderLayer::Boss } },

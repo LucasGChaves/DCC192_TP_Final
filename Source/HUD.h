@@ -15,7 +15,7 @@ namespace HUDConstants
 
     constexpr float kCharWidth = 20.0f;
     constexpr float kWordHeight = 20.0f;
-    constexpr int   kPointSize = 48;
+    constexpr int   kPointSize = 34;
     inline const Vector2 kCharSize = Vector2(kCharWidth, kWordHeight);
     inline const Vector2 kScoreOffset = Vector2(85.0f, 34.0f);
 
