@@ -238,12 +238,18 @@ void Game::LoadMainMenu()
     mainMenu->AddImage(mRenderer, "../Assets/Images/howToPlay.png",
         Vector2{mWindowWidth * 0.70f, mWindowHeight * 0.02f}, Vector2{377.f, 463.f});
 
-    auto button1 = mainMenu->AddButton("Press 'Enter' to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
+    mainMenu->AddButton("Press 'Enter' to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
         Vector2(400.0f, 80.0f),
-        [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");},
-        Vector2{350.f, 20.f});
-    auto button2 = mainMenu->AddButton("Quit", Vector2(mWindowWidth/2.0f - 200.0f, 700.0f),
-        Vector2(400.0f, 80.0f),[this]() {Quit();},Vector2{50.f, 20.f});
+        [this]() {
+            mFadeState = FadeState::FadeOut;
+            mFadeTime  = 0.f;
+            SetGameScene(GameScene::Level1);
+            mAudio->PlaySound("dogBark.wav");
+        },
+        Vector2{350.f, 20.f}, 20);
+
+    mainMenu->AddButton("Quit", Vector2(mWindowWidth/2.0f - 200.0f, 700.0f),
+        Vector2(400.0f, 80.0f),[this]() {Quit();},Vector2{50.f, 20.f}, 20);
 
 }
 
