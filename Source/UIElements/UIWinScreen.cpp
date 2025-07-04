@@ -13,7 +13,7 @@ UIWinScreen::UIWinScreen(Game* game, const std::string& fontName)
 
     Vector2 sz = t->GetSize();
 
-    t->SetPosition(Vector2{(mGame->GetWindowWidth() - sz.x) * 0.5f, (mGame->GetWindowHeight() - sz.y) * 0.2f});
+    t->SetPosition(Vector2{(mGame->GetWindowWidth() - sz.x) * 0.5f, (mGame->GetWindowHeight() - sz.y) * 0.7f});
     t->SetBox(boxColor, borderColor, 3);
 
     // Do not erase this comment yet.
