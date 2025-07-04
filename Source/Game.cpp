@@ -177,7 +177,7 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level1)
     {
-        mAudio->StopSound(mMusicHandle);
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize level and actors
@@ -194,7 +194,7 @@ void Game::ChangeScene()
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
-        mAudio->StopSound(mMusicHandle);
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level2.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m04.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -209,7 +209,7 @@ void Game::ChangeScene()
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
-        mAudio->StopSound(mMusicHandle);
+        mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level3.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -294,7 +294,14 @@ void Game::ProcessInput()
                 // if (event.key.keysym.sym == SDLK_RETURN)
                 if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_p) // troquei para não termos conflito com o input especifico da tela (ver 'if' acima)
                 {
+                    mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
                     TogglePause();
+                    if (mGamePlayState == GamePlayState::Paused) {
+                        HandleVolumeLevelDuringPause(false);
+                    }
+                    else {
+                        HandleVolumeLevelDuringPause(true);
+                    }
                 }
                 break;
         }
@@ -400,7 +407,7 @@ void Game::UpdateGame()
         if (mShowWinScreen) {
             mShowWinScreen = false;
             new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
-            mAudio->StopSound(mMusicHandle);
+            mAudio->StopAllSounds();
             mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
             mMusicHandle = mAudio->PlaySound("win.wav", false);
 
@@ -789,8 +796,8 @@ UIScreen* Game::CreatePauseMenu()
             pauseMenu->Close();
             mIsSpikeGateLowered = true;
             mSkeletonNum = 0;
-            mShowWinScreen = true;
             SetGameScene(GameScene::MainMenu);
+            HandleVolumeLevelDuringPause(true);
         }
     );
 
@@ -800,6 +807,7 @@ UIScreen* Game::CreatePauseMenu()
         buttonSize,
         [this]() {
             TogglePause();
+            HandleVolumeLevelDuringPause(true);
         }
     );
 
@@ -841,6 +849,9 @@ void Game::BuildActorsFromMap() {
 
             }
         }
+        else if (obj.name == "boss") {
+            mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+        }
         else if (obj.name.find("spike-gate") != std::string::npos)
         {
             int drawOrder = obj.name.back() - '0';
@@ -851,9 +862,6 @@ void Game::BuildActorsFromMap() {
             if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             mSkeletonNum++;
-        }
-        else if (obj.name == "boss") {
-            mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
         else if (obj.name == "spAttackPlaceholder" && mBoss) {
             mBoss->SetSpAttackPos(Vector2{obj.pos.x * SCALE, obj.pos.y * SCALE});
@@ -907,3 +915,25 @@ void Game::DecreaseSkeletonNum() {
         mSkeletonNum = 0;
     }
 };
+
+void Game::HandleVolumeLevelDuringPause(bool resumingGame) {
+    if (mGameScene == GameScene::Level1 || mGameScene == GameScene::Level2 || mGameScene == GameScene::Level3) {
+        std::string soundName = "";
+        if (mGameScene == GameScene::Level1) {
+            soundName = "Level1.wav";
+        }
+        else if (mGameScene == GameScene::Level2) {
+            soundName = "Level2.wav";
+        }
+        else if (mGameScene == GameScene::Level3) {
+            soundName = "Level3.wav";
+        }
+        Mix_Chunk* chunk = mAudio->GetSound(soundName);
+
+        if (resumingGame) {
+            Mix_VolumeChunk(chunk, MIX_MAX_VOLUME);
+            return;
+        }
+        Mix_VolumeChunk(chunk, MIX_MAX_VOLUME/4);
+    }
+}

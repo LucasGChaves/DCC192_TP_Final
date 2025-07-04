@@ -159,6 +159,8 @@ private:
 
     void BuildActorsFromMap();
 
+    void HandleVolumeLevelDuringPause(bool resumingGame);
+
     // All the UI elements
     std::vector<class UIScreen*> mUIStack;
     std::unordered_map<std::string, class UIFont*> mFonts;
