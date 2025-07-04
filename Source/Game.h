@@ -92,7 +92,7 @@ public:
     class AudioSystem* GetAudio() { return mAudio; }
 
     // UI functions
-    void PushUI(class UIScreen* screen) { SDL_Log("PushUI: Adicionando UI %p. Novo tamanho da pilha: %zu", screen, mUIStack.size() + 1); mUIStack.emplace_back(screen); }
+    void PushUI(class UIScreen* screen) { mUIStack.emplace_back(screen); }
     const std::vector<class UIScreen*>& GetUIStack() { return mUIStack; }
 
     // Window functions

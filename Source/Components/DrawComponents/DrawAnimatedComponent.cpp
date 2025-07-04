@@ -80,7 +80,6 @@ void DrawAnimatedComponent::ForceSetAnimation(const std::string& name)
 {
     if (mAnimName != name && mAnimations.find(name) != mAnimations.end())
     {
-        //SDL_Log("🎞️ SetAnimation: %s", name.c_str());
         mAnimName = name;
         mAnimTimer = 0.0f;
     }

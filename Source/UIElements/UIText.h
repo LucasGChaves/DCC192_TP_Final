@@ -41,6 +41,6 @@ protected:
     int mBorderWidth = 2;
 
     std::vector<SDL_Texture*> mLineTextures;
-    std::vector<Vector2>      mLineSizes;    // w/h de cada linha
-    int                       mLineSpacing = 4; // pixels entre linhas
+    std::vector<Vector2>      mLineSizes;
+    int                       mLineSpacing = 4;
 };

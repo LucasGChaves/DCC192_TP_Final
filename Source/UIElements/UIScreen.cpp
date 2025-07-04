@@ -17,7 +17,6 @@ UIScreen::UIScreen(Game* game, const std::string& fontName)
         ,mState(UIState::Active)
         ,mSelectedButtonIndex(-1)
 {
-    SDL_Log("Construtor UIScreen: Objeto %p está se auto-adicionando à pilha.", this);
     mGame->PushUI(this);
 
     mFont = mGame->LoadFont(fontName);

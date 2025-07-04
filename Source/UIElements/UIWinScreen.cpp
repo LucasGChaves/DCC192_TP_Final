@@ -16,6 +16,8 @@ UIWinScreen::UIWinScreen(Game* game, const std::string& fontName)
     t->SetPosition(Vector2{(mGame->GetWindowWidth() - sz.x) * 0.5f, (mGame->GetWindowHeight() - sz.y) * 0.2f});
     t->SetBox(boxColor, borderColor, 3);
 
+    // Do not erase this comment yet.
+
     // unsigned wrapLen = 600;
     // Vector2 dims{ float(wrapLen), 200.0f };
     //

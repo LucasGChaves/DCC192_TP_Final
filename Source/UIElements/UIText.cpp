@@ -22,26 +22,22 @@ UIText::~UIText()
 
 void UIText::SetText(const std::string &text)
 {
-    // 1) Limpa texturas antigas
     for (auto t : mLineTextures) SDL_DestroyTexture(t);
     mLineTextures.clear();
     mLineSizes.clear();
 
-    // 2) Quebra o texto em linhas
     std::stringstream ss(text);
     std::string line;
     int maxWidth = 0;
     int totalH   = 0;
     while (std::getline(ss, line, '\n'))
     {
-        // renderiza **essa linha** com o seu font e wrapLength
         SDL_Texture* tex = mFont->RenderText(line, mColor, mPointSize, mWrapLength);
         if (!tex)
         {
             SDL_Log("UIText::SetText: falha em RenderText para \"%s\"", line.c_str());
             continue;
         }
-        // mede a textura
         int w,h;
         SDL_QueryTexture(tex, nullptr, nullptr, &w, &h);
 
@@ -51,12 +47,13 @@ void UIText::SetText(const std::string &text)
         maxWidth = std::max(maxWidth, w);
         totalH  += h + mLineSpacing;
     }
-    if (!mLineSizes.empty()) totalH -= mLineSpacing; // retira o último espaçamento
+    if (!mLineSizes.empty()) totalH -= mLineSpacing;
 
-    // 3) Ajusta o tamanho do UIElement
     mSize.x = float(maxWidth);
     mSize.y = float(totalH);
 }
+
+//Do not erase this comment yet.
 
 // void UIText::SetText(const std::string &text)
 // {
