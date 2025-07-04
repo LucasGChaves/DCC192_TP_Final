@@ -238,7 +238,7 @@ void Game::LoadMainMenu()
     mainMenu->AddImage(mRenderer, "../Assets/Images/howToPlay.png",
         Vector2{mWindowWidth * 0.70f, mWindowHeight * 0.02f}, Vector2{377.f, 463.f});
 
-    mainMenu->AddButton("Press 'Enter' to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
+    mainMenu->AddButton("Press ENTER to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
         Vector2(400.0f, 80.0f),
         [this]() {
             mFadeState = FadeState::FadeOut;
@@ -584,6 +584,8 @@ void Game::GenerateOutput()
 
     for (auto actor : actorsOnCamera)
     {
+        if (actor == mBoss) continue;
+
         auto drawable = actor->GetComponent<DrawComponent>();
         if (drawable && drawable->IsVisible())
         {
@@ -591,13 +593,11 @@ void Game::GenerateOutput()
         }
     }
 
-    // Sort drawables by draw order
     std::sort(drawables.begin(), drawables.end(),
               [](const DrawComponent* a, const DrawComponent* b) {
                   return a->GetDrawOrder() < b->GetDrawOrder();
               });
 
-    // Draw all drawables
     for (auto drawable : drawables)
     {
         drawable->Draw(mRenderer, mModColor);
@@ -610,7 +610,14 @@ void Game::GenerateOutput()
         RenderLayer(mRenderer, mTileMap, wallDetailsIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
     }
 
-    // Draw all UI screens
+    if (mBoss) {
+        auto drawable = mBoss->GetComponent<DrawComponent>();
+        if (drawable && drawable->IsVisible()) {
+            drawable->Draw(mRenderer, mModColor);
+        }
+
+    }
+
     for (auto ui :mUIStack)
     {
         ui->Draw(mRenderer);
