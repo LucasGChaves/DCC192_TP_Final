@@ -53,16 +53,16 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 377.25,
-                "y": 207.75
+                "x": 368.25,
+                "y": 183.75
             }
         },
         "maps/e01m03.tmx": {
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 490,
-                "y": 570
+                "x": 367.33333333333337,
+                "y": 367.33333333333337
             }
         },
         "maps/e01m04.tmx": {
@@ -70,7 +70,7 @@
                 6
             ],
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 392.25,
                 "y": 214.75
@@ -91,7 +91,7 @@
             "scale": 3,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 407.16666666666663,
+                "x": 367.16666666666663,
                 "y": 156.16666666666663
             }
         },
