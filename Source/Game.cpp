@@ -205,7 +205,7 @@ void Game::ChangeScene()
     }
     else if (mNextScene == GameScene::Level3)
     {
-        //mShowWinScreen = false;
+        mShowWinScreen = true;
         float hudScale = 2.0f;
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
@@ -405,19 +405,16 @@ void Game::UpdateGame()
     }
     // Reinsert audio system
     mAudio->Update(deltaTime);
-    if (mPlayer && mDog && mBoss && mGameScene == GameScene::Level3
+
+    if (mShowWinScreen && mPlayer && mDog && !mBoss && mGameScene == GameScene::Level3
         && mPlayer->GetScore() == mSkeletonNum
-        && mBoss->IsDying()
         && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
         && mDog->GetState() == Dog::State::Follow) {
-        if (mShowWinScreen) {
             mShowWinScreen = false;
             new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
             mAudio->StopAllSounds();
             mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
             mMusicHandle = mAudio->PlaySound("win.wav", false);
-
-        }
     }
 
     // Reinsert UI screens
@@ -800,6 +797,8 @@ UIScreen* Game::CreatePauseMenu()
         [this, pauseMenu]() {
             if (pauseMenu->GetState() != UIScreen::UIState::Active) return;
             pauseMenu->Close();
+            mFadeState = FadeState::FadeOut;
+            mFadeTime  = 0.f;
             mIsSpikeGateLowered = true;
             mSkeletonNum = 0;
             SetGameScene(GameScene::MainMenu);
