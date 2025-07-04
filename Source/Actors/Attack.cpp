@@ -10,19 +10,18 @@
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
 #include "../Game.h"
 #include "Skeleton.h"
+#include "Boss.h"
 
-Attack::Attack(Game *game, const std::vector<Vector2>& polygon) : Actor(game) {
-    float minX = polygon[0].x, minY = polygon[0].y, maxX = polygon[0].x, maxY = polygon[0].y;
-    for (const auto& v : polygon) {
-        if (v.x < minX) minX = v.x;
-        if (v.x > maxX) maxX = v.x;
-        if (v.y < minY) minY = v.y;
-        if (v.y > maxY) maxY = v.y;
-    }
-    float w = maxX - minX;
-    float h = maxY - minY;
+Attack::Attack(Game *game, Vector2 base, Vector2 forward) : Actor(game) {
+    float w = (std::abs(forward.y) == 1 ? 2.f : 1.f) * 16.f * Game::SCALE;
+    float h = (std::abs(forward.x) == 1 ? 2.f : 1.f) * 16.f * Game::SCALE;
+
+    float forwardX = 16.f * (forward.x == 1.f ? 2.f : forward.x);
+    float forwardY = 16.f * (forward.y == 1.f ? 2.f : forward.y);
+
+    auto position = base + Vector2(forwardX, forwardY);
     
-    SetPosition(Vector2(minX, minY));
+    SetPosition(position);
 
     mColliderComponent = new AABBColliderComponent(this, 0, 0, w, h, ColliderLayer::PlayerAttack, false);
 
@@ -30,6 +29,12 @@ Attack::Attack(Game *game, const std::vector<Vector2>& polygon) : Actor(game) {
         if (auto* enemy = dynamic_cast<Skeleton*>(actor)) {
             if (enemy->GetColliderComponent() && mColliderComponent->Intersect(*enemy->GetColliderComponent())) {
                 enemy->Die();
+            }
+        }
+        else if (auto* boss = dynamic_cast<Boss*>(actor)) {
+            auto aabb = boss->GetComponent<AABBColliderComponent>();
+            if (aabb && mColliderComponent->Intersect(*aabb)) {
+                boss->hit();
             }
         }
     }

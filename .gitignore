@@ -1,9 +1,14 @@
-Assets/Images/mapDrafts/tileset/
-Assets/Images/mapDrafts/ruffQuest.tiled-project
-Assets/Images/mapDrafts/ruffQuest.tiled-session
-
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+Assets/Images/mapDrafts/assets/*
+Assets/Images/mapDrafts.zip
+Assets/Images/mapDrafts/tileset.zip
+Assets/Images/mapDrafts/assets.zip
+Assets/Sounds/*
+Assets/Sprites/*
+Assets/Sprites.zip
+Assets/Sounds/*
 
 # User-specific stuff
 .idea/**/workspace.xml

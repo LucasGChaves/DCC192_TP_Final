@@ -40,12 +40,18 @@ add_executable(${PROJECT_NAME}
         Source/Actors/ColliderBlock.h
         Source/Actors/Skeleton.h
         Source/Actors/Skeleton.cpp
+        Source/Actors/InvisibleWall.cpp
+        Source/Actors/InvisibleWall.h
+        Source/Actors/SpikeGate.cpp
+        Source/Actors/SpikeGate.h
+        Source/Actors/Boss.cpp
+        Source/Actors/Boss.h
         Source/Components/ColliderComponents/AABBColliderComponent.cpp
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
         Source/Components/DrawComponents/DrawAnimatedComponent.h
-        Source/Actors/Spawner.cpp
-        Source/Actors/Spawner.h
+        Source/Components/DrawComponents/DrawBossAnimatedComponent.cpp
+        Source/Components/DrawComponents/DrawBossAnimatedComponent.h
         Source/AudioSystem.cpp
         Source/AudioSystem.h
         Source/UIElements/UIScreen.h
@@ -65,6 +71,12 @@ add_executable(${PROJECT_NAME}
         Source/SpatialHashing.h
         Source/Actors/Attack.cpp
         Source/Actors/Attack.h
+        Source/UIElements/UIGameOver.cpp
+        Source/UIElements/UIGameOver.h
+        Source/UIElements/UIWinScreen.cpp
+        Source/UIElements/UIWinScreen.h
+        Source/Actors/Dog.cpp
+        Source/Actors/Dog.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)

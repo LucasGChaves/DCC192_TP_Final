@@ -7,9 +7,9 @@
 const std::map<ColliderLayer, const std::set<ColliderLayer>> ColliderIgnoreMap = {
         { ColliderLayer::Player, {} },
         { ColliderLayer::Enemy, {} },
-        { ColliderLayer::Blocks, { ColliderLayer::Blocks } },
-        { ColliderLayer::Pole, {} },
-        { ColliderLayer::PlayerAttack, { ColliderLayer::Player, ColliderLayer::Blocks, ColliderLayer::Pole } } // ✅
+        { ColliderLayer::Boss, {ColliderLayer::Blocks, ColliderLayer::Enemy} },
+        { ColliderLayer::Blocks, { ColliderLayer::Blocks, ColliderLayer::Boss } },
+        { ColliderLayer::PlayerAttack, { ColliderLayer::Player, ColliderLayer::Blocks } } // ✅
 };
 
 AABBColliderComponent::AABBColliderComponent(

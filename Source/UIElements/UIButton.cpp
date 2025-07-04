@@ -60,7 +60,6 @@ void UIButton::Draw(SDL_Renderer *renderer, const Vector2 &screenPos)
 
 void UIButton::OnClick()
 {
-    // TODO
     if (mOnClick) {
         mOnClick();
     }

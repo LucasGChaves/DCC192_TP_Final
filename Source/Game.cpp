@@ -23,8 +23,12 @@
 #include "Actors/Skeleton.h"
 #include "Actors/Player.h"
 #include "Actors/ColliderBlock.h"
-#include "Actors/Spawner.h"
+#include "Actors/InvisibleWall.h"
+#include "Actors/SpikeGate.h"
+#include "Actors/Dog.h"
+#include "Actors/Boss.h"
 #include "UIElements/UIScreen.h"
+#include "UIElements/UIWinScreen.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Components/DrawComponents/DrawSpriteComponent.h"
 #include "Components/DrawComponents/DrawPolygonComponent.h"
@@ -39,6 +43,9 @@ Game::Game(int windowWidth, int windowHeight)
         ,mWindowHeight(windowHeight)
         ,mPlayer(nullptr)
         ,mHUD(nullptr)
+        ,mBoss(nullptr)
+        ,mTopInvisibleWall(nullptr)
+        ,mBottomInvisibleWall(nullptr)
         ,mBackgroundColor(0, 0, 0)
         ,mModColor(255, 255, 255)
         ,mCameraPos(Vector2::Zero)
@@ -52,7 +59,10 @@ Game::Game(int windowWidth, int windowHeight)
         ,mBackgroundTexture(nullptr)
         ,mBackgroundSize(Vector2::Zero)
         ,mBackgroundPosition(Vector2::Zero)
+        ,mFadeState(FadeState::None)
+        ,mFadeTime(0.f)
         ,mTileMap(nullptr)
+        ,mSkeletonNum(0)
 {
 
 }
@@ -122,7 +132,7 @@ void Game::SetGameScene(Game::GameScene scene, float transitionTime)
         SDL_Log("SetGameScene: Scene transition already in progress.");
         return;
     }
-    if (scene == GameScene::MainMenu || scene == GameScene::Level1 || scene == GameScene::Level2){
+    if (scene == GameScene::MainMenu || scene == GameScene::Level1 || scene == GameScene::Level2 || scene == GameScene::Level3){
         mNextScene = scene;
         mSceneManagerState = SceneManagerState::Entering;
         mSceneManagerTimer = transitionTime;
@@ -134,7 +144,6 @@ void Game::SetGameScene(Game::GameScene scene, float transitionTime)
 
 void Game::ResetGameScene(float transitionTime)
 {
-    // TODO
     SetGameScene(mGameScene, transitionTime);
 }
 
@@ -160,58 +169,55 @@ void Game::ChangeScene()
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
-        // Initialize main menu actors
-        mBackgroundColor.Set(107.0f, 140.0f, 255.0f);
 
         mAudio->StopAllSounds();
-        mMusicHandle = mAudio->PlaySound("MainMenu.wav", true);
+        mMusicHandle = mAudio->PlaySound("MainMenu.mp3", true);
 
         LoadMainMenu();
     }
     else if (mNextScene == GameScene::Level1)
     {
-        // TODO
-        float hudScale = 2.0f;
-        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
-
         mAudio->StopSound(mMusicHandle);
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
-
-        SDL_Log("Loading level 1 map...");
 
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
-
-        //OBS: Inicialização do esqueleto comentada para fins de debug //TODO - descomentar depois
-        //  const float minDistance = 200.0f;
-        //  Vector2 minBounds(0.0f, 0.0f);
-        //  Vector2 maxBounds(static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight));
-        //
-        //  for (int i = 0; i < 5; ++i) {
-        //      Vector2 spawnPos;
-        //      bool validPos = false;
-        //
-        //      while (!validPos) {
-        //          spawnPos = Random::GetVector(minBounds, maxBounds);
-        //
-        //          Vector2 toPlayer = spawnPos - mPlayer->GetPosition();
-        //          float distance = toPlayer.Length();
-        //
-        //          if (distance >= minDistance) {
-        //              validPos = true;
-        //          }
-        //      }
-        //
-        //      new Skeleton(this, mPlayer, spawnPos);
-        // }
+        mTopInvisibleWall->GetComponent<AABBColliderComponent>()->SetEnabled(true);
+        mIsSpikeGateLowered = true;
+        mPlayer->LockActor();
+        mDog->SetState(Dog::State::Wander);
     }
     else if (mNextScene == GameScene::Level2)
     {
-        // TODO
+        //mShowWinScreen = false;
+        float hudScale = 2.0f;
+        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
-        // Initialize actors
-        //LoadLevel("../Assets/Levels/level1-2.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+        mAudio->StopSound(mMusicHandle);
+        mMusicHandle = mAudio->PlaySound("Level2.wav", true);
+
+        LoadLevel("../Assets/Images/mapDrafts/maps/e01m04.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
+        BuildActorsFromMap();
+        mTopInvisibleWall->GetComponent<AABBColliderComponent>()->SetEnabled(false);
+        mIsSpikeGateLowered = false;
+        mGamePlayState = GamePlayState::EnteringMap;
+    }
+    else if (mNextScene == GameScene::Level3)
+    {
+        //mShowWinScreen = false;
+        float hudScale = 2.0f;
+        mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
+
+        mAudio->StopSound(mMusicHandle);
+        mMusicHandle = mAudio->PlaySound("Level3.wav", true);
+
+        LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
+        mSkeletonNum = 0;
+        BuildActorsFromMap();
+        mIsSpikeGateLowered = false;
+        mDog->SetState(Dog::State::Idle);
+        mGamePlayState = GamePlayState::EnteringMap;
     }
 
     // Set new scene
@@ -221,7 +227,6 @@ void Game::ChangeScene()
 
 void Game::LoadMainMenu()
 {
-    // TODO
 
     auto mainMenu = new UIScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
     const Vector2 backgroundSize = Vector2(1600.0f, 900.0f);
@@ -230,10 +235,15 @@ void Game::LoadMainMenu()
     const Vector2 titlePos = Vector2(mWindowWidth/2.0f - titleSize.x/2.0f, 50.0f);
     mainMenu->AddImage(mRenderer, "../Assets/Images/Background.png", backgroundPos, backgroundSize);
     mainMenu->AddImage(mRenderer, "../Assets/Images/Logo.png", titlePos, titleSize);
+    mainMenu->AddImage(mRenderer, "../Assets/Images/howToPlay.png",
+        Vector2{mWindowWidth * 0.70f, mWindowHeight * 0.02f}, Vector2{377.f, 463.f});
 
-
-    auto button1 = mainMenu->AddButton("Begin Quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f), Vector2(400.0f, 80.0f),
-                                       [this]() {SetGameScene(GameScene::Level1);});
+    auto button1 = mainMenu->AddButton("Press 'Enter' to begin your quest!", Vector2(mWindowWidth/2.0f - 200.0f, 600.0f),
+        Vector2(400.0f, 80.0f),
+        [this]() {SetGameScene(GameScene::Level1); mAudio->PlaySound("dogBark.wav");},
+        Vector2{350.f, 20.f});
+    auto button2 = mainMenu->AddButton("Quit", Vector2(mWindowWidth/2.0f - 200.0f, 700.0f),
+        Vector2(400.0f, 80.0f),[this]() {Quit();},Vector2{50.f, 20.f});
 
 }
 
@@ -295,7 +305,9 @@ void Game::ProcessInput()
 
 void Game::ProcessInputActors()
 {
-    if(mGamePlayState == GamePlayState::Playing)
+    if(mGamePlayState == GamePlayState::Playing ||
+        mGamePlayState == GamePlayState::Leaving ||
+        mGamePlayState == GamePlayState::EnteringMap)
     {
         // Get actors on camera
         std::vector<Actor*> actorsOnCamera =
@@ -306,9 +318,12 @@ void Game::ProcessInputActors()
         bool isPlayerOnCamera = false;
         for (auto actor: actorsOnCamera)
         {
-            actor->ProcessInput(state);
+            if (mGamePlayState == GamePlayState::Playing && actor != mPlayer) {
+                actor->ProcessInput(state);
+            }
 
             if (actor == mPlayer) {
+                actor->ProcessInput(state);
                 isPlayerOnCamera = true;
             }
         }
@@ -369,17 +384,28 @@ void Game::UpdateGame()
     {
         deltaTime = 0.05f;
     }
-
     mTicksCount = SDL_GetTicks();
-
     if(mGamePlayState != GamePlayState::Paused && mGamePlayState != GamePlayState::GameOver)
     {
         // Reinsert all actors and pending actors
         UpdateActors(deltaTime);
     }
-
     // Reinsert audio system
     mAudio->Update(deltaTime);
+    if (mPlayer && mDog && mBoss && mGameScene == GameScene::Level3
+        && mPlayer->GetScore() == mSkeletonNum
+        && mBoss->IsDying()
+        && mDog->GetDistanceWithOwner() <= TILE_SIZE * SCALE * 3
+        && mDog->GetState() == Dog::State::Follow) {
+        if (mShowWinScreen) {
+            mShowWinScreen = false;
+            new UIWinScreen(this, "../Assets/Fonts/PeaberryBase.ttf");
+            mAudio->StopSound(mMusicHandle);
+            mMusicHandle = mAudio->PlaySound("dogBark.wav", false);
+            mMusicHandle = mAudio->PlaySound("win.wav", false);
+
+        }
+    }
 
     // Reinsert UI screens
     for (auto ui : mUIStack) {
@@ -400,12 +426,7 @@ void Game::UpdateGame()
     }
 
     UpdateCamera();
-
     UpdateSceneManager(deltaTime);
-
-    if (mGameScene != GameScene::MainMenu && mGamePlayState == GamePlayState::Playing){
-        UpdateLevelTime(deltaTime);
-    }
 }
 
 void Game::UpdateSceneManager(float deltaTime)
@@ -416,6 +437,10 @@ void Game::UpdateSceneManager(float deltaTime)
         if (mSceneManagerTimer <= 0.0f){
             mSceneManagerTimer = TRANSITION_TIME;
             mSceneManagerState = SceneManagerState::Active;
+
+            if (mFadeState == FadeState::None || mGamePlayState == GamePlayState::GameOver) {
+                mFadeState = FadeState::FadeOut;
+                }
         }
     }
 
@@ -426,12 +451,23 @@ void Game::UpdateSceneManager(float deltaTime)
             mSceneManagerState = SceneManagerState::None;
         }
     }
+
+    if (mFadeState == FadeState::FadeOut) {
+        mFadeTime += deltaTime;
+        if (mFadeTime >= TRANSITION_TIME) {
+            mFadeTime = 0.f;
+            mFadeState = FadeState::FadeIn;
+        }
+    }
+    else if (mFadeState == FadeState::FadeIn) {
+        mFadeTime += deltaTime;
+        if (mFadeTime >= TRANSITION_TIME) {
+            mFadeTime = 0.f;
+            mFadeState = FadeState::None;
+        }
+    }
 }
 
-void Game::UpdateLevelTime(float deltaTime)
-{
-    // TODO
-}
 
 void Game::UpdateCamera()
 {
@@ -458,7 +494,6 @@ void Game::UpdateActors(float deltaTime)
         if (actor->GetState() == ActorState::Destroy)
             toDelete.emplace_back(actor);
     }
-
     if (!isPlayerOnCamera && mPlayer)
     {
         mPlayer->Update(deltaTime);
@@ -502,17 +537,21 @@ std::vector<AABBColliderComponent *> Game::GetNearbyColliders(const Vector2& pos
 void Game::GenerateOutput()
 {
     // Clear frame with background color
-    //SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
+    SDL_SetRenderDrawColor(mRenderer, mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 255);
 
     // Clear back buffer
     SDL_RenderClear(mRenderer);
 
     int roofIdx = -1;
+    int wallDetailsIdx = -1;
 
     if (mTileMap && !mTileMap->layers.empty()) {
         for (int i=0; i<mTileMap->layers.size(); i++) {
             if (mTileMap->layers[i].name == "roof") {
                 roofIdx = i;
+            }
+            else if (mTileMap->layers[i].name == "wallDetails") {
+                wallDetailsIdx = i;
             }
             else if (mTileMap->layers[i].type == LayerType::Block && mTileMap->layers[i].name != "staticObjects") {
                 RenderLayer(mRenderer, mTileMap, i, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
@@ -551,6 +590,9 @@ void Game::GenerateOutput()
     if (roofIdx > -1) {
         RenderLayer(mRenderer, mTileMap, roofIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
     }
+    if (wallDetailsIdx > -1) {
+        RenderLayer(mRenderer, mTileMap, wallDetailsIdx, mCameraPos, mWindowWidth, mWindowHeight,  SCALE);
+    }
 
     // Draw all UI screens
     for (auto ui :mUIStack)
@@ -558,10 +600,24 @@ void Game::GenerateOutput()
         ui->Draw(mRenderer);
     }
 
-    if (mSceneManagerState == SceneManagerState::Active) {
-        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
-        SDL_Rect fullScreenRect = {0, 0, mWindowWidth, mWindowHeight};
-        SDL_RenderFillRect(mRenderer, &fullScreenRect);
+    // if (mSceneManagerState == SceneManagerState::Active) {
+    //     SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
+    //     SDL_Rect fullScreenRect = {0, 0, mWindowWidth, mWindowHeight};
+    //     SDL_RenderFillRect(mRenderer, &fullScreenRect);
+    // }
+
+    if (mFadeState == FadeState::FadeOut) {
+        float alphaOut = mFadeTime/TRANSITION_TIME;
+        SDL_SetRenderDrawBlendMode(mRenderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255 * alphaOut);
+        SDL_RenderFillRect(mRenderer, nullptr);
+    }
+
+    if (mFadeState == FadeState::FadeIn) {
+        float alphaIn = mFadeTime/TRANSITION_TIME;
+        SDL_SetRenderDrawBlendMode(mRenderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255 * (1 - alphaIn));
+        SDL_RenderFillRect(mRenderer, nullptr);
     }
 
     // Swap front buffer and back buffer
@@ -635,6 +691,10 @@ void Game::UnloadScene()
 
     mHUD = nullptr;
     mPlayer = nullptr;
+    mDog = nullptr;
+    mBoss = nullptr;
+    mTopInvisibleWall = nullptr;
+    mBottomInvisibleWall = nullptr;
 
     // Delete UI screens
     for (auto ui : mUIStack) {
@@ -652,7 +712,6 @@ void Game::UnloadScene()
 
 void Game::Shutdown()
 {
-    // TODO - descomentar e alterar depois
     UnloadScene();
     for (auto font : mFonts) {
          font.second->Unload();
@@ -728,6 +787,9 @@ UIScreen* Game::CreatePauseMenu()
         [this, pauseMenu]() {
             if (pauseMenu->GetState() != UIScreen::UIState::Active) return;
             pauseMenu->Close();
+            mIsSpikeGateLowered = true;
+            mSkeletonNum = 0;
+            mShowWinScreen = true;
             SetGameScene(GameScene::MainMenu);
         }
     );
@@ -757,9 +819,49 @@ void Game::BuildActorsFromMap() {
         if (obj.name == "player") {
             mPlayer = new Player(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
         }
+        else if (obj.name == "dog")
+        {
+            mDog = new Dog(this, Vector2(obj.pos.x * SCALE - 48.0f, obj.pos.y * SCALE - 48.0f));
+            if (mPlayer) mDog->SetOwner(mPlayer);
+        }
+        else if (obj.name.find("invisibleWall") != std::string::npos) {
+            size_t pos = obj.name.find('-');
+
+            if (pos != std::string::npos) {
+                std::string topOrBottom = obj.name.substr(pos + 1);
+
+                if (topOrBottom == "bottom") {
+                    mBottomInvisibleWall = new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                    obj.width * SCALE, obj.height * SCALE, obj.scene, topOrBottom);
+                }
+                else {
+                    mTopInvisibleWall = new InvisibleWall(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                    obj.width * SCALE, obj.height * SCALE, obj.scene, topOrBottom);
+                }
+
+            }
+        }
+        else if (obj.name.find("spike-gate") != std::string::npos)
+        {
+            int drawOrder = obj.name.back() - '0';
+            new SpikeGate(this, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE),
+                obj.width * SCALE, obj.height * SCALE, drawOrder);
+        }
+        else if (obj.name == "skeleton") {
+            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+            mSkeletonNum++;
+        }
+        else if (obj.name == "boss") {
+            mBoss = new Boss(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
+        }
+        else if (obj.name == "spAttackPlaceholder" && mBoss) {
+            mBoss->SetSpAttackPos(Vector2{obj.pos.x * SCALE, obj.pos.y * SCALE});
+        }
     }
 
     Layer staticObjectLayer = mTileMap->layers[staticObjectsLayerIdx];
+    bool rotate = false;
 
     for (int y=0; y<staticObjectLayer.height; y++) {
         for (int x=0; x<staticObjectLayer.width; x++) {
@@ -768,9 +870,16 @@ void Game::BuildActorsFromMap() {
 
             if (gid == 0) continue;
 
-            int tsxIdx = FindTilesetIndex(mTileMap, gid);
+            TileRenderInfo tsInfo = GetTileFlipInfoFromGID(gid);
+            uint32_t clean_gid = tsInfo.clean_gid;
+
+            int tsxIdx = FindTilesetIndex(mTileMap, clean_gid);
             const auto& ts = mTileMap->tilesets[tsxIdx];
-            int localId = gid - ts.firstGid;
+            int localId = clean_gid - ts.firstGid;
+
+            if (clean_gid != gid) {
+                rotate = true;
+            }
 
             if (!ts.isCollection) {
                 int row = localId / ts.columns;
@@ -779,7 +888,7 @@ void Game::BuildActorsFromMap() {
                 Vector2 pos{static_cast<float>(x*TILE_SIZE*SCALE), static_cast<float>(y*TILE_SIZE*SCALE)};
                 Vector2 srcPos{static_cast<float>(col * TILE_SIZE), static_cast<float>(row * TILE_SIZE)};
 
-                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture);
+                new ColliderBlock(this, pos, srcPos, TILE_SIZE * SCALE, TILE_SIZE * SCALE, ts.imageTexture, rotate);
             }
             else {
                 const SDL_Rect& size = ts.sizes[localId];
@@ -791,3 +900,10 @@ void Game::BuildActorsFromMap() {
         }
     }
 }
+
+void Game::DecreaseSkeletonNum() {
+    mSkeletonNum--;
+    if (mSkeletonNum <= 0) {
+        mSkeletonNum = 0;
+    }
+};

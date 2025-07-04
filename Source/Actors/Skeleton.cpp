@@ -8,10 +8,10 @@
 Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
         : Actor(game)
         , mTarget(target)
-        , mSpeed(120.0f)
+        , mSpeed(50.0f)
         , mIsDying(false)
 {
-
+    mIsLocked = false;
     SetPosition(pos);
     SetScale(Game::SCALE);
 
@@ -31,9 +31,12 @@ Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
     mDrawComponent->SetAnimation("IdleDown");
     mDrawComponent->SetAnimFPS(10.0f);
 
+    auto [dx, dy, w, h] = ComputeColliderParams(Game::TILE_SIZE * 2, Game::TILE_SIZE * 2);
+
+    mRigidBodyComponent = new RigidBodyComponent(this);
+
     // Colisor
-    mColliderComponent = new AABBColliderComponent(this, 0, 0,
-        Game::TILE_SIZE * Game::SCALE, Game::TILE_SIZE * Game::SCALE, ColliderLayer::Enemy, false);
+    mColliderComponent = new AABBColliderComponent(this, dx, dy, w, h, ColliderLayer::Enemy, false);
 }
 
 void Skeleton::OnUpdate(float deltaTime)
@@ -49,12 +52,22 @@ void Skeleton::OnUpdate(float deltaTime)
     if (mIsDying || !mTarget) return;
 
     Vector2 toPlayer = mTarget->GetPosition() - GetPosition();
+    Vector2 vel = Vector2::Zero;
+
     if (toPlayer.Length() > 1.0f)
     {
         toPlayer.Normalize();
-        SetPosition(GetPosition() + toPlayer * mSpeed * deltaTime);
 
-        if (std::abs(toPlayer.x) > std::abs(toPlayer.y))
+        vel = toPlayer * mSpeed;
+
+        float diff = std::abs(std::abs(toPlayer.x) - std::abs(toPlayer.y));
+
+        if (diff >= 0.f && diff <= 0.5f) {
+            SetRotation(toPlayer.x > 0 ? 0.0f : Math::Pi);
+            mDrawComponent->SetAnimation("WalkSide");
+        }
+
+        else if (std::abs(toPlayer.x) > std::abs(toPlayer.y))
         {
             SetRotation(toPlayer.x > 0 ? 0.0f : Math::Pi);
             mDrawComponent->SetAnimation("WalkSide");
@@ -71,9 +84,9 @@ void Skeleton::OnUpdate(float deltaTime)
         mStepTimer -= deltaTime;
         if (mStepTimer <= 0.0f)
         {
-            // mGame->GetAudio()->PlaySound("PlayerWalk.wav");
             mStepTimer = 0.2f;
         }
+        mRigidBodyComponent->SetVelocity(vel);
     }
     else
     {
@@ -81,18 +94,18 @@ void Skeleton::OnUpdate(float deltaTime)
     }
 }
 
-void Skeleton::OnHorizontalCollision(float, AABBColliderComponent* other)
+void Skeleton::OnHorizontalCollision(float overlap, AABBColliderComponent* other)
 {
-    if (mIsDying) return;
-    else if (other->GetLayer() == ColliderLayer::Player)
-    {
-        mTarget->Kill();
+    if (other->GetLayer() == ColliderLayer::Player) {
+        if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
     }
 }
 
-void Skeleton::OnVerticalCollision(float, AABBColliderComponent* other)
+void Skeleton::OnVerticalCollision(float overlap, AABBColliderComponent* other)
 {
-    OnHorizontalCollision(0.0f, other);
+    if (other->GetLayer() == ColliderLayer::Player) {
+        if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
+    }
 }
 
 void Skeleton::Die()
@@ -100,8 +113,12 @@ void Skeleton::Die()
     if (mIsDying) return;
     mIsDying = true;
     mDrawComponent->SetAnimation("Dead");
-    mColliderComponent->SetEnabled(false); // Disable collision after death
-    mDeathTimer = 0.5f; // Adjust to match animation duration (in seconds)
+    mColliderComponent->SetEnabled(false); 
+    mDeathTimer = 0.5f; 
+
+    if (mTarget) {
+        mTarget->AddScore(1);
+    }
 }
 
 std::vector<int> Skeleton::GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount)

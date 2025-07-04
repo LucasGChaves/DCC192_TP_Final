@@ -48,10 +48,10 @@ void DrawSpriteComponent::Draw(SDL_Renderer *renderer, const Vector3 &modColor)
         srcRect = &srcPos;
     }
 
-    SDL_RendererFlip flip = SDL_FLIP_NONE;
-    if (mOwner->GetRotation() == Math::Pi) {
-        flip = SDL_FLIP_HORIZONTAL;
-    }
+    // SDL_RendererFlip flip = SDL_FLIP_NONE;
+    // if (mOwner->GetRotation() == Math::Pi) {
+    //     flip = SDL_FLIP_VERTICAL;
+    // }
 
     SDL_SetTextureBlendMode(mSpriteSheetSurface, SDL_BLENDMODE_BLEND);
 
@@ -60,5 +60,6 @@ void DrawSpriteComponent::Draw(SDL_Renderer *renderer, const Vector3 &modColor)
                            static_cast<Uint8>(modColor.y),
                            static_cast<Uint8>(modColor.z));
 
-    SDL_RenderCopyEx(renderer, mSpriteSheetSurface, srcRect, &dstRect, mOwner->GetRotation(), nullptr, flip);
+    SDL_RenderCopyEx(renderer, mSpriteSheetSurface, srcRect, &dstRect,
+        mOwner->GetRotation(), nullptr, mOwner->GetFlip());
 }

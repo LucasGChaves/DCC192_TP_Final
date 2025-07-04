@@ -14,8 +14,7 @@
 #include "Math.h"
 #include "MapHelper.h"
 
-class Game
-{
+class Game {
 public:
     static const int LEVEL_WIDTH = 46;
     static const int LEVEL_HEIGHT = 23;
@@ -24,17 +23,18 @@ public:
     static const int TRANSITION_TIME = 1;
 
     //Screen dimension constants
-    static const int SCREEN_WIDTH = 736;
-    static const int SCREEN_HEIGHT = 368;
+    static const int SCREEN_WIDTH = 1400;
+    static const int SCREEN_HEIGHT = 800;
 
-    //static const int SCALE = SCREEN_HEIGHT / (LEVEL_HEIGHT * TILE_SIZE);
-    static const int SCALE = 1;
+    static const int SCALE = 3;
+    //static const int SCALE = 1;
 
     enum class GameScene
     {
         MainMenu,
         Level1,
-        Level2
+        Level2,
+        Level3
     };
 
     enum class SceneManagerState
@@ -51,7 +51,14 @@ public:
         Paused,
         GameOver,
         LevelComplete,
-        Leaving
+        Leaving,
+        EnteringMap
+    };
+
+    enum class FadeState {
+        FadeOut,
+        FadeIn,
+        None
     };
 
     Game(int windowWidth, int windowHeight);
@@ -103,13 +110,32 @@ public:
     void SetBackgroundImage(const std::string& imagePath, const Vector2 &position = Vector2::Zero, const Vector2& size = Vector2::Zero);
     void TogglePause();
 
+    GameScene GetGameScene() { return mGameScene; }
+
     // Game-specific
     const class Player* GetPlayer() { return mPlayer; }
+    const class Boss* GetBoss() { return mBoss; }
+
 
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
 
+    void DecreaseSkeletonNum();
+
     UIScreen* CreatePauseMenu();
+
+    int GetNumSkeletons() const { return mSkeletonNum; }
+
+    MapData* mTileMap;
+    int mSkeletonNum;
+
+    void SetSpikeGateLowered(bool cond) {mIsSpikeGateLowered = cond;}
+    bool GetSpikeGateLowered() {return mIsSpikeGateLowered;}
+
+    const class Dog* GetDog() { return mDog; }
+
+    const class InvisibleWall* GetTopInvisibleWall() { return mTopInvisibleWall; }
+    const class InvisibleWall* GetBottomInvisibleWall() { return mBottomInvisibleWall; }
 
 private:
     void ProcessInput();
@@ -123,8 +149,6 @@ private:
     SceneManagerState mSceneManagerState;
     float mSceneManagerTimer;
 
-    // HUD functions
-    void UpdateLevelTime(float deltaTime);
 
     // Load the level from a CSV file as a 2D array
     int **ReadLevelData(const std::string& fileName, int width, int height);
@@ -166,15 +190,24 @@ private:
 
     // Game-specific
     class Player *mPlayer;
+    class Dog *mDog;
+    class InvisibleWall *mTopInvisibleWall;
+    class InvisibleWall *mBottomInvisibleWall;
     class HUD *mHUD;
+    class Boss *mBoss;
     SoundHandle mMusicHandle;
 
     float mGameTimer;
     int mGameTimeLimit;
 
+    FadeState mFadeState;
+    float mFadeTime;
+
     SDL_Texture *mBackgroundTexture;
     Vector2 mBackgroundSize;
     Vector2 mBackgroundPosition;
 
-    MapData* mTileMap;
+    bool mShowWinScreen = true;
+
+    bool mIsSpikeGateLowered = false;
 };

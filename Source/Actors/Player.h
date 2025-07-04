@@ -6,7 +6,7 @@
 class Player : public Actor
 {
 public:
-    explicit Player(Game* game, Vector2 pos, float forwardSpeed = 150.0f);
+    explicit Player(Game* game, Vector2 pos, float forwardSpeed = 300.0f);
 
     void OnProcessInput(const Uint8* keyState) override;
     void OnUpdate(float deltaTime) override;
@@ -21,6 +21,8 @@ public:
 
     void Hit();
     int GetHearts() const { return mHearts; }
+    int GetScore() const { return mScore; }
+    void AddScore(int value) { mScore += value; }
 
 private:
     float mDeathTimer = -1.0f;
@@ -33,10 +35,13 @@ private:
     std::string mLastDirection;
 
     int mHearts;
+    int mScore = 0;
     float mInvincibleTime;
-    // Blinking effect variables
+
     float mBlinkTimer = 0.0f;
     bool mIsBlinkVisible = true;
+
+    bool mTriggeredAnimation = false;
 
     class RigidBodyComponent* mRigidBodyComponent;
     class DrawAnimatedComponent* mDrawComponent;

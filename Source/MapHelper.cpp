@@ -129,15 +129,15 @@ int FindTilesetIndex(const MapData* map, int gid) {
 void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
     Vector2& cameraPos, float windowWidth, float windowHeight, int scale, float extraRadius) {
 
-    auto [sr, sc, er, ec] = GetCameraTileBounds(
-    cameraPos,
-    windowWidth,
-    windowHeight,
-    extraRadius,
-    map->tileWidth,
-    map->mapWidth,
-    map->mapHeight
-);
+//     auto [sr, sc, er, ec] = GetCameraTileBounds(
+//     cameraPos,
+//     windowWidth,
+//     windowHeight,
+//     extraRadius,
+//     map->tileWidth * scale,
+//     map->mapWidth,
+//     map->mapHeight
+// );
 
     const auto& layer = map->layers[layerIdx];
 
@@ -145,17 +145,26 @@ void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
         return;
     }
 
-    //for (int y=0; y<layer.height; y++) {
-    for (int y=sr; y<=er; y++) {
-        for (int x=sc; x<=ec; x++) {
-        //for (int x=0; x<layer.width; x++) {
+    bool flipped = false;
+
+    for (int y=0; y<layer.height; y++) {
+    //for (int y=sr; y<=er; y++) {
+        //for (int x=sc; x<=ec; x++) {
+        for (int x=0; x<layer.width; x++) {
             int gid = layer.data[y*layer.width + x];
 
             if (gid == 0) continue;
 
-            int tsxIdx = FindTilesetIndex(map, gid);
+            TileRenderInfo tsInfo = GetTileFlipInfoFromGID(gid);
+            uint32_t clean_gid = tsInfo.clean_gid;
+
+            int tsxIdx = FindTilesetIndex(map, clean_gid);
             const auto& ts = map->tilesets[tsxIdx];
-            int localId = gid - ts.firstGid;
+            int localId = clean_gid - ts.firstGid;
+
+            if (clean_gid != gid) {
+                flipped = true;
+            }
 
             if (!ts.isCollection) {
 
@@ -170,7 +179,13 @@ void RenderLayer(SDL_Renderer* renderer, const MapData* map, int layerIdx,
                 SDL_Rect dst{x * map->tileWidth * scale - static_cast<int>(cameraPos.x),
                     y * map->tileHeight * scale - static_cast<int>(cameraPos.y),
                     ts.tileWidth * scale, ts.tileHeight * scale};
-                SDL_RenderCopy(renderer, ts.imageTexture, &src, &dst);
+
+                if (!flipped) {
+                    SDL_RenderCopy(renderer, ts.imageTexture, &src, &dst);
+                }
+                else {
+                    SDL_RenderCopyEx(renderer, ts.imageTexture, &src, &dst, tsInfo.angle_deg, nullptr, tsInfo.flip);
+                }
             }
             else {
                 if (!ts.textures[localId]) {
@@ -220,4 +235,59 @@ int GetLayerIdx(MapData map, std::string layerName) {
         }
     }
     return -1;
+}
+
+TileRenderInfo GetTileFlipInfoFromGID(uint32_t gid_with_flags) {
+    constexpr uint32_t FLIP_H = 0x80000000;
+    constexpr uint32_t FLIP_V = 0x40000000;
+    constexpr uint32_t FLIP_D = 0x20000000;
+
+    bool flip_h = gid_with_flags & FLIP_H;
+    bool flip_v = gid_with_flags & FLIP_V;
+    bool flip_d = gid_with_flags & FLIP_D;
+
+    uint32_t clean_gid = gid_with_flags & ~(FLIP_H | FLIP_V | FLIP_D);
+
+    double angle_deg = 0.0;
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
+
+    if (!flip_h && !flip_v && !flip_d) {
+        angle_deg = 0;
+        flip = SDL_FLIP_NONE;
+    }
+    else if (flip_h && !flip_v && !flip_d) {
+        angle_deg = 0;
+        flip = SDL_FLIP_HORIZONTAL;
+    }
+    else if (!flip_h && flip_v && !flip_d) {
+        angle_deg = 0;
+        flip = SDL_FLIP_VERTICAL;
+    }
+    else if (flip_h && flip_v && !flip_d) {
+        angle_deg = 180;
+        flip = SDL_FLIP_NONE;
+    }
+    else if (!flip_h && !flip_v && flip_d) {
+        angle_deg = 90;
+        flip = SDL_FLIP_HORIZONTAL;
+    }
+    else if (flip_h && !flip_v && flip_d) {
+        angle_deg = 270;
+        flip = SDL_FLIP_NONE;
+    }
+    else if (!flip_h && flip_v && flip_d) {
+        angle_deg = 90;
+        flip = SDL_FLIP_NONE;
+    }
+    else if (flip_h && flip_v && flip_d) {
+        angle_deg = 270;
+        flip = SDL_FLIP_HORIZONTAL;
+    }
+
+    return {
+        clean_gid,
+        angle_deg,
+        flip
+    };
+
 }
