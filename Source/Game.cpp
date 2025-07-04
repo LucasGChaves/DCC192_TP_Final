@@ -877,7 +877,7 @@ void Game::BuildActorsFromMap() {
                 obj.width * SCALE, obj.height * SCALE, drawOrder);
         }
         else if (obj.name == "skeleton") {
-            if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            //if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             mSkeletonNum++;
         }
