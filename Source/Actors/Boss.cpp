@@ -142,6 +142,9 @@ void Boss::OnUpdate(float deltaTime) {
     {
         distanceToTarget.Normalize();
 
+        // Move the boss away from the player when hit
+        if (mInvincibleTimer > 0.f) distanceToTarget *= -0.5f;
+
         Vector2 vel = distanceToTarget * mSpeed;
 
         float diff = std::abs(std::abs(distanceToTarget.x) - std::abs(distanceToTarget.y));
