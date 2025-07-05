@@ -96,17 +96,7 @@
   <object id="2" name="player" type="scene_2" x="352" y="336" width="32" height="32"/>
   <object id="3" name="invisibleWall-top" type="scene_2" x="352" y="0" width="32" height="64"/>
   <object id="19" name="spike-gate-1" type="scene_2" x="352" y="48" width="32" height="32"/>
-  <object id="30" name="skeleton" type="scene-3" x="353" y="197" width="32" height="32"/>
   <object id="32" name="skeleton" type="scene-3" x="246" y="247.5" width="32" height="32"/>
-  <object id="33" name="skeleton" type="scene-3" x="458" y="249" width="32" height="32"/>
-  <object id="34" name="skeleton" type="scene-3" x="268.5" y="149" width="32" height="32"/>
-  <object id="35" name="skeleton" type="scene-3" x="228" y="148" width="32" height="32"/>
-  <object id="36" name="skeleton" type="scene-3" x="434" y="148.5" width="32" height="32"/>
-  <object id="37" name="skeleton" type="scene-3" x="475" y="148.5" width="32" height="32"/>
-  <object id="38" name="skeleton" type="scene-3" x="556" y="188.5" width="32" height="32"/>
-  <object id="39" name="skeleton" type="scene-3" x="152" y="193.5" width="32" height="32"/>
-  <object id="40" name="skeleton" type="scene-3" x="240" y="75" width="32" height="32"/>
-  <object id="41" name="skeleton" type="scene-3" x="402.5" y="72.5" width="32" height="32"/>
  </objectgroup>
  <layer id="4" name="roof" width="46" height="23" locked="1">
   <data encoding="csv">

@@ -159,17 +159,6 @@
                 }, 
                 {
                  "height":32,
-                 "id":30,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":353,
-                 "y":197
-                }, 
-                {
-                 "height":32,
                  "id":32,
                  "name":"skeleton",
                  "rotation":0,
@@ -178,105 +167,6 @@
                  "width":32,
                  "x":246,
                  "y":247.5
-                }, 
-                {
-                 "height":32,
-                 "id":33,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":458,
-                 "y":249
-                }, 
-                {
-                 "height":32,
-                 "id":34,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":268.5,
-                 "y":149
-                }, 
-                {
-                 "height":32,
-                 "id":35,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":228,
-                 "y":148
-                }, 
-                {
-                 "height":32,
-                 "id":36,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":434,
-                 "y":148.5
-                }, 
-                {
-                 "height":32,
-                 "id":37,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":475,
-                 "y":148.5
-                }, 
-                {
-                 "height":32,
-                 "id":38,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":556,
-                 "y":188.5
-                }, 
-                {
-                 "height":32,
-                 "id":39,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":152,
-                 "y":193.5
-                }, 
-                {
-                 "height":32,
-                 "id":40,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":240,
-                 "y":75
-                }, 
-                {
-                 "height":32,
-                 "id":41,
-                 "name":"skeleton",
-                 "rotation":0,
-                 "type":"scene-3",
-                 "visible":true,
-                 "width":32,
-                 "x":402.5,
-                 "y":72.5
                 }],
          "opacity":1,
          "type":"objectgroup",
