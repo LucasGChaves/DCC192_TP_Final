@@ -71,6 +71,7 @@ void Boss::OnUpdate(float deltaTime) {
 
     if (mIsDying || !mTarget) return;
 
+    HandleTimers(deltaTime);
 
     if (mRunToMiddleTimer >= 0.f) {
         mRunToMiddleTimer -= deltaTime;
@@ -122,23 +123,60 @@ void Boss::OnUpdate(float deltaTime) {
         mColliderComponent->SetOffset(Vector2::Zero);
         mColliderComponent->SetSize(mDrawComponent->GetDefaultFrameSize());
     }
-    //------
 
-    if (mAtSpAttackPos && mSpAttackTimer >= 0.f) return;
+    Vector2 distanceToTarget;
 
-    Vector2 distanceToTarget = Vector2::Zero;
-
-    float threshold = 1.0f;
+    float threshold = 10.0f;
 
     if (mChasingPlayer) {
         distanceToTarget = mTarget->GetPosition() - mPosition;
-        //threshold = 1.0f;
+        threshold = 24.f * Game::SCALE;
     }
     else {
         distanceToTarget = mSpAttackPos - mPosition;
     }
 
-    if (distanceToTarget.Length() > threshold)
+    // Move the boss away from the player when hit
+    if (mInvincibleTimer > 0.f) {
+        distanceToTarget.Normalize();
+        distanceToTarget *= -0.5f;
+        Vector2 vel = distanceToTarget * mSpeed;
+        mRigidBodyComponent->SetVelocity(vel);
+        mDrawComponent->ForceSetAnimation("Hurt" + mLastDirection);
+    }
+
+    // Decrease attack delay and avoid other interactions
+    if (!std::isnan(mAttackDelay) && mAttackDelay > .0f && mInvincibleTimer <= .0f) {
+        mRigidBodyComponent->SetVelocity(Vector2::Zero);
+        mAttackDelay -= deltaTime;
+        return;
+    }
+
+    // Do the attack
+    if (!std::isnan(mAttackDelay) && mAttackDelay <= .0f && mDelayBetweenAttacks <= 0.0f && mInvincibleTimer <= .0f) {
+        float x = 0.f, y = 0.f;
+
+        if (mLastDirection == "Up") y = -4.f * Game::SCALE;
+        else if (mLastDirection == "Down") y = 24.f * Game::SCALE;
+        else if (mLastDirection == "Side") {
+            if (GetRotation() == 0.f) x = 23.f * Game::SCALE;
+            else x = -9.f * Game::SCALE;
+        }
+
+        new Attack(mGame, GetPosition(), Vector2(x, y), ColliderLayer::Boss);
+
+        std::string animationName = "Strike" + mLastDirection;
+
+        mDrawComponent->SetAnimation(animationName);
+        mAttackDelay = NAN;
+        mDelayBetweenAttacks = 2.5f;
+        mPostAttackAnimationDelay = .5f;
+        return;
+    }
+
+    if (mAtSpAttackPos && mSpAttackTimer >= 0.f || mInvincibleTimer > .0f) return;
+
+    if (distanceToTarget.Length() > threshold && mInvincibleTimer <= 0.f)
     {
         distanceToTarget.Normalize();
 
@@ -146,39 +184,20 @@ void Boss::OnUpdate(float deltaTime) {
 
         float diff = std::abs(std::abs(distanceToTarget.x) - std::abs(distanceToTarget.y));
 
-        if (diff >= 0.f && diff <= 0.5f) {
+        if (diff >= 0.f && diff <= 0.5f || std::abs(distanceToTarget.x) > std::abs(distanceToTarget.y)) {
             SetRotation(distanceToTarget.x > 0 ? 0.0f : Math::Pi);
-            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtSide");
-            else {
-                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkSide");
-                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
-            }
-        }
-
-        else if (std::abs(distanceToTarget.x) > std::abs(distanceToTarget.y))
-        {
-            SetRotation(distanceToTarget.x > 0 ? 0.0f : Math::Pi);
-            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtSide");
-            else {
-                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkSide");
-                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
-            }
+            HandleChasingAnimation("HurtSide", "WalkSide");
+            mLastDirection = "Side";
         }
         else if (distanceToTarget.y < 0)
         {
-            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtUp");
-            else {
-                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkUp");
-                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
-            }
+            HandleChasingAnimation("HurtUp", "WalkUp");
+            mLastDirection = "Up";
         }
         else
         {
-            if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtDown");
-            else {
-                if (mChasingPlayer) mDrawComponent->SetAnimation("WalkDown");
-                else mDrawComponent->SetAnimation("GoingToSpAttackPos");
-            }
+            HandleChasingAnimation("HurtDown", "WalkDown");
+            mLastDirection = "Down";
         }
 
         mStepTimer -= deltaTime;
@@ -190,19 +209,19 @@ void Boss::OnUpdate(float deltaTime) {
     }
     else
     {
-        if (mInvincibleTimer > 0.f) mDrawComponent->SetAnimation("HurtDown");
-        else {
-            if (mChasingPlayer) mDrawComponent->SetAnimation("IdleDown");
-            else mDrawComponent->SetAnimation("GoingToSpAttackPos");
+        if (mChasingPlayer && mDelayBetweenAttacks <= .0f) {
+            mAttackDelay = .5f;
         }
+
+        if (mChasingPlayer && mDelayBetweenAttacks > .0f && std::isnan(mAttackDelay) && mPostAttackAnimationDelay <= .0f && mInvincibleTimer <= .0f) {
+            mDrawComponent->SetAnimation("Idle" + mLastDirection);
+        }
+
         if (!mChasingPlayer) {
+            mDrawComponent->SetAnimation("GoingToSpAttackPos");
             mRigidBodyComponent->SetVelocity(Vector2::Zero);
             mAtSpAttackPos = true;
         }
-    }
-
-    if (mInvincibleTimer > 0.f) {
-        mInvincibleTimer -= deltaTime;
     }
 }
 
@@ -223,6 +242,7 @@ void Boss::OnVerticalCollision(float overlap, AABBColliderComponent* other)
 void Boss::Die()
 {
     if (mIsDying) return;
+
     mDrawComponent->SetAnimation("Dead");
     mDrawComponent->SetAnimFPS(4.0f);
     mIsDying = true;
@@ -231,7 +251,27 @@ void Boss::Die()
 
 void Boss::Hit() {
     if (mInvincibleTimer > 0.f) return;
-    SDL_Log("DECREASING LIFEPOINTS");
+
     mLifePoints--;
     mInvincibleTimer = 2.f;
+}
+
+void Boss::HandleChasingAnimation(std::string hurtAnimation, std::string walkAnimation) {
+    if (mInvincibleTimer > 0.f) {
+        mDrawComponent->SetAnimation(hurtAnimation);
+        return;
+    }
+
+    if (mChasingPlayer) {
+        mDrawComponent->SetAnimation(walkAnimation);
+        return;
+    }
+
+    mDrawComponent->SetAnimation("GoingToSpAttackPos");
+}
+
+void Boss::HandleTimers(float deltaTime) {
+    if (mInvincibleTimer > 0.f) mInvincibleTimer -= deltaTime;
+    if (mDelayBetweenAttacks > 0.f) mDelayBetweenAttacks -= deltaTime;
+    if (mPostAttackAnimationDelay > .0f) mPostAttackAnimationDelay -= deltaTime;
 }
