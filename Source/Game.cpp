@@ -166,6 +166,7 @@ void Game::ChangeScene()
                                          LEVEL_WIDTH * TILE_SIZE * SCALE,
                                          LEVEL_HEIGHT * TILE_SIZE * SCALE);
 
+
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
@@ -202,6 +203,39 @@ void Game::ChangeScene()
         mTopInvisibleWall->GetComponent<AABBColliderComponent>()->SetEnabled(false);
         mIsSpikeGateLowered = false;
         mGamePlayState = GamePlayState::EnteringMap;
+
+        if (mTileMap) {
+            int W = mTileMap->mapWidth;
+            int H = mTileMap->mapHeight;
+            //SDL_Log("W: %d", W);
+            //SDL_Log("H: %d", H);
+            //SDL_Log("staticBlocksIdx: %d", mStaticBlocksLayerIdx);
+            mPassable.assign(H, std::vector<bool>(W, true));
+            // SDL_Log("Test");
+            //
+            // for (int i=0; i<mTileMap->layers.size(); i++) {
+            //     SDL_Log("%s / %d / %d", mTileMap->layers[i].name.c_str(), mTileMap->layers[i].data.size(), i);
+            // }
+            // SDL_Log("idx: %d", mStaticBlocksLayerIdx);
+
+            //Quit();
+            //return;
+
+            mStaticBlocksLayerIdx = GetStaticObjectsLayer();
+
+            if (mStaticBlocksLayerIdx >= 0) {
+                for (int r = 0; r < H; ++r) {
+                    for (int c = 0; c < W; ++c) {
+                        int gid = mTileMap->layers[mStaticBlocksLayerIdx].data[r*W + c];
+                        // if (r == 0 && c == 0) {
+                        //     SDL_Log("gid: %d", gid);
+                        // }
+                        if (gid != 0) mPassable[r][c] = false;
+                    }
+                }
+            }
+            //SDL_Log("[0][0] on change scene: %d", static_cast<int>(mPassable[0][0]));
+        }
     }
     else if (mNextScene == GameScene::Level3)
     {
@@ -878,6 +912,9 @@ void Game::BuildActorsFromMap() {
         }
         else if (obj.name == "skeleton") {
             //if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
+            static bool x = false; // TODO - LEMBRAR DE TIRAR
+            if (x) continue; // TODO - LEMBRAR DE TIRAR
+            x = true; // TODO - LEMBRAR DE TIRAR
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             mSkeletonNum++;
         }
@@ -954,4 +991,13 @@ void Game::HandleVolumeLevelDuringPause(bool resumingGame) {
         }
         Mix_VolumeChunk(chunk, MIX_MAX_VOLUME/4);
     }
+}
+
+int Game::GetStaticObjectsLayer() {
+    if (!mTileMap) return -1;
+
+    for (int i=0; i<mTileMap->layers.size(); i++) {
+        if (mTileMap->layers[i].name == "staticObjects") return i;
+    }
+    return -1;
 }

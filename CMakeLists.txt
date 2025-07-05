@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME}
         Source/tinyxml2.h
         Source/MapHelper.cpp
         Source/MapHelper.h
+        Source/AStar.cpp
+        Source/AStar.h
         Source/Game.cpp
         Source/Components/DrawComponents/DrawComponent.cpp
         Source/Components/DrawComponents/DrawComponent.h
