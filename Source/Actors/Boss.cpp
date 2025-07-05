@@ -11,8 +11,8 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
-    mRunToMiddleTimer = Random::GetIntRange(25, 35);
-    mSpAttackTimer = 30.f;
+    mRunToMiddleTimer = Random::GetIntRange(2, 2);
+    mSpAttackTimer = 5.f;
 
     mDrawComponent = new DrawBossAnimatedComponent(this,
         "../Assets/Sprites/Boss/boss.png", "../Assets/Sprites/Boss/boss.json", 100, 1);
@@ -87,13 +87,19 @@ void Boss::OnUpdate(float deltaTime) {
             else {
                 mDrawComponent->SetAnimation("LoopSpAttack");
             }
+
+            mFireballSpawnTimer -= deltaTime;
+            if (mFireballSpawnTimer <= 0.f) {
+                new FireballSpawner(mGame, mPosition, 12, 0.1f);
+                mFireballSpawnTimer = mFireballSpawnInterval;
+            }
         }
         else if (mAtSpAttackPos) {
             mChasingPlayer = true;
             mAtSpAttackPos = false;
-            mRunToMiddleTimer = Random::GetIntRange(25, 35);
+            mRunToMiddleTimer = Random::GetIntRange(2, 2);
             mSpeed = 200.f;
-            mSpAttackTimer = 30.f;
+            mSpAttackTimer = 5.f;
             mBeginSpAttackTimer = 1.f;
         }
     }
@@ -128,7 +134,7 @@ void Boss::OnUpdate(float deltaTime) {
 
     Vector2 distanceToTarget = Vector2::Zero;
 
-    float threshold = 1.0f;
+    float threshold = 10.0f;
 
     if (mChasingPlayer) {
         distanceToTarget = mTarget->GetPosition() - mPosition;
@@ -198,7 +204,7 @@ void Boss::OnUpdate(float deltaTime) {
         if (!mChasingPlayer) {
             mRigidBodyComponent->SetVelocity(Vector2::Zero);
             mAtSpAttackPos = true;
-            new FireballSpawner(mGame, GetPosition(), 12, 0.1f);
+            // new FireballSpawner(mGame, GetPosition(), 12, 0.1f);
         }
     }
 
