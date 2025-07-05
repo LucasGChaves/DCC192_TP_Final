@@ -16,7 +16,7 @@ Projectile::Projectile(Game* game, Vector2 pos, float angle, float speed, float 
     , mSpeed(speed)
     , mLifeTime(lifetime)
 {
-    SDL_Log("Projectile criada em (%.2f, %.2f) com ângulo %.2f", pos.x, pos.y, angle);
+    //SDL_Log("Projectile criada em (%.2f, %.2f) com ângulo %.2f", pos.x, pos.y, angle);
 
     SetPosition(pos);
 
@@ -35,7 +35,7 @@ void Projectile::OnUpdate(float deltaTime)
 {
     mElapsedTime += deltaTime;
     if (mElapsedTime >= mLifeTime) {
-        SDL_Log("Projectile destruída após %.2f segundos", mElapsedTime);
+        //SDL_Log("Projectile destruída após %.2f segundos", mElapsedTime);
         SetState(ActorState::Destroy);
         return;
     }

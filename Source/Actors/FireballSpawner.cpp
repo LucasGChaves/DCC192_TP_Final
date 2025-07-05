@@ -14,7 +14,7 @@ FireballSpawner::FireballSpawner(Game* game, Vector2 center, int count, float de
     , mSpeed(speed)
     , mLifetime(lifetime)
 {
-    SDL_Log("Spawner criado com %d fireballs", count);
+    //SDL_Log("Spawner criado com %d fireballs", count);
 
 }
 
@@ -31,7 +31,7 @@ void FireballSpawner::OnUpdate(float deltaTime)
         Vector2 offset(Math::Cos(angle) * radius, Math::Sin(angle) * radius);
         Vector2 spawnPos = mCenter + offset;
 
-        SDL_Log("Criando fireball %d em (%.2f, %.2f) com ângulo %.2f", mSpawnedCount, spawnPos.x, spawnPos.y, angle);
+        //SDL_Log("Criando fireball %d em (%.2f, %.2f) com ângulo %.2f", mSpawnedCount, spawnPos.x, spawnPos.y, angle);
 
         new Projectile(GetGame(), spawnPos, angle, mSpeed, mLifetime);
 
