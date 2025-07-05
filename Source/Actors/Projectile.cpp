@@ -5,6 +5,10 @@
 #include <SDL_log.h>
 #include "../Game.h"
 #include "Projectile.h"
+
+#include <vector>
+#include <vector>
+
 #include "../Components/DrawComponents/DrawPolygonComponent.h"
 #include "../Components/DrawComponents/DrawAnimatedComponent.h"
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
@@ -28,7 +32,7 @@ Projectile::Projectile(Game* game, Vector2 pos, float angle, float speed, float 
     mDrawComponent->SetAnimFPS(10.0f);
 
     mRigidBodyComponent = new RigidBodyComponent(this);
-    // mColliderComponent = new AABBColliderComponent(this, 0, 0, 6, 15, ColliderLayer::EnemyAttack, false);
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, 15, 15, ColliderLayer::Projectile, false);
 }
 
 void Projectile::OnUpdate(float deltaTime)
@@ -46,4 +50,27 @@ void Projectile::OnUpdate(float deltaTime)
     );
 
     mRigidBodyComponent->SetVelocity(velocity);
+}
+
+void Projectile::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
+{
+    auto player = dynamic_cast<Player*> (other->GetOwner());
+    if (player)
+    {
+        player->Hit();
+    }
+    mColliderComponent->SetEnabled(false);
+    mRigidBodyComponent->SetEnabled(false);
+    SetState(ActorState::Destroy);
+}
+
+void Projectile::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other) {
+    auto player = dynamic_cast<Player*> (other->GetOwner());
+    if (player)
+    {
+        player->Hit();
+    }
+    mColliderComponent->SetEnabled(false);
+    mRigidBodyComponent->SetEnabled(false);
+    SetState(ActorState::Destroy);
 }

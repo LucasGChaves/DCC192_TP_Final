@@ -46,7 +46,7 @@ class Boss : public Actor {
   float mInvincibleTimer = 0.f;
 
   float mFireballSpawnTimer = 0.0f;
-  float mFireballSpawnInterval = 2.0f;
+  float mFireballSpawnInterval = 3.0f;
 
   class DrawBossAnimatedComponent* mDrawComponent;
   class AABBColliderComponent* mColliderComponent;

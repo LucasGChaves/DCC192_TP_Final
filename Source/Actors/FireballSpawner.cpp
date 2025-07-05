@@ -27,7 +27,7 @@ void FireballSpawner::OnUpdate(float deltaTime)
         float angleStep = Math::TwoPi / mTotalCount;
         float angle = mSpawnedCount * angleStep;
 
-        float radius = 10.0f;
+        float radius = 80.0f;
         Vector2 offset(Math::Cos(angle) * radius, Math::Sin(angle) * radius);
         Vector2 spawnPos = mCenter + offset;
 

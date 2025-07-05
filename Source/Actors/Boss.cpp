@@ -90,7 +90,11 @@ void Boss::OnUpdate(float deltaTime) {
 
             mFireballSpawnTimer -= deltaTime;
             if (mFireballSpawnTimer <= 0.f) {
-                new FireballSpawner(mGame, mPosition, 12, 0.1f);
+                Vector2 bossOffset(
+                    mDrawComponent->GetDefaultFrameSize().x / 2.0f,
+                    mDrawComponent->GetDefaultFrameSize().x / 2.0f
+                );
+                new FireballSpawner(mGame, mPosition + bossOffset, 12, 0.1f);
                 mFireballSpawnTimer = mFireballSpawnInterval;
             }
         }
