@@ -5,6 +5,10 @@
 #include <SDL_log.h>
 #include "../Game.h"
 #include "Projectile.h"
+
+#include <vector>
+#include <vector>
+
 #include "../Components/DrawComponents/DrawPolygonComponent.h"
 #include "../Components/DrawComponents/DrawAnimatedComponent.h"
 #include "../Components/ColliderComponents/AABBColliderComponent.h"
@@ -16,8 +20,6 @@ Projectile::Projectile(Game* game, Vector2 pos, float angle, float speed, float 
     , mSpeed(speed)
     , mLifeTime(lifetime)
 {
-    //SDL_Log("Projectile criada em (%.2f, %.2f) com ângulo %.2f", pos.x, pos.y, angle);
-
     SetPosition(pos);
 
     float visualAngle = Math::ToDegrees(mAngle) + 90.0f + 180.0f;
@@ -27,15 +29,14 @@ Projectile::Projectile(Game* game, Vector2 pos, float angle, float speed, float 
     mDrawComponent->SetAnimation("Flaming");
     mDrawComponent->SetAnimFPS(10.0f);
 
-    mRigidBodyComponent = new RigidBodyComponent(this);
-    // mColliderComponent = new AABBColliderComponent(this, 0, 0, 6, 15, ColliderLayer::EnemyAttack, false);
+    mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false, 1);
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, 15, 15, ColliderLayer::Projectile, false, 1);
 }
 
 void Projectile::OnUpdate(float deltaTime)
 {
     mElapsedTime += deltaTime;
     if (mElapsedTime >= mLifeTime) {
-        //SDL_Log("Projectile destruída após %.2f segundos", mElapsedTime);
         SetState(ActorState::Destroy);
         return;
     }
@@ -46,4 +47,27 @@ void Projectile::OnUpdate(float deltaTime)
     );
 
     mRigidBodyComponent->SetVelocity(velocity);
+}
+
+void Projectile::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
+{
+    auto player = dynamic_cast<Player*> (other->GetOwner());
+    if (player)
+    {
+        player->Hit();
+    }
+    mColliderComponent->SetEnabled(false);
+    mRigidBodyComponent->SetEnabled(false);
+    SetState(ActorState::Destroy);
+}
+
+void Projectile::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other) {
+    auto player = dynamic_cast<Player*> (other->GetOwner());
+    if (player)
+    {
+        player->Hit();
+    }
+    mColliderComponent->SetEnabled(false);
+    mRigidBodyComponent->SetEnabled(false);
+    SetState(ActorState::Destroy);
 }

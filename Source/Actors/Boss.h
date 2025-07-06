@@ -32,24 +32,27 @@ class Boss : public Actor {
     bool IsAtSpAttackPos() { return mAtSpAttackPos; }
 
   private:
-  Player* mTarget;
-  float mSpeed;
-  bool mIsDying;
-  float mDeathTimer = 1.f;
-  float mSpAttackTimer = -1.0f;
-  float mRunToMiddleTimer = -1.0f;
-  Vector2 mSpAttackPos;
-  bool mAtSpAttackPos = false;
-  bool mChasingPlayer = true;
-  float mBeginSpAttackTimer = 1.f;
-  int mLifePoints = 3;
-  float mInvincibleTimer = 0.f;
-
-  float mFireballSpawnTimer = 0.0f;
-  float mFireballSpawnInterval = 2.0f;
-
-  class DrawBossAnimatedComponent* mDrawComponent;
-  class AABBColliderComponent* mColliderComponent;
-  class RigidBodyComponent* mRigidBodyComponent;
-
+    Player* mTarget;
+    float mSpeed;
+    bool mIsDying;
+    float mDeathTimer = 1.f;
+    float mSpAttackTimer = -1.0f;
+    float mRunToMiddleTimer = -1.0f;
+    Vector2 mSpAttackPos;
+    bool mAtSpAttackPos = false;
+    bool mChasingPlayer = true;
+    float mBeginSpAttackTimer = 1.f;
+    int mLifePoints = 3;
+    float mInvincibleTimer = 0.f;
+    float mFireballSpawnTimer = 0.0f;
+    float mFireballSpawnInterval = 2.0f;
+    class DrawBossAnimatedComponent* mDrawComponent;
+    class AABBColliderComponent* mColliderComponent;
+    class RigidBodyComponent* mRigidBodyComponent;
+    void HandleChasingAnimation(std::string hurtAnimation, std::string walkAnimation);
+    float mAttackDelay = NAN;
+    float mDelayBetweenAttacks = 0.f;
+    float mPostAttackAnimationDelay = .0f;
+    std::string mLastDirection;
+    void HandleTimers(float deltaTime);
 };

@@ -8,17 +8,16 @@
 class FireballSpawner : public Actor {
 public:
     FireballSpawner(Game* game, Vector2 center, int count, float delay, float speed = 300.0f, float lifetime = 2.0f);
-
-    void OnUpdate(float deltaTime) override;
+    // void OnUpdate(float deltaTime) override;
 
 private:
     Vector2 mCenter;
     int mTotalCount;
     int mSpawnedCount = 0;
-    float mDelay;
-    float mTimeSinceLastSpawn = 0.0f;
     float mSpeed;
     float mLifetime;
+    // float mDelay;
+    // float mTimeSinceLastSpawn = 0.0f;
 };
 
 #endif

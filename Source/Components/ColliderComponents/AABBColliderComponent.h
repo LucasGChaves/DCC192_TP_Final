@@ -16,7 +16,8 @@ enum class ColliderLayer
     Blocks,
     InvisibleWall,
     PlayerAttack, // ✅ Adicionado
-    EnemyAttack
+    EnemyAttack,
+    Projectile
 };
 
 // Define os pares de camadas que se ignoram

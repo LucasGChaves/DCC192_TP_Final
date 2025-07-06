@@ -5,12 +5,14 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 #include "Actor.h"
-
+#include "Player.h"
 
 class Projectile : public Actor {
 public:
     explicit Projectile(Game* game, Vector2 pos, float angle, float speed = 300.0f, float lifetime = 2.0f);
     void OnUpdate(float deltaTime) override;
+    void OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other);
+    void OnVerticalCollision(const float minOverlap, AABBColliderComponent* other);
 
 private:
     float mAngle = 0.0f;
@@ -19,7 +21,7 @@ private:
     float mElapsedTime = 0.0f;
 
     class RigidBodyComponent* mRigidBodyComponent;
-    // class AABBColliderComponent* mColliderComponent;
+    class AABBColliderComponent* mColliderComponent;
     class DrawAnimatedComponent* mDrawComponent;
 };
 
