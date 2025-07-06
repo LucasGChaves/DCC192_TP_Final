@@ -172,14 +172,14 @@ void Game::ChangeScene()
     {
 
         mAudio->StopAllSounds();
-        //mMusicHandle = mAudio->PlaySound("MainMenu.mp3", true);
+        mMusicHandle = mAudio->PlaySound("MainMenu.mp3", true);
 
         LoadMainMenu();
     }
     else if (mNextScene == GameScene::Level1)
     {
         mAudio->StopAllSounds();
-        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -196,7 +196,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopAllSounds();
-        //mMusicHandle = mAudio->PlaySound("Level2.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level2.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m04.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
@@ -230,7 +230,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopAllSounds();
-        //mMusicHandle = mAudio->PlaySound("Level3.wav", true);
+        mMusicHandle = mAudio->PlaySound("Level3.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         mSkeletonNum = 0;
