@@ -185,18 +185,14 @@ void Game::ChangeScene()
         mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
-        // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
         mTopInvisibleWall->GetComponent<AABBColliderComponent>()->SetEnabled(true);
         mIsSpikeGateLowered = true;
         mPlayer->LockActor();
         mDog->SetState(Dog::State::Wander);
-        // Show dialog box at the beginning of Level 1
         mLevel1DialogTimer = 0.0f;
-        mLevel1Dialog = new UIDialogBox(this, "../Assets/Fonts/PeaberryBase.ttf");
-        mUIStack.push_back(mLevel1Dialog);
-        mLevel1Dialog->SetVisible(true);
+        mLevel1Dialog = nullptr;
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -434,12 +430,18 @@ void Game::UpdateGame()
         }
     }
 
-    // Level 1 dialog box time management
-    if (mGameScene == GameScene::Level1 && mLevel1Dialog && mLevel1DialogTimer >= 0.0f) {
+    if (mGameScene == GameScene::Level1 && mLevel1DialogTimer >= 0.0f) {
         mLevel1DialogTimer += deltaTime;
-        if (mLevel1DialogTimer >= 5.0f) {
+        if (mLevel1DialogTimer >= 3.0f && mLevel1Dialog == nullptr) {
+            mLevel1Dialog = new UIDialogBox(this, "../Assets/Fonts/PeaberryBase.ttf");
+            mUIStack.push_back(mLevel1Dialog);
+            mLevel1Dialog->SetVisible(true);
+        }
+        if (mLevel1DialogTimer >= 6.0f && mLevel1Dialog) {
             mLevel1Dialog->SetVisible(false);
+            mLevel1Dialog = nullptr;
             mLevel1DialogTimer = -1.0f;
+            mAudio->PlaySound("dogBark.wav");
         }
     }
 
