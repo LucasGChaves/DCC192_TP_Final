@@ -238,7 +238,6 @@ void Boss::Die()
 
 void Boss::Hit() {
     if (mInvincibleTimer > 0.f) return;
-    SDL_Log("DECREASING LIFEPOINTS");
     mLifePoints--;
     mInvincibleTimer = 2.f;
 }

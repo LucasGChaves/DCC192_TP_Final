@@ -53,7 +53,7 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 368.25,
+                "x": 577.25,
                 "y": 183.75
             }
         },
@@ -61,7 +61,7 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 367.33333333333337,
+                "x": 366.6666666666666,
                 "y": 367.33333333333337
             }
         },
@@ -70,10 +70,10 @@
                 6
             ],
             "scale": 2,
-            "selectedLayer": 2,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 577.5,
-                "y": 277.75
+                "x": 325.25,
+                "y": 214.75
             }
         },
         "maps/e01m05.tmj": {

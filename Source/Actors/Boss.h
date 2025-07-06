@@ -42,7 +42,7 @@ class Boss : public Actor {
   bool mAtSpAttackPos = false;
   bool mChasingPlayer = true;
   float mBeginSpAttackTimer = 1.f;
-  int mLifePoints = 10;
+  int mLifePoints = 3;
   float mInvincibleTimer = 0.f;
 
   float mFireballSpawnTimer = 0.0f;
