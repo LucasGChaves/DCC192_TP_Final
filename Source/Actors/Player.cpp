@@ -290,6 +290,14 @@ void Player::OnHorizontalCollision(const float minOverlap, AABBColliderComponent
             mGame->SetGamePlayState(Game::GamePlayState::Leaving);
         }
     }
+
+    else if (other->GetLayer() == ColliderLayer::Projectile) {
+        Hit();
+        other->SetEnabled(false);
+        auto otherRigidBody = other->GetOwner()->GetComponent<RigidBodyComponent>();
+        if (otherRigidBody) otherRigidBody->SetEnabled(false);
+        other->GetOwner()->SetState(ActorState::Destroy);
+    }
 }
 
 void Player::EnableCollision(bool enabled)
@@ -317,6 +325,14 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
         if (wall->GetType() == InvisibleWall::Type::Top) {
             mGame->SetGamePlayState(Game::GamePlayState::Leaving);
         }
+    }
+
+    else if (other->GetLayer() == ColliderLayer::Projectile) {
+        Hit();
+        other->SetEnabled(false);
+        auto otherRigidBody = other->GetOwner()->GetComponent<RigidBodyComponent>();
+        if (otherRigidBody) otherRigidBody->SetEnabled(false);
+        other->GetOwner()->SetState(ActorState::Destroy);
     }
 }
 

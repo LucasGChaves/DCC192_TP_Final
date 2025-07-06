@@ -53,7 +53,7 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 368.25,
+                "x": 577.25,
                 "y": 183.75
             }
         },
@@ -61,7 +61,7 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 367.33333333333337,
+                "x": 366.6666666666666,
                 "y": 367.33333333333337
             }
         },
@@ -70,9 +70,9 @@
                 6
             ],
             "scale": 2,
-            "selectedLayer": 4,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 392.25,
+                "x": 325.25,
                 "y": 214.75
             }
         },
@@ -89,9 +89,9 @@
                 19
             ],
             "scale": 3,
-            "selectedLayer": 3,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 367.16666666666663,
+                "x": 327.66666666666663,
                 "y": 156.16666666666663
             }
         },

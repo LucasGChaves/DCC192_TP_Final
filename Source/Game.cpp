@@ -171,6 +171,7 @@ void Game::ChangeScene()
                                          LEVEL_WIDTH * TILE_SIZE * SCALE,
                                          LEVEL_HEIGHT * TILE_SIZE * SCALE);
 
+
     // Scene Manager FSM: using if/else instead of switch
     if (mNextScene == GameScene::MainMenu)
     {
@@ -208,6 +209,25 @@ void Game::ChangeScene()
         mTopInvisibleWall->GetComponent<AABBColliderComponent>()->SetEnabled(false);
         mIsSpikeGateLowered = false;
         mGamePlayState = GamePlayState::EnteringMap;
+
+        if (mTileMap) {
+            int W = mTileMap->mapWidth;
+            int H = mTileMap->mapHeight;
+
+            mPassable.assign(H, std::vector<bool>(W, true));
+
+            mStaticBlocksLayerIdx = GetStaticObjectsLayer();
+
+            if (mStaticBlocksLayerIdx >= 0) {
+                for (int r = 0; r < H; ++r) {
+                    for (int c = 0; c < W; ++c) {
+                        int gid = mTileMap->layers[mStaticBlocksLayerIdx].data[r*W + c];
+                        if (gid != 0) mPassable[r][c] = false;
+                    }
+                }
+            }
+            SetPassable2x2Vector();
+        }
     }
     else if (mNextScene == GameScene::Level3)
     {
@@ -408,6 +428,10 @@ void Game::UpdateGame()
     {
         // Reinsert all actors and pending actors
         UpdateActors(deltaTime);
+    }
+    else if (mGamePlayState == GamePlayState::GameOver) {
+        mIsSpikeGateLowered = true;
+        mSkeletonNum = 0;
     }
     // Reinsert audio system
     mAudio->Update(deltaTime);
@@ -978,5 +1002,29 @@ void Game::HandleVolumeLevelDuringPause(bool resumingGame) {
             return;
         }
         Mix_VolumeChunk(chunk, MIX_MAX_VOLUME/4);
+    }
+}
+
+int Game::GetStaticObjectsLayer() {
+    if (!mTileMap) return -1;
+
+    for (int i=0; i<mTileMap->layers.size(); i++) {
+        if (mTileMap->layers[i].name == "staticObjects") return i;
+    }
+    return -1;
+}
+
+void Game::SetPassable2x2Vector() {
+    int h = mPassable.size(), w = mPassable[0].size();
+    mPassable2x2 = mPassable;
+    for (int r = 0; r < h-1; ++r) {
+        for (int c = 0; c < w-1; ++c) {
+            if (mPassable[r][c] && mPassable[r+1][c] &&
+                mPassable[r][c+1] && mPassable[r+1][c+1]) {
+                mPassable2x2[r][c] = true;
+                } else {
+                    mPassable2x2[r][c] = false;
+                }
+        }
     }
 }
