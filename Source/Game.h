@@ -212,4 +212,8 @@ private:
     bool mShowWinScreen = true;
 
     bool mIsSpikeGateLowered = false;
+
+    // Dialog box timer and pointer for Level 1
+    float mLevel1DialogTimer = -1.0f;
+    class UIDialogBox* mLevel1Dialog = nullptr;
 };
