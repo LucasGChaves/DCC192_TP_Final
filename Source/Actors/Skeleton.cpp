@@ -8,7 +8,7 @@
 Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
         : Actor(game)
         , mTarget(target)
-        , mSpeed(50.0f)
+        , mSpeed(200.0f)
         , mIsDying(false)
         , mLastTargetTile(Vector2{-1.f, -1.f})
 {
@@ -16,7 +16,6 @@ Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
-    // Draw e animações
     mDrawComponent = new DrawAnimatedComponent(this,
                                                "../Assets/Sprites/Skeleton/skeleton.png",
                                                "../Assets/Sprites/Skeleton/skeleton.json");
@@ -36,13 +35,11 @@ Skeleton::Skeleton(Game* game, Player* target, Vector2 pos)
 
     mRigidBodyComponent = new RigidBodyComponent(this);
 
-    // Colisor
     mColliderComponent = new AABBColliderComponent(this, dx, dy, w, h, ColliderLayer::Enemy, false);
 }
 
 void Skeleton::OnUpdate(float deltaTime)
 {
-    // 1) Estado Dying (permanece até destruir)
     if (mState == State::Dying) {
         mDeathTimer -= deltaTime;
         if (mDeathTimer <= 0.0f) {
@@ -53,52 +50,27 @@ void Skeleton::OnUpdate(float deltaTime)
 
     if (mState == State::Dying || !mTarget) return;
 
-    // 2) Calcula vetor e visibilidade
     Vector2 toPlayer = mTarget ? (mTarget->GetPosition() - mPosition): Vector2::Zero;
 
-    bool canSee = (mTarget != nullptr)
-               && InsideFOV(mCurrentDir, toPlayer) //InsideFOV funcionando
-               && HasLineOfSight()
-               && toPlayer.Length() > 1.0f;
+    bool seesPlayer = (mState == State::Wander)
+               && InsideFOV(toPlayer)
+               && HasLineOfSight();
 
-    SDL_Log("InsideFOV: %d", InsideFOV(mCurrentDir, toPlayer));
-    SDL_Log("HasLineOfSight: %d", HasLineOfSight());
-    SDL_Log("toPlayer.Length() > 1.0f: %d", toPlayer.Length() > 1.0f);
-    SDL_Log("canSee: %d", canSee);
+    if (seesPlayer)
+    {
+        mState = State::Chasing;
+        mLastTargetTile = Vector2{-1.f, -1.f};
+    }
 
-    //SDL_Log("angle: %f %f", GetForward().x, GetForward().y);
-    //SDL_Log("rotation: %f", Math::ToDegrees(GetRotation()));
-
-    // 3) State machine
     switch (mState)
     {
         case State::Wander:
-            if (canSee) {
-                // transita para perseguir
-                mState = State::Chasing;
-                // já reseta last target tile pra forçar recálculo de path
-                mLastTargetTile = Vector2{-1.f, -1.f};
-            }
-            else {
-                Wander(deltaTime);
-            }
+            Wander(deltaTime);
         break;
 
         case State::Chasing:
-            if (!canSee) {
-                // perdeu visão, volta a vagar
-                mState = State::Wander;
-                // zera a velocidade
-                mRigidBodyComponent->SetVelocity(Vector2::Zero);
-            }
-            else {
-                // permanece em chase: recálculo e seguimento de path
-                Chase(deltaTime, toPlayer);
-            }
+            Chase(deltaTime);
         break;
-
-        default:
-            break;
     }
 }
 
@@ -145,37 +117,33 @@ std::vector<int> Skeleton::GetAnimationFramesByNamePrefix(const std::string& pre
     return frames;
 }
 
-bool Skeleton::InsideFOV(Vector2 dir, Vector2 toPlayer) {
-    //float angle = Math::ToDegrees(Math::Atan2(-dir.y, dir.x));
-    //Vector2 rotation{Math::Cos(angle), -Math::Sin(angle)};
-    dir.Normalize();
+bool Skeleton::InsideFOV(Vector2 toPlayer) {
+    if (mState == State::Chasing) {
+        return true;
+    }
+
+    mCurrentDir.Normalize();
     toPlayer.Normalize();
-    float dot = toPlayer.x * dir.x + toPlayer.y * dir.y;
+    float dot = toPlayer.x * mCurrentDir.x + toPlayer.y * mCurrentDir.y;
     return dot >= Math::Cos(mFOVAngle/2.f);
 }
 
 bool Skeleton::HasLineOfSight()
 {
-    //SDL_Log("[0][0]: %d", static_cast<int>(mGame->GetPassableVector()[0][0]));
-    // 1) Pega o tamanho de um tile em pixels
     const float tilePx = Game::TILE_SIZE * Game::SCALE;
     //auto& passable     = mGame->GetPassableVector();
     int H              = (int)mGame->GetPassableVector().size();
     int W              = (int)mGame->GetPassableVector()[0].size();
 
-    auto [x, y, w, h] = ComputeColliderParams(Game::TILE_SIZE * 2, Game::TILE_SIZE * 2);
+    Vector2 center  = mColliderComponent->GetCenter();
+    auto* bb1 = mTarget->GetComponent<AABBColliderComponent>();
+    Vector2 playerCenter   = bb1->GetCenter();
 
-    // 2) Calcula as coordenadas de tile (coluna, linha) do centro do esqueleto e do player
-    Vector2 myCenter    = GetPosition() + Vector2{ static_cast<float>(w), static_cast<float>(h) } * 0.5f;
-    Vector2 targetCenter = mTarget->GetPosition() + Vector2{ static_cast<float>(w),
-                                                            static_cast<float>(h) } * 0.5f;
+    int x0 = int(center.x / tilePx);
+    int y0 = int(center.y / tilePx);
+    int x1 = int(playerCenter.x  / tilePx);
+    int y1 = int(playerCenter.y  / tilePx);
 
-    int x0 = int(myCenter.x / tilePx);
-    int y0 = int(myCenter.y / tilePx);
-    int x1 = int(targetCenter.x / tilePx);
-    int y1 = int(targetCenter.y / tilePx);
-
-    // 3) Se o destino estiver fora dos limites, sem LOS
     if (x1 < 0 || x1 >= W || y1 < 0 || y1 >= H)
         return false;
 
@@ -184,97 +152,48 @@ bool Skeleton::HasLineOfSight()
     int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
     int err = dx + dy;
 
-    // 5) Percorre a linha, pulando o primeiro tile (o próprio esqueleto)
     while (true)
     {
-        // Avança para o próximo tile
         int e2 = 2 * err;
         if (e2 >= dy) { err += dy; x0 += sx; }
         if (e2 <= dx) { err += dx; y0 += sy; }
 
-        // Se chegamos ao destino, LOS livre
         if (x0 == x1 && y0 == y1)
             return true;
 
-        // Se saiu dos limites, bloqueado
         if (x0 < 0 || x0 >= W || y0 < 0 || y0 >= H)
             return false;
 
-        // Se o tile não for atravessável, LOS bloqueada
         if (!mGame->GetPassableVector()[y0][x0])
             return false;
     }
 }
 
-// Não apagar por enquanto
-// bool Skeleton::HasLineOfSight(Vector2 toPlayer) {
-//     // 1) converte para direção unitária e distância
-//     float dist = toPlayer.Length();
-//     toPlayer.Normalize();
-//
-//     // 2) número de passos = quantos tiles atravessa
-//     float tilePx = Game::TILE_SIZE * Game::SCALE;
-//     int steps = int(dist / tilePx) + 1;
-//
-//     // 3) percorre um passo em cada tile
-//     for (int i = 1; i < steps; ++i) {
-//         Vector2 sample = mPosition + toPlayer * (i * tilePx);
-//
-//         // 4) converte amostra pra índices de tile
-//         int c = int(sample.x / tilePx);
-//         int r = int(sample.y / tilePx);
-//
-//         // 5) checa se está dentro da matriz
-//         //auto& passable = mGame->GetPassableVector();
-//         if (r < 0 || r >= mGame->GetPassableVector().size() ||
-//             c < 0 || c >= mGame->GetPassableVector()[0].size())
-//             return false; // fora do mapa é bloqueio
-//
-//         // 6) se o tile não for atravessável, linha de visão bloqueada
-//         if (!mGame->GetPassableVector()[r][c])
-//             return false;
-//     }
-//     return true;
-// }
-
 void Skeleton::InitWander()
 {
-    // Semente randômica (pode ser static)
-    static std::mt19937 rng{ std::random_device{}() };
+    srand(static_cast<unsigned int>(time(nullptr)));
 
-    // Gera um intervalo aleatório entre 0.5s e 2.0s
-    std::uniform_real_distribution<float> distInterval(0.5f, 2.0f);
-    mWanderInterval = distInterval(rng);
+    int direction = rand() % 4;
 
-    // Gera direção aleatória em 4 direções cardeais
-    std::uniform_int_distribution<int> distDir(0,3);
-    int d = distDir(rng);
-    switch(d) {
-        case 0: mWanderDir = Vector2{ 1, 0 }; break;  // direita
-        case 1: mWanderDir = Vector2{-1, 0 }; break;  // esquerda
-        case 2: mWanderDir = Vector2{ 0, 1 }; break;  // baixo
-        default:mWanderDir = Vector2{ 0,-1 }; break;  // cima
+    switch(direction) {
+        case 0: mWanderDir = Vector2{ 1, 0 }; break;
+        case 1: mWanderDir = Vector2{-1, 0 }; break;
+        case 2: mWanderDir = Vector2{ 0, 1 }; break;
+        default:mWanderDir = Vector2{ 0,-1 }; break;
     }
     mWanderTimer = 0.0f;
     mCurrentDir = mWanderDir;
 }
 
-// Função de wander usando RigidBody
 void Skeleton::Wander(float deltaTime)
 {
-    // 1) Atualiza timer
     mWanderTimer += deltaTime;
-    if (mWanderTimer >= mWanderInterval) {
-        // troca direção e reinicia timer
+    if (mWanderTimer >= 1.0f) {
         InitWander();
     }
 
-    // 2) Aplica velocidade na direção escolhida
     mRigidBodyComponent->SetVelocity(mWanderDir * mSpeed);
 
-    //SDL_Log("angle: %f", Math::ToDegrees(Math::Atan2(-mWanderDir.y, mWanderDir.x)));
-
-    // 3) Escolhe animação conforme mWanderDir
     if (std::abs(mWanderDir.x) >= std::abs(mWanderDir.y)) {
         SetRotation(mWanderDir.x > 0 ? 0.0f : Math::Pi);
         mDrawComponent->SetAnimation("WalkSide");
@@ -287,58 +206,158 @@ void Skeleton::Wander(float deltaTime)
     }
 }
 
-void Skeleton::Chase(float deltatime, Vector2 toPlayer) {
-    if (toPlayer.Length() <= 1.f) return;
+void Skeleton::Chase(float deltaTime)
+{
+    Vector2 lastPlayerCenter = Vector2::Zero;
 
-    // 3.1) Índices de tile do Skeleton e do Player
-    float tilePx = Game::TILE_SIZE * Game::SCALE;
-    int myR = int(mPosition.y / tilePx);
-    int myC = int(mPosition.x / tilePx);
-    int pR  = int(mTarget->GetPosition().y / tilePx);
-    int pC  = int(mTarget->GetPosition().x / tilePx);
+    const float tilePx = Game::TILE_SIZE * Game::SCALE;
 
-    // 3.2) Recalcula rota A* se o player mudou de tile
-    if (pR != static_cast<int>(mLastTargetTile.x) || pC != static_cast<int>(mLastTargetTile.y)) {
-        mPath = FindPathAStar(
-            mGame->GetPassableVector(),
-            myR, myC, pR, pC
-        );
+    Vector2 myCenter     = mColliderComponent->GetCenter();
+    auto* playerBB       = mTarget->GetComponent<AABBColliderComponent>();
+    Vector2 playerCenter = playerBB->GetCenter();
+
+    int r0 = int(myCenter.y / tilePx);
+    int c0 = int(myCenter.x / tilePx);
+    int r1 = int(playerCenter.y / tilePx);
+    int c1 = int(playerCenter.x / tilePx);
+
+    mRepathTimer -= deltaTime;
+
+    float distMoved = (playerCenter - lastPlayerCenter).Length();
+
+    bool tileChanged    = (r1 != int(mLastTargetTile.x) || c1 != int(mLastTargetTile.y));
+    bool movedFarEnough = (distMoved > tilePx * 0.5f);
+    bool timeToRepath   = (mRepathTimer <= 0.0f);
+
+    auto [goalR, goalC] = GetGoalTile(
+    mTarget->GetComponent<AABBColliderComponent>(),
+    mGame->GetPassable2x2Vector(),
+    (int)mGame->GetPassable2x2Vector().size(),
+    (int)mGame->GetPassable2x2Vector()[0].size()
+);
+    if (tileChanged || movedFarEnough || timeToRepath)
+    {
+        mPath = FindPathAStar(mGame->GetPassable2x2Vector(),r0, c0, goalR, goalC);
+
+        if (!mPath.empty())
+        {
+            Vector2 startTileCenter{ (c0 + 0.5f) * tilePx, (r0 + 0.5f) * tilePx };
+            if ((mPath.front() - startTileCenter).Length() < 1e-3f)
+                mPath.erase(mPath.begin());
+        }
+
+        mLastTargetTile = Vector2{ float(r1), float(c1) };
         mNextWaypoint = 0;
-        mLastTargetTile = Vector2{static_cast<float>(pR), static_cast<float>(pC)};
+        mRepathTimer = 0.5f;
     }
 
-    // 3.3) Segue o próximo waypoint (se houver)
-    if (mNextWaypoint < mPath.size()) {
-        Vector2 wp   = mPath[mNextWaypoint];
-        Vector2 toWP = wp - mPosition;
-
-        // chegou no waypoint?
-        if (toWP.Length() < tilePx * 0.1f) {
+    const float reachRad = tilePx * 0.10f;
+    while (mNextWaypoint < mPath.size())
+    {
+        if ((mPath[mNextWaypoint] - myCenter).Length() < reachRad)
             ++mNextWaypoint;
-        } else {
-            // normaliza e aplica velocidade
-            mCurrentDir = toWP;
-            toWP.Normalize();
-            Vector2 vel = toWP * mSpeed;
-            mRigidBodyComponent->SetVelocity(vel);
+        else
+            break;
+    }
 
-            // 4) MESMA lógica de animação do seu código original,
-            //    porém usando toWP em vez de toPlayer
-            float diff = std::abs(std::abs(toWP.x) - std::abs(toWP.y));
-            if (diff <= 0.5f) {
-                SetRotation(toWP.x > 0 ? 0.0f : Math::Pi);
-                mDrawComponent->SetAnimation("WalkSide");
-            }
-            else if (std::abs(toWP.x) > std::abs(toWP.y)) {
-                SetRotation(toWP.x > 0 ? 0.0f : Math::Pi);
-                mDrawComponent->SetAnimation("WalkSide");
-            }
-            else if (toWP.y < 0) {
-                mDrawComponent->SetAnimation("WalkUp");
-            }
-            else {
-                mDrawComponent->SetAnimation("WalkDown");
-            }
+    Vector2 desiredVel = Vector2::Zero;
+    Vector2 toPlayer = mTarget->GetPosition() - mPosition;
+
+    if (mNextWaypoint < mPath.size() && toPlayer.Length() > Game::TILE_SIZE * Game::SCALE )
+    {
+        Vector2 toWP = mPath[mNextWaypoint] - myCenter;
+        mCurrentDir = toWP;
+        toWP.Normalize();
+        desiredVel  = toWP * mSpeed;
+    }
+    else {
+
+        if (toPlayer.Length() > 1.f) {
+            mCurrentDir = toPlayer;
+            toPlayer.Normalize();
+            desiredVel = toPlayer * mSpeed;
+        }
+        else {
+            desiredVel = Vector2::Zero;
         }
     }
+
+    mRigidBodyComponent->SetVelocity(desiredVel);
+
+    float diff = std::abs(std::abs(mCurrentDir.x) - std::abs(mCurrentDir.y));
+    if (diff <= 0.5f) {
+        SetRotation(mCurrentDir.x > 0 ? 0.0f : Math::Pi);
+        mDrawComponent->SetAnimation("WalkSide");
+    }
+    else if (std::abs(mCurrentDir.x) > std::abs(mCurrentDir.y)) {
+        SetRotation(mCurrentDir.x > 0 ? 0.0f : Math::Pi);
+        mDrawComponent->SetAnimation("WalkSide");
+    }
+    else if (mCurrentDir.y < 0) {
+        mDrawComponent->SetAnimation("WalkUp");
+    }
+    else {
+        mDrawComponent->SetAnimation("WalkDown");
+    }
+}
+
+std::pair<int,int> Skeleton::GetGoalTile(
+    const AABBColliderComponent* playerBB,
+    const std::vector<std::vector<bool>>& passable2x2,
+    int maxRows, int maxCols)
+{
+    Vector2 min = playerBB->GetMin();
+    Vector2 max = playerBB->GetMax();
+    float tilePx = Game::TILE_SIZE * Game::SCALE;
+
+    int r0 = int(min.y / tilePx);
+    int c0 = int(min.x / tilePx);
+    int r1 = int((max.y - 1) / tilePx);
+    int c1 = int((max.x - 1) / tilePx);
+
+    struct Node { int r,c; float dist; };
+    std::vector<Node> candidates;
+
+    Vector2 skCenter = mColliderComponent->GetCenter();
+    int sr = int(skCenter.y / tilePx), sc = int(skCenter.x / tilePx);
+
+    for (int r = r0; r <= r1; ++r) {
+      for (int c = c0; c <= c1; ++c) {
+        if (r>=0 && r<maxRows && c>=0 && c<maxCols && passable2x2[r][c]) {
+          float dr = float(r - sr), dc = float(c - sc);
+          candidates.push_back({r,c, dr*dr + dc*dc});
+        }
+      }
+    }
+
+    if (!candidates.empty()) {
+      auto best = std::min_element(
+        candidates.begin(), candidates.end(),
+        [](auto &a, auto &b){ return a.dist < b.dist; }
+      );
+      return {best->r, best->c};
+    }
+
+    const int drs[8] = {-1,-1,-1, 0, 0, 1, 1, 1};
+    const int dcs[8] = {-1, 0, 1,-1, 1,-1, 0, 1};
+    candidates.clear();
+
+    for (int r = r0-1; r <= r1+1; ++r) {
+      for (int c = c0-1; c <= c1+1; ++c) {
+        if (r>=0 && r<maxRows && c>=0 && c<maxCols && passable2x2[r][c]) {
+          float dr = float(r - sr), dc = float(c - sc);
+          candidates.push_back({r,c, dr*dr + dc*dc});
+        }
+      }
+    }
+    if (!candidates.empty()) {
+      auto best = std::min_element(
+        candidates.begin(), candidates.end(),
+        [](auto &a, auto &b){ return a.dist < b.dist; }
+      );
+      return {best->r, best->c};
+    }
+
+    int fr = int(skCenter.y / tilePx), fc = int(skCenter.x / tilePx);
+    return {fr, fc};
 }

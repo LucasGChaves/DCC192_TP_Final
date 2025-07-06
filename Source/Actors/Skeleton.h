@@ -29,14 +29,19 @@ public:
     AABBColliderComponent* GetColliderComponent() const { return mColliderComponent; }
     void Die();
 
+    std::pair<int,int> GetGoalTile(
+    const AABBColliderComponent* playerBB,
+    const std::vector<std::vector<bool>>& passable2x2,
+    int maxRows, int maxCols);
+
 
 
 private:
     std::vector<int> GetAnimationFramesByNamePrefix(const std::string& prefix, int frameCount);
-    bool InsideFOV(Vector2 dir, Vector2 toPlayer);
+    bool InsideFOV(Vector2 toPlayer);
     bool HasLineOfSight();
     void Wander(float deltatime);
-    void Chase(float deltatime, Vector2 toPlayer);
+    void Chase(float deltatime);
     void InitWander();
 
     Player* mTarget;
@@ -50,7 +55,7 @@ private:
     Vector2 mWanderDir = Vector2::Zero;
     Vector2 mCurrentDir = Vector2::Zero;
     float mWanderTimer = 0.0f;
-    float mWanderInterval = 1.0f;  // trocar de direção a cada ~1s
+    float mRepathTimer = 0.0f;
     State mState = State::Wander;
 
     class DrawAnimatedComponent* mDrawComponent;

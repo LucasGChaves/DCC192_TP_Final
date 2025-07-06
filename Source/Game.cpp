@@ -172,14 +172,14 @@ void Game::ChangeScene()
     {
 
         mAudio->StopAllSounds();
-        mMusicHandle = mAudio->PlaySound("MainMenu.mp3", true);
+        //mMusicHandle = mAudio->PlaySound("MainMenu.mp3", true);
 
         LoadMainMenu();
     }
     else if (mNextScene == GameScene::Level1)
     {
         mAudio->StopAllSounds();
-        mMusicHandle = mAudio->PlaySound("Level1.wav", true);
+        //mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
         // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
@@ -196,7 +196,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopAllSounds();
-        mMusicHandle = mAudio->PlaySound("Level2.wav", true);
+        //mMusicHandle = mAudio->PlaySound("Level2.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m04.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
@@ -207,19 +207,8 @@ void Game::ChangeScene()
         if (mTileMap) {
             int W = mTileMap->mapWidth;
             int H = mTileMap->mapHeight;
-            //SDL_Log("W: %d", W);
-            //SDL_Log("H: %d", H);
-            //SDL_Log("staticBlocksIdx: %d", mStaticBlocksLayerIdx);
-            mPassable.assign(H, std::vector<bool>(W, true));
-            // SDL_Log("Test");
-            //
-            // for (int i=0; i<mTileMap->layers.size(); i++) {
-            //     SDL_Log("%s / %d / %d", mTileMap->layers[i].name.c_str(), mTileMap->layers[i].data.size(), i);
-            // }
-            // SDL_Log("idx: %d", mStaticBlocksLayerIdx);
 
-            //Quit();
-            //return;
+            mPassable.assign(H, std::vector<bool>(W, true));
 
             mStaticBlocksLayerIdx = GetStaticObjectsLayer();
 
@@ -227,14 +216,11 @@ void Game::ChangeScene()
                 for (int r = 0; r < H; ++r) {
                     for (int c = 0; c < W; ++c) {
                         int gid = mTileMap->layers[mStaticBlocksLayerIdx].data[r*W + c];
-                        // if (r == 0 && c == 0) {
-                        //     SDL_Log("gid: %d", gid);
-                        // }
                         if (gid != 0) mPassable[r][c] = false;
                     }
                 }
             }
-            //SDL_Log("[0][0] on change scene: %d", static_cast<int>(mPassable[0][0]));
+            SetPassable2x2Vector();
         }
     }
     else if (mNextScene == GameScene::Level3)
@@ -244,7 +230,7 @@ void Game::ChangeScene()
         mHUD = new HUD(this, "../Assets/Fonts/PeaberryBase.ttf");
 
         mAudio->StopAllSounds();
-        mMusicHandle = mAudio->PlaySound("Level3.wav", true);
+        //mMusicHandle = mAudio->PlaySound("Level3.wav", true);
 
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m01.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         mSkeletonNum = 0;
@@ -1000,4 +986,19 @@ int Game::GetStaticObjectsLayer() {
         if (mTileMap->layers[i].name == "staticObjects") return i;
     }
     return -1;
+}
+
+void Game::SetPassable2x2Vector() {
+    int h = mPassable.size(), w = mPassable[0].size();
+    mPassable2x2 = mPassable;
+    for (int r = 0; r < h-1; ++r) {
+        for (int c = 0; c < w-1; ++c) {
+            if (mPassable[r][c] && mPassable[r+1][c] &&
+                mPassable[r][c+1] && mPassable[r+1][c+1]) {
+                mPassable2x2[r][c] = true;
+                } else {
+                    mPassable2x2[r][c] = false;
+                }
+        }
+    }
 }

@@ -118,7 +118,8 @@ public:
     const class Boss* GetBoss() { return mBoss; }
     SpatialHashing* GetSpatialHashing() { return mSpatialHashing; }
     std::vector<std::vector<bool>> GetPassableVector() { return mPassable; }
-
+    std::vector<std::vector<bool>> GetPassable2x2Vector() { return mPassable2x2; }
+    void SetPassable2x2Vector();
 
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
     GamePlayState GetGamePlayState() const { return mGamePlayState; }
@@ -221,5 +222,6 @@ private:
     bool mIsSpikeGateLowered = false;
 
     std::vector<std::vector<bool>> mPassable;
+    std::vector<std::vector<bool>> mPassable2x2;
     int mStaticBlocksLayerIdx = -1;
 };
