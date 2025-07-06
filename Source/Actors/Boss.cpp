@@ -11,8 +11,8 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     SetPosition(pos);
     SetScale(Game::SCALE);
 
-    mRunToMiddleTimer = Random::GetIntRange(2, 2); // 25, 35 de default aqui
-    mSpAttackTimer = 5.f; // 30 de default aqui
+    mRunToMiddleTimer = Random::GetIntRange(25, 35); // 25, 35 de default aqui
+    mSpAttackTimer = 30.f; // 30 de default aqui
 
     mDrawComponent = new DrawBossAnimatedComponent(this,
         "../Assets/Sprites/Boss/boss.png", "../Assets/Sprites/Boss/boss.json", 100, 1);
@@ -87,24 +87,24 @@ void Boss::OnUpdate(float deltaTime) {
             }
             else {
                 mDrawComponent->SetAnimation("LoopSpAttack");
-            }
 
-            mFireballSpawnTimer -= deltaTime;
-            if (mFireballSpawnTimer <= 0.f) {
-                Vector2 bossOffset(
-                    mDrawComponent->GetDefaultFrameSize().x / 2.0f,
-                    mDrawComponent->GetDefaultFrameSize().x / 2.0f
-                );
-                new FireballSpawner(mGame, mPosition + bossOffset, 12, 0.1f);
-                mFireballSpawnTimer = mFireballSpawnInterval;
+                mFireballSpawnTimer -= deltaTime;
+                if (mFireballSpawnTimer <= 0.f) {
+                    Vector2 bossOffset(
+                        mDrawComponent->GetDefaultFrameSize().x / 2.0f,
+                        mDrawComponent->GetDefaultFrameSize().x / 2.0f
+                    );
+                    new FireballSpawner(mGame, mPosition + bossOffset, 18, 0.1f);
+                    mFireballSpawnTimer = mFireballSpawnInterval;
+                }
             }
         }
         else if (mAtSpAttackPos) {
             mChasingPlayer = true;
             mAtSpAttackPos = false;
-            mRunToMiddleTimer = Random::GetIntRange(2, 2); // 25 e 25 de default aqui
+            mRunToMiddleTimer = Random::GetIntRange(25, 35); // 25 e 25 de default aqui
             mSpeed = 200.f;
-            mSpAttackTimer = 5.f; // 30 de default aqui
+            mSpAttackTimer = 30.f; // 30 de default aqui
             mBeginSpAttackTimer = 1.f;
         }
     }
