@@ -423,6 +423,10 @@ void Game::UpdateGame()
         // Reinsert all actors and pending actors
         UpdateActors(deltaTime);
     }
+    else if (mGamePlayState == GamePlayState::GameOver) {
+        mIsSpikeGateLowered = true;
+        mSkeletonNum = 0;
+    }
     // Reinsert audio system
     mAudio->Update(deltaTime);
 
