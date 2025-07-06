@@ -145,28 +145,6 @@
                  "width":32,
                  "x":352,
                  "y":0
-                }, 
-                {
-                 "height":64,
-                 "id":77,
-                 "name":"boss",
-                 "rotation":0,
-                 "type":"scene-1",
-                 "visible":true,
-                 "width":64,
-                 "x":262.667,
-                 "y":83.333
-                }, 
-                {
-                 "height":32,
-                 "id":82,
-                 "name":"spAttackPlaceholder",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":352.667,
-                 "y":112.667
                 }],
          "opacity":1,
          "type":"objectgroup",

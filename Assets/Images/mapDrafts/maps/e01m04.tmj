@@ -98,7 +98,6 @@
             86, 86, 86, 86, 86, 86, 86, 86, 86, 59, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3221225572, 60, 2147483734, 2147483734, 2147483734, 2147483734, 2147483734, 2147483734, 2147483734, 2147483734, 2147483734],
          "height":23,
          "id":1,
-         "locked":true,
          "name":"staticObjects",
          "opacity":1,
          "type":"tilelayer",
@@ -167,6 +166,17 @@
                  "width":32,
                  "x":246,
                  "y":247.5
+                }, 
+                {
+                 "height":32,
+                 "id":44,
+                 "name":"skeleton",
+                 "rotation":0,
+                 "type":"scene-3",
+                 "visible":true,
+                 "width":32,
+                 "x":477,
+                 "y":70
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -210,7 +220,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":42,
+ "nextobjectid":45,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="46" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="42">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="46" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="45">
  <editorsettings>
   <export target="e01m04.tmj" format="json"/>
  </editorsettings>
@@ -64,7 +64,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="1" name="staticObjects" width="46" height="23" locked="1">
+ <layer id="1" name="staticObjects" width="46" height="23">
   <data encoding="csv">
 86,86,86,86,86,86,86,86,86,46,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2147483748,2147483748,2147483734,2147483734,2147483734,2147483734,2147483734,2147483734,2147483734,2147483734,2147483734,
 86,86,86,86,86,86,86,86,46,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2147483748,2147483748,2147483734,2147483734,2147483734,2147483734,2147483734,2147483734,2147483734,2147483734,
@@ -97,6 +97,7 @@
   <object id="3" name="invisibleWall-top" type="scene_2" x="352" y="0" width="32" height="64"/>
   <object id="19" name="spike-gate-1" type="scene_2" x="352" y="48" width="32" height="32"/>
   <object id="32" name="skeleton" type="scene-3" x="246" y="247.5" width="32" height="32"/>
+  <object id="44" name="skeleton" type="scene-3" x="477" y="70" width="32" height="32"/>
  </objectgroup>
  <layer id="4" name="roof" width="46" height="23" locked="1">
   <data encoding="csv">
