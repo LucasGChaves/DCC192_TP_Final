@@ -18,7 +18,6 @@ FireballSpawner::FireballSpawner(Game* game, Vector2 center, int count, float de
 
     for (int i = 0; i < mTotalCount; ++i)
     {
-        SDL_Log("Spawn fireball");
         float angle = i * angleStep;
 
         float radius = 80.0f;
