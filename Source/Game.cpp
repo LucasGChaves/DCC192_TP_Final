@@ -898,9 +898,6 @@ void Game::BuildActorsFromMap() {
         }
         else if (obj.name == "skeleton") {
             //if (auto i = Random::GetIntRange(0, 1); i == 0) continue;
-            static bool x = false; // TODO - LEMBRAR DE TIRAR
-            if (x) continue; // TODO - LEMBRAR DE TIRAR
-            x = true; // TODO - LEMBRAR DE TIRAR
             new Skeleton(this, mPlayer, Vector2(obj.pos.x * SCALE, obj.pos.y * SCALE));
             mSkeletonNum++;
         }
