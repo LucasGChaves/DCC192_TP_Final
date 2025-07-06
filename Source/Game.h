@@ -13,6 +13,7 @@
 #include "AudioSystem.h"
 #include "Math.h"
 #include "MapHelper.h"
+#include "SpatialHashing.h"
 
 class Game {
 public:
@@ -115,6 +116,8 @@ public:
     // Game-specific
     const class Player* GetPlayer() { return mPlayer; }
     const class Boss* GetBoss() { return mBoss; }
+    SpatialHashing* GetSpatialHashing() { return mSpatialHashing; }
+    std::vector<std::vector<bool>> GetPassableVector() { return mPassable; }
 
 
     void SetGamePlayState(GamePlayState state) { mGamePlayState = state; }
@@ -160,6 +163,10 @@ private:
     void BuildActorsFromMap();
 
     void HandleVolumeLevelDuringPause(bool resumingGame);
+
+    void GetPassablePos();
+
+    int GetStaticObjectsLayer();
 
     // All the UI elements
     std::vector<class UIScreen*> mUIStack;
@@ -212,4 +219,7 @@ private:
     bool mShowWinScreen = true;
 
     bool mIsSpikeGateLowered = false;
+
+    std::vector<std::vector<bool>> mPassable;
+    int mStaticBlocksLayerIdx = -1;
 };
