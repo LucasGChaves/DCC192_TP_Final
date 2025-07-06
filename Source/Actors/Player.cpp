@@ -26,13 +26,13 @@ Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(this,dx, dy, w, h, ColliderLayer::Player, false, 100);
 
-     // std::vector<Vector2> vertices = {
-     //     Vector2(dx, dy),                     // Top-left
-     //     Vector2(dx + w, dy),            // Top-right
-     //     Vector2(dx + w, dy + h),   // Bottom-right
-     //     Vector2(dx, dy + h)            // Bottom-left
-     // };
-    //new DrawPolygonComponent(this, vertices);
+    //   std::vector<Vector2> vertices = {
+    //       Vector2(dx, dy),                     // Top-left
+    //       Vector2(dx + w, dy),            // Top-right
+    //       Vector2(dx + w, dy + h),   // Bottom-right
+    //       Vector2(dx, dy + h)            // Bottom-left
+    //   };
+    // new DrawPolygonComponent(this, vertices);
     mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json", 6);
 
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
@@ -132,14 +132,14 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
 
         float x = 0.f, y = 0.f;
 
-        if (mLastDirection == "Up") y = -1.f;
-        else if (mLastDirection == "Down") y = 1.f;
+        if (mLastDirection == "Up") y = -4.f * Game::SCALE;
+        else if (mLastDirection == "Down") y = 24.f * Game::SCALE;
         else if (mLastDirection == "Side") {
-            if (GetRotation() == 0.f) x = 1.f;
-            else x = -1.f;
+            if (GetRotation() == 0.f) x = 23.f * Game::SCALE;
+            else x = -9.f * Game::SCALE;
         }
 
-        new Attack(mGame, GetPosition(), Vector2(x, y));
+        new Attack(mGame, GetPosition(), Vector2(x, y), ColliderLayer::Player);
     }
 }
 
