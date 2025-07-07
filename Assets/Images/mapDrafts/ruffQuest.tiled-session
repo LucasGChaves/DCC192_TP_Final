@@ -70,9 +70,9 @@
                 6
             ],
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 325.25,
+                "x": 353.25,
                 "y": 214.75
             }
         },
@@ -85,13 +85,10 @@
             }
         },
         "maps/e01m05.tmx": {
-            "expandedObjectLayers": [
-                19
-            ],
             "scale": 3,
-            "selectedLayer": 5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 327.66666666666663,
+                "x": 330.16666666666663,
                 "y": 156.16666666666663
             }
         },
