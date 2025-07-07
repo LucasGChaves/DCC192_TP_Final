@@ -1,18 +1,18 @@
 #include "Boss.h"
-
+#include "FireballSpawner.h"
 int count = 0;
 
 Boss::Boss(Game* game, Player* target, Vector2 pos)
         : Actor(game)
         , mTarget(target)
-        , mSpeed(120.0f)
+        , mSpeed(200.0f)
         , mIsDying(false)
 {
     SetPosition(pos);
     SetScale(Game::SCALE);
 
     mRunToMiddleTimer = Random::GetIntRange(10, 15);
-    mSpAttackTimer = 30.f;
+    mSpAttackTimer = 15.f;
 
     mDrawComponent = new DrawBossAnimatedComponent(this,
         "../Assets/Sprites/Boss/boss.png", "../Assets/Sprites/Boss/boss.json", 100, 1);
@@ -30,6 +30,7 @@ Boss::Boss(Game* game, Player* target, Vector2 pos)
     mDrawComponent->AddAnimation("HurtSide", {80, 81, 82, 83});
     mDrawComponent->AddAnimation("HurtUp", {88, 89, 90, 91});
     mDrawComponent->AddAnimation("Dead", {96, 97, 98, 99});
+    mDrawComponent->AddAnimation("GoingToSpAttackPos", {105});
     mDrawComponent->AddAnimation("BeginSpAttack", {104});
     mDrawComponent->AddAnimation("LoopSpAttack", {106, 107, 108, 109});
 
@@ -70,16 +71,15 @@ void Boss::OnUpdate(float deltaTime) {
 
     if (mIsDying || !mTarget) return;
 
+    HandleTimers(deltaTime);
+
     if (mRunToMiddleTimer >= 0.f) {
-        //SDL_Log("decreasing mRunToMiddleTimer");
         mRunToMiddleTimer -= deltaTime;
     }
     else {
-        //SDL_Log("going to middle");
         mChasingPlayer = false;
-
+        mSpeed = 300.f;
         if (mAtSpAttackPos && mSpAttackTimer >= 0.f) {
-            //SDL_Log("doing sp attack");
             mSpAttackTimer -= deltaTime;
             if (mBeginSpAttackTimer >= 0.f) {
                 mDrawComponent->SetAnimation("BeginSpAttack");
@@ -87,14 +87,24 @@ void Boss::OnUpdate(float deltaTime) {
             }
             else {
                 mDrawComponent->SetAnimation("LoopSpAttack");
+
+                mFireballSpawnTimer -= deltaTime;
+                if (mFireballSpawnTimer <= 0.f) {
+                    Vector2 bossOffset(
+                        mDrawComponent->GetDefaultFrameSize().x / 2.0f,
+                        mDrawComponent->GetDefaultFrameSize().y / 2.0f
+                    );
+                    new FireballSpawner(mGame, mPosition + bossOffset, 32, 0.1f);
+                    mFireballSpawnTimer = mFireballSpawnInterval;
+                }
             }
         }
         else if (mAtSpAttackPos) {
-            //SDL_Log("back to chase");
             mChasingPlayer = true;
             mAtSpAttackPos = false;
             mRunToMiddleTimer = Random::GetIntRange(10, 15);
-            mSpAttackTimer = 30.f;
+            mSpeed = 200.f;
+            mSpAttackTimer = 15.f;
             mBeginSpAttackTimer = 1.f;
         }
     }
@@ -125,21 +135,59 @@ void Boss::OnUpdate(float deltaTime) {
     }
     //------
 
-    if (mAtSpAttackPos) return;
+    Vector2 distanceToTarget;
 
-    Vector2 distanceToTarget = Vector2::Zero;
-
-    float threshold = 0.5f;
+    float threshold = 10.0f;
 
     if (mChasingPlayer) {
         distanceToTarget = mTarget->GetPosition() - mPosition;
-        threshold = 1.0f;
+        threshold = 24.f * Game::SCALE;
     }
     else {
         distanceToTarget = mSpAttackPos - mPosition;
     }
 
-    if (distanceToTarget.Length() > threshold)
+    // Move the boss away from the player when hit
+    if (mInvincibleTimer > 0.f) {
+        distanceToTarget.Normalize();
+        distanceToTarget *= -0.5f;
+        Vector2 vel = distanceToTarget * mSpeed;
+        mRigidBodyComponent->SetVelocity(vel);
+        mDrawComponent->ForceSetAnimation("Hurt" + mLastDirection);
+    }
+
+    // Decrease attack delay and avoid other interactions
+    if (!std::isnan(mAttackDelay) && mAttackDelay > .0f && mInvincibleTimer <= .0f) {
+        mRigidBodyComponent->SetVelocity(Vector2::Zero);
+        mAttackDelay -= deltaTime;
+        return;
+    }
+
+    // Do the attack
+    if (!std::isnan(mAttackDelay) && mAttackDelay <= .0f && mDelayBetweenAttacks <= 0.0f && mInvincibleTimer <= .0f) {
+        float x = 0.f, y = 0.f;
+
+        if (mLastDirection == "Up") y = -4.f * Game::SCALE;
+        else if (mLastDirection == "Down") y = 24.f * Game::SCALE;
+        else if (mLastDirection == "Side") {
+            if (GetRotation() == 0.f) x = 23.f * Game::SCALE;
+            else x = -9.f * Game::SCALE;
+        }
+
+        new Attack(mGame, GetPosition(), Vector2(x, y), ColliderLayer::Boss);
+
+        std::string animationName = "Strike" + mLastDirection;
+
+        mDrawComponent->SetAnimation(animationName);
+        mAttackDelay = NAN;
+        mDelayBetweenAttacks = 2.5f;
+        mPostAttackAnimationDelay = .5f;
+        return;
+    }
+
+    if (mAtSpAttackPos && mSpAttackTimer >= 0.f || mInvincibleTimer > .0f) return;
+
+    if (distanceToTarget.Length() > threshold && mInvincibleTimer <= 0.f)
     {
         distanceToTarget.Normalize();
 
@@ -147,23 +195,20 @@ void Boss::OnUpdate(float deltaTime) {
 
         float diff = std::abs(std::abs(distanceToTarget.x) - std::abs(distanceToTarget.y));
 
-        if (diff >= 0.f && diff <= 0.5f) {
+        if (diff >= 0.f && diff <= 0.5f || std::abs(distanceToTarget.x) > std::abs(distanceToTarget.y)) {
             SetRotation(distanceToTarget.x > 0 ? 0.0f : Math::Pi);
-            mDrawComponent->SetAnimation("WalkSide");
-        }
-
-        else if (std::abs(distanceToTarget.x) > std::abs(distanceToTarget.y))
-        {
-            SetRotation(distanceToTarget.x > 0 ? 0.0f : Math::Pi);
-            mDrawComponent->SetAnimation("WalkSide");
+            HandleChasingAnimation("HurtSide", "WalkSide");
+            mLastDirection = "Side";
         }
         else if (distanceToTarget.y < 0)
         {
-            mDrawComponent->SetAnimation("WalkUp");
+            HandleChasingAnimation("HurtUp", "WalkUp");
+            mLastDirection = "Up";
         }
         else
         {
-            mDrawComponent->SetAnimation("WalkDown");
+            HandleChasingAnimation("HurtDown", "WalkDown");
+            mLastDirection = "Down";
         }
 
         mStepTimer -= deltaTime;
@@ -175,10 +220,16 @@ void Boss::OnUpdate(float deltaTime) {
     }
     else
     {
-        if (mChasingPlayer) {
-            mDrawComponent->SetAnimation("IdleDown");
+        if (mChasingPlayer && mDelayBetweenAttacks <= .0f) {
+            mAttackDelay = .5f;
         }
-        else {
+
+        if (mChasingPlayer && mDelayBetweenAttacks > .0f && std::isnan(mAttackDelay) && mPostAttackAnimationDelay <= .0f && mInvincibleTimer <= .0f) {
+            mDrawComponent->SetAnimation("Idle" + mLastDirection);
+        }
+
+        if (!mChasingPlayer) {
+            mDrawComponent->SetAnimation("GoingToSpAttackPos");
             mRigidBodyComponent->SetVelocity(Vector2::Zero);
             mAtSpAttackPos = true;
         }
@@ -187,23 +238,52 @@ void Boss::OnUpdate(float deltaTime) {
 
 void Boss::OnHorizontalCollision(float overlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Player) {
-        if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
-    }
+    // if (other->GetLayer() == ColliderLayer::Player) {
+    //     if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
+    // }
 }
 
 void Boss::OnVerticalCollision(float overlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Player) {
-        if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
-    }
+    // if (other->GetLayer() == ColliderLayer::Player) {
+    //     if (auto *player = dynamic_cast<Player*>(other->GetOwner())) player->Hit();
+    // }
 }
 
 void Boss::Die()
 {
     if (mIsDying) return;
+
+    mRigidBodyComponent->SetVelocity(Vector2::Zero);
     mDrawComponent->SetAnimation("Dead");
     mDrawComponent->SetAnimFPS(4.0f);
     mIsDying = true;
     mColliderComponent->SetEnabled(false);
+}
+
+void Boss::Hit() {
+    if (mInvincibleTimer > 0.f) return;
+
+    mLifePoints--;
+    mInvincibleTimer = 2.f;
+}
+
+void Boss::HandleChasingAnimation(std::string hurtAnimation, std::string walkAnimation) {
+    if (mInvincibleTimer > 0.f) {
+        mDrawComponent->SetAnimation(hurtAnimation);
+        return;
+    }
+
+    if (mChasingPlayer) {
+        mDrawComponent->SetAnimation(walkAnimation);
+        return;
+    }
+
+    mDrawComponent->SetAnimation("GoingToSpAttackPos");
+}
+
+void Boss::HandleTimers(float deltaTime) {
+    if (mInvincibleTimer > 0.f) mInvincibleTimer -= deltaTime;
+    if (mDelayBetweenAttacks > 0.f) mDelayBetweenAttacks -= deltaTime;
+    if (mPostAttackAnimationDelay > .0f) mPostAttackAnimationDelay -= deltaTime;
 }

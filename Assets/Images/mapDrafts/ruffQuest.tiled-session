@@ -3,12 +3,12 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "maps/e01m04.tmx",
+    "activeFile": "maps/e01m05.tmx",
     "expandedProjectPaths": [
         "tileset/teste",
-        ".",
         "maps",
-        "tileset"
+        "tileset",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -53,16 +53,16 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 377.25,
-                "y": 207.75
+                "x": 577.25,
+                "y": 183.75
             }
         },
         "maps/e01m03.tmx": {
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 490,
-                "y": 570
+                "x": 366.6666666666666,
+                "y": 367.33333333333337
             }
         },
         "maps/e01m04.tmx": {
@@ -70,9 +70,9 @@
                 6
             ],
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 392.25,
+                "x": 353.25,
                 "y": 214.75
             }
         },
@@ -85,13 +85,10 @@
             }
         },
         "maps/e01m05.tmx": {
-            "expandedObjectLayers": [
-                19
-            ],
             "scale": 3,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 407.16666666666663,
+                "x": 330.16666666666663,
                 "y": 156.16666666666663
             }
         },
@@ -218,19 +215,22 @@
     "last.imagePath": "C:/Users/gabri/Documents/game-dev/DCC192_TP_Final/Assets/Images/mapDrafts/assets/Cute_Fantasy_Characters/Angels",
     "map.lastUsedExportFilter": "Arquivos de mapa JSON (*.tmj *.json)",
     "openFiles": [
-        "maps/e01m04.tmx"
+        "maps/e01m04.tmx",
+        "maps/e01m05.tmx",
+        "maps/e01m01.tmx",
+        "maps/e01m03.tmx"
     ],
     "project": "ruffQuest.tiled-project",
     "recentFiles": [
         "maps/e01m04.tmx",
+        "maps/e01m03.tmx",
+        "maps/e01m01.tmx",
+        "maps/e01m05.tmx",
         "maps/e01m05.tmj",
         "tileset/Dungeon_1_Arch_Open.tsx",
         "tileset/Angel_2-Sheet_edit.tsx",
         "tileset/Skeleton.tsx",
         "tileset/Player.tsx",
-        "maps/e01m01.tmx",
-        "maps/e01m03.tmx",
-        "maps/e01m05.tmx",
         "tileset/Dungeon_2_Door_anim.tsx",
         "tileset/dog_idle.tsx",
         "tileset/chars.tsx"

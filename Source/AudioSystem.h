@@ -105,6 +105,8 @@ enum class SoundState
 	//       "Assets/Sounds/ChompLoop.wav".
 	void CacheSound(const std::string& soundName);
 
+    struct Mix_Chunk* GetSound(const std::string& soundName);
+
 private:
 	// If the sound is already loaded, returns Mix_Chunk from the map.
 	// Otherwise, will attempt to load the file and save it in the map.
@@ -112,7 +114,7 @@ private:
 	// NOTE: The soundName is without the "Assets/Sounds/" part of the file
 	//       For example, pass in "ChompLoop.wav" rather than
 	//       "Assets/Sounds/ChompLoop.wav".
-	struct Mix_Chunk* GetSound(const std::string& soundName);
+
 
 	// Internal struct used to track the properties of active sound handles
 	struct HandleInfo

@@ -1,17 +1,5 @@
 #include "Player.h"
-#include "../Game.h"
-#include "../Components/DrawComponents/DrawAnimatedComponent.h"
-#include "../Components/ColliderComponents/AABBColliderComponent.h"
-#include "../Components/RigidBodyComponent.h"
-#include <SDL_mixer.h>
-#include <algorithm>
-#include "../Math.h"
 
-#include "Attack.h"
-#include "Dog.h"
-#include "InvisibleWall.h"
-#include "../Components/DrawComponents/DrawPolygonComponent.h"
-#include "../UIElements/UIGameOver.h"
 
 Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
         : Actor(game)
@@ -38,13 +26,13 @@ Player::Player(Game* game, Vector2 pos, const float forwardSpeed)
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(this,dx, dy, w, h, ColliderLayer::Player, false, 100);
 
-    // std::vector<Vector2> vertices = {
-    //     Vector2(dx, dy),                     // Top-left
-    //     Vector2(dx + w, dy),            // Top-right
-    //     Vector2(dx + w, dy + h),   // Bottom-right
-    //     Vector2(dx, dy + h)            // Bottom-left
-    // };
-    //new DrawPolygonComponent(this, vertices);
+    //   std::vector<Vector2> vertices = {
+    //       Vector2(dx, dy),                     // Top-left
+    //       Vector2(dx + w, dy),            // Top-right
+    //       Vector2(dx + w, dy + h),   // Bottom-right
+    //       Vector2(dx, dy + h)            // Bottom-left
+    //   };
+    // new DrawPolygonComponent(this, vertices);
     mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Player/player.png", "../Assets/Sprites/Player/player.json", 6);
 
     mDrawComponent->AddAnimation("IdleDown", GetAnimationFramesByNamePrefix("Idle_down", 6));
@@ -144,14 +132,14 @@ void Player::OnHandleKeyPress(const int key, const bool isPressed)
 
         float x = 0.f, y = 0.f;
 
-        if (mLastDirection == "Up") y = -1.f;
-        else if (mLastDirection == "Down") y = 1.f;
+        if (mLastDirection == "Up") y = -4.f * Game::SCALE;
+        else if (mLastDirection == "Down") y = 24.f * Game::SCALE;
         else if (mLastDirection == "Side") {
-            if (GetRotation() == 0.f) x = 1.f;
-            else x = -1.f;
+            if (GetRotation() == 0.f) x = 23.f * Game::SCALE;
+            else x = -9.f * Game::SCALE;
         }
 
-        new Attack(mGame, GetPosition(), Vector2(x, y));
+        new Attack(mGame, GetPosition(), Vector2(x, y), ColliderLayer::Player);
     }
 }
 
@@ -284,7 +272,14 @@ void Player::Win(AABBColliderComponent *poleCollider)
 
 void Player::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
+    if (other->GetLayer() == ColliderLayer::Boss) {
+        auto boss = dynamic_cast<Boss*>(other->GetOwner());
+        if (boss->IsAtSpAttackPos() && boss->GetSpAttackTimer() > 0.0f) {
+            Hit();
+        }
+    }
+
+    else if (other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
         mIsLocked = true;
         mTriggeredAnimation = true;
         mTargetPos = other->GetOwner()->GetPosition();
@@ -294,6 +289,14 @@ void Player::OnHorizontalCollision(const float minOverlap, AABBColliderComponent
         if (wall->GetType() == InvisibleWall::Type::Top) {
             mGame->SetGamePlayState(Game::GamePlayState::Leaving);
         }
+    }
+
+    else if (other->GetLayer() == ColliderLayer::Projectile) {
+        Hit();
+        other->SetEnabled(false);
+        auto otherRigidBody = other->GetOwner()->GetComponent<RigidBodyComponent>();
+        if (otherRigidBody) otherRigidBody->SetEnabled(false);
+        other->GetOwner()->SetState(ActorState::Destroy);
     }
 }
 
@@ -305,7 +308,14 @@ void Player::EnableCollision(bool enabled)
 
 void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
+    if (other->GetLayer() == ColliderLayer::Boss) {
+        auto boss = dynamic_cast<Boss*>(other->GetOwner());
+        if (boss->IsAtSpAttackPos() && boss->GetSpAttackTimer() > 0.0f) {
+            Hit();
+        }
+    }
+
+    else if (minOverlap < 0 && other->GetLayer() == ColliderLayer::InvisibleWall && !mIsLocked) {
         mIsLocked = true;
         mTriggeredAnimation = true;
         mTargetPos = other->GetOwner()->GetPosition();
@@ -315,6 +325,14 @@ void Player::OnVerticalCollision(const float minOverlap, AABBColliderComponent* 
         if (wall->GetType() == InvisibleWall::Type::Top) {
             mGame->SetGamePlayState(Game::GamePlayState::Leaving);
         }
+    }
+
+    else if (other->GetLayer() == ColliderLayer::Projectile) {
+        Hit();
+        other->SetEnabled(false);
+        auto otherRigidBody = other->GetOwner()->GetComponent<RigidBodyComponent>();
+        if (otherRigidBody) otherRigidBody->SetEnabled(false);
+        other->GetOwner()->SetState(ActorState::Destroy);
     }
 }
 

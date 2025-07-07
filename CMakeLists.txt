@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME}
         Source/tinyxml2.h
         Source/MapHelper.cpp
         Source/MapHelper.h
+        Source/AStar.cpp
+        Source/AStar.h
         Source/Game.cpp
         Source/Components/DrawComponents/DrawComponent.cpp
         Source/Components/DrawComponents/DrawComponent.h
@@ -34,6 +36,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/DrawComponents/DrawSpriteComponent.h
         Source/Components/DrawComponents/DrawPolygonComponent.cpp
         Source/Components/DrawComponents/DrawPolygonComponent.h
+        Source/Actors/Projectile.cpp
+        Source/Actors/Projectile.h
         Source/Actors/Player.cpp
         Source/Actors/Player.h
         Source/Actors/ColliderBlock.cpp
@@ -77,6 +81,10 @@ add_executable(${PROJECT_NAME}
         Source/UIElements/UIWinScreen.h
         Source/Actors/Dog.cpp
         Source/Actors/Dog.h
+        Source/UIElements/UIDialogBox.cpp
+        Source/UIElements/UIDialogBox.h
+        Source/Actors/FireballSpawner.cpp
+        Source/Actors/FireballSpawner.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)

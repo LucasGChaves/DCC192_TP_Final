@@ -9,7 +9,7 @@
 
 class Attack : public Actor {
 public:
-    explicit Attack(Game* game, Vector2 base, Vector2 forward);
+    explicit Attack(Game* game, Vector2 base, Vector2 forward, ColliderLayer ownerLayer);
 
 private:
     class AABBColliderComponent* mColliderComponent;

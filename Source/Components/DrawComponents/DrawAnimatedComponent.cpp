@@ -73,14 +73,13 @@ void DrawAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modColor
                            static_cast<Uint8>(modColor.y),
                            static_cast<Uint8>(modColor.z));
 
-    SDL_RenderCopyEx(renderer, mSpriteSheetSurface, srcRect, &dstRect, 0.0, nullptr, flip);
+    SDL_RenderCopyEx(renderer, mSpriteSheetSurface, srcRect, &dstRect, mAngle, nullptr, flip);
 }
 
 void DrawAnimatedComponent::ForceSetAnimation(const std::string& name)
 {
     if (mAnimName != name && mAnimations.find(name) != mAnimations.end())
     {
-        //SDL_Log("🎞️ SetAnimation: %s", name.c_str());
         mAnimName = name;
         mAnimTimer = 0.0f;
     }
