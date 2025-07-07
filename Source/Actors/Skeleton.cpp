@@ -93,6 +93,7 @@ void Skeleton::Die()
     if (mIsDying || mState == State::Dying) return;
     mIsDying = true;
     mState = State::Dying;
+    mRigidBodyComponent->SetVelocity(Vector2::Zero);
     mDrawComponent->SetAnimation("Dead");
     mColliderComponent->SetEnabled(false); 
     mDeathTimer = 0.5f; 
