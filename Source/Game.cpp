@@ -29,10 +29,12 @@
 #include "Actors/Boss.h"
 #include "UIElements/UIScreen.h"
 #include "UIElements/UIWinScreen.h"
+#include "UIElements/UIDialogBox.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Components/DrawComponents/DrawSpriteComponent.h"
 #include "Components/DrawComponents/DrawPolygonComponent.h"
 #include "Components/ColliderComponents/AABBColliderComponent.h"
+
 
 Game::Game(int windowWidth, int windowHeight)
         :mWindow(nullptr)
@@ -63,6 +65,9 @@ Game::Game(int windowWidth, int windowHeight)
         ,mFadeTime(0.f)
         ,mTileMap(nullptr)
         ,mSkeletonNum(0)
+        // Dialog box timer for Level 1
+        ,mLevel1DialogTimer(-1.0f)
+        ,mLevel1Dialog(nullptr)
 {
 
 }
@@ -181,13 +186,14 @@ void Game::ChangeScene()
         mAudio->StopAllSounds();
         mMusicHandle = mAudio->PlaySound("Level1.wav", true);
 
-        // Initialize level and actors
         LoadLevel("../Assets/Images/mapDrafts/maps/e01m05.tmj", LEVEL_WIDTH, LEVEL_HEIGHT);
         BuildActorsFromMap();
         mTopInvisibleWall->GetComponent<AABBColliderComponent>()->SetEnabled(true);
         mIsSpikeGateLowered = true;
         mPlayer->LockActor();
         mDog->SetState(Dog::State::Wander);
+        mLevel1DialogTimer = 0.0f;
+        mLevel1Dialog = nullptr;
     }
     else if (mNextScene == GameScene::Level2)
     {
@@ -448,10 +454,30 @@ void Game::UpdateGame()
         }
     }
 
-    // Delete any UIElements that are closed
+    if (mGameScene == GameScene::Level1 && mLevel1DialogTimer >= 0.0f) {
+        mLevel1DialogTimer += deltaTime;
+        if (mLevel1DialogTimer >= 2.0f && mLevel1Dialog == nullptr) {
+            mLevel1Dialog = new UIDialogBox(this, "../Assets/Fonts/PeaberryBase.ttf");
+            mUIStack.push_back(mLevel1Dialog);
+            mLevel1Dialog->SetVisible(true);
+        }
+        if (mLevel1DialogTimer >= 6.0f && mLevel1Dialog) {
+            mLevel1Dialog->SetVisible(false);
+            mLevel1Dialog = nullptr;
+            mLevel1DialogTimer = -1.0f;
+            mAudio->PlaySound("dogBark.wav");
+        }
+    }
+
+
     auto iter = mUIStack.begin();
     while (iter != mUIStack.end()) {
         if ((*iter)->GetState() == UIScreen::UIState::Closing) {
+
+            if (*iter == mLevel1Dialog) {
+                mLevel1Dialog = nullptr;
+                mLevel1DialogTimer = -1.0f;
+            }
             delete *iter;
             iter = mUIStack.erase(iter);
         } else {
@@ -743,11 +769,10 @@ void Game::UnloadScene()
     mTopInvisibleWall = nullptr;
     mBottomInvisibleWall = nullptr;
 
-    // Delete UI screens
-    for (auto ui : mUIStack) {
-        delete ui;
-        mUIStack.pop_back();
-    }
+    // Set dialog pointer to nullptr before deleting UI screens
+    mLevel1Dialog = nullptr;
+    mLevel1DialogTimer = -1.0f;
+    
     mUIStack.clear();
 
     // Delete background texture

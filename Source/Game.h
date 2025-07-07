@@ -221,6 +221,8 @@ private:
 
     bool mIsSpikeGateLowered = false;
 
+    float mLevel1DialogTimer = -1.0f;
+    class UIDialogBox* mLevel1Dialog = nullptr;
     std::vector<std::vector<bool>> mPassable;
     std::vector<std::vector<bool>> mPassable2x2;
     int mStaticBlocksLayerIdx = -1;

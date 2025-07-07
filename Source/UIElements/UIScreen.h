@@ -64,6 +64,9 @@ protected:
     // State
     UIState mState;
 
+    // Visibility
+    bool mIsVisible = true;
+
     // List of buttons, texts, and images
     int mSelectedButtonIndex;
     std::vector<UIButton *> mButtons;

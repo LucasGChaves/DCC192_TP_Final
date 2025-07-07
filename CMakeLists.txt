@@ -81,6 +81,8 @@ add_executable(${PROJECT_NAME}
         Source/UIElements/UIWinScreen.h
         Source/Actors/Dog.cpp
         Source/Actors/Dog.h
+        Source/UIElements/UIDialogBox.cpp
+        Source/UIElements/UIDialogBox.h
         Source/Actors/FireballSpawner.cpp
         Source/Actors/FireballSpawner.h
 )
