@@ -4,7 +4,7 @@
 #include <SDL_log.h>
 
 #include "Projectile.h"
-#include "Math.h"
+#include "../Math.h"
 
 FireballSpawner::FireballSpawner(Game* game, Vector2 center, int count, float delay, float speed, float lifetime)
     : Actor(game)

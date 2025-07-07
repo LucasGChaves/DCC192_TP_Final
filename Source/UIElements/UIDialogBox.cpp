@@ -13,7 +13,7 @@ UIDialogBox::UIDialogBox(Game* game, const std::string& fontName)
     int winW = mGame->GetWindowWidth();
     int winH = mGame->GetWindowHeight();
     Vector2 size(winW, winH / 3.0f);
-    Vector2 pos(50, winH - size.y +130); 
+    Vector2 pos(50, winH - size.y +140); 
 
     auto* t = AddText(introText, pos, size, 36, winW - 100);
     t->SetBox(boxColor, borderColor, 3);

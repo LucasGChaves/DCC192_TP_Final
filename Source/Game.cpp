@@ -456,7 +456,7 @@ void Game::UpdateGame()
 
     if (mGameScene == GameScene::Level1 && mLevel1DialogTimer >= 0.0f) {
         mLevel1DialogTimer += deltaTime;
-        if (mLevel1DialogTimer >= 3.0f && mLevel1Dialog == nullptr) {
+        if (mLevel1DialogTimer >= 2.0f && mLevel1Dialog == nullptr) {
             mLevel1Dialog = new UIDialogBox(this, "../Assets/Fonts/PeaberryBase.ttf");
             mUIStack.push_back(mLevel1Dialog);
             mLevel1Dialog->SetVisible(true);

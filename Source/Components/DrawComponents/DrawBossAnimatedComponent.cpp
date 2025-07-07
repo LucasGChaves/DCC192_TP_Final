@@ -27,7 +27,7 @@ void DrawBossAnimatedComponent::Draw(SDL_Renderer* renderer, const Vector3& modC
         static_cast<float>(srcRect->h * Game::SCALE)};
 
 
-        Vector2 center{mOwner->GetPosition().x + (mDefaultFrameSize.x * 0.5f), mOwner->GetPosition().y + (mDefaultFrameSize.y * 0.5f)}
+        Vector2 center{mOwner->GetPosition().x + (mDefaultFrameSize.x * 0.5f), mOwner->GetPosition().y + (mDefaultFrameSize.y * 0.5f)};
 
         Vector2 framePos = center - (frameSizeScaled * 0.5f);
 
