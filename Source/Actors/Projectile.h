@@ -9,7 +9,7 @@
 
 class Projectile : public Actor {
 public:
-    explicit Projectile(Game* game, Vector2 pos, float angle, float speed = 300.0f, float lifetime = 2.0f);
+    explicit Projectile(Game* game, Vector2 pos, float angle, float speed = 300.0f, float lifetime = 4.0f);
     void OnUpdate(float deltaTime) override;
     void OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other);
     void OnVerticalCollision(const float minOverlap, AABBColliderComponent* other);

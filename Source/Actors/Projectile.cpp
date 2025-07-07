@@ -29,8 +29,8 @@ Projectile::Projectile(Game* game, Vector2 pos, float angle, float speed, float 
     mDrawComponent->SetAnimation("Flaming");
     mDrawComponent->SetAnimFPS(10.0f);
 
-    mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false, 1);
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, 15, 15, ColliderLayer::Projectile, false, 1);
+    mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false);
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, 15, 15, ColliderLayer::Projectile, false);
 }
 
 void Projectile::OnUpdate(float deltaTime)

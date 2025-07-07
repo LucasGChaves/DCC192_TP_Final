@@ -92,9 +92,9 @@ void Boss::OnUpdate(float deltaTime) {
                 if (mFireballSpawnTimer <= 0.f) {
                     Vector2 bossOffset(
                         mDrawComponent->GetDefaultFrameSize().x / 2.0f,
-                        mDrawComponent->GetDefaultFrameSize().x / 2.0f
+                        mDrawComponent->GetDefaultFrameSize().y / 2.0f
                     );
-                    new FireballSpawner(mGame, mPosition + bossOffset, 18, 0.1f);
+                    new FireballSpawner(mGame, mPosition + bossOffset, 32, 0.1f);
                     mFireballSpawnTimer = mFireballSpawnInterval;
                 }
             }
@@ -254,6 +254,7 @@ void Boss::Die()
 {
     if (mIsDying) return;
 
+    mRigidBodyComponent->SetVelocity(Vector2::Zero);
     mDrawComponent->SetAnimation("Dead");
     mDrawComponent->SetAnimFPS(4.0f);
     mIsDying = true;

@@ -24,7 +24,7 @@ FireballSpawner::FireballSpawner(Game* game, Vector2 center, int count, float de
         Vector2 offset(Math::Cos(angle) * radius, Math::Sin(angle) * radius);
         Vector2 spawnPos = mCenter + offset;
 
-        new Projectile(GetGame(), spawnPos, angle, mSpeed, mLifetime);
+        new Projectile(GetGame(), spawnPos, angle, mSpeed, 4.0f);
     }
 
     SetState(ActorState::Destroy);
